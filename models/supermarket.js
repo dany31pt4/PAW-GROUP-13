@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const supermarketSchema = new mongoose.Schema(
   {
-    owner: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -15,7 +15,11 @@ const supermarketSchema = new mongoose.Schema(
     deliveryMethods: [{ type: String, enum: ["pickup", "courier"] }],
     deliveryCost: { type: Number, default: 0 },
 
-    isApproved: { type: Boolean, default: false },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
   },
   { timestamps: true },
 );
