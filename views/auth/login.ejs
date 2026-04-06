@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Marketplace Local</title>
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-8 col-md-5">
+
+        <!-- Cabeçalho -->
+        <div class="text-center mb-4">
+          <h3 class="fw-bold">Marketplace Local</h3>
+          <p class="text-muted">Backoffice</p>
+        </div>
+
+        <!-- Card do formulário -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+
+            <!-- Mensagem de erro (vem do backend) -->
+            <% if (locals.erro) { %>
+              <div class="alert alert-danger alert-dismissible" role="alert">
+                <%= locals.erro %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            <% } %>
+
+            <h5 class="fw-semibold mb-4">Entrar na conta</h5>
+
+            <form action="/auth/login" method="POST">
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  placeholder="o_teu@email.com"
+                  required>
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  placeholder="••••••••"
+                  required>
+              </div>
+
+              <div class="mb-4 form-check">
+                <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                <label class="form-check-label text-muted" for="remember">
+                  Manter sessão iniciada
+                </label>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100">
+                Entrar
+              </button>
+
+            </form>
+
+            <hr class="my-4">
+
+            <p class="text-center text-muted mb-0" style="font-size: 14px">
+              Novo supermercado?
+              <a href="/auth/registo" class="text-decoration-none">Registar aqui</a>
+            </p>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
