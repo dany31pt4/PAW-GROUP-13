@@ -46,8 +46,38 @@ const registerSupermarket = async (req, res) => {
   }
 };
 
+const registerCourier = async (req, res) => {
+  try {
+    const saltRounds = 10;
+    console.log("Dados recebidos para registo de entregador:", req.body);
+    const { name, phone, address, email, password } = req.body;
+    const passwordEncrypt = await bcrypt.hash(password, saltRounds);
+
+    const newUserCourier = await User.create({
+      name: name,
+      phone: phone,
+      address: address,
+      email: email,
+      password: passwordEncrypt,
+      role: "courier",
+    });
+
+
+    console.log("Create User Courier successful:", newUserCourier);
+    res.redirect("/auth/login");
+  } catch (erro) {
+    console.error("Erro:", erro);
+    res.render("auth/register", {
+      erro: "Erro ao gravar na base de dados. Vê o terminal.",
+    });
+    res.render("auth/register", {
+      erro: "Erro ao registar entregador. Tente novamente.",
+    });
+  }
+};
 
 module.exports = {
   renderRegisterPage,
   registerSupermarket,
+  registerCourier
 };

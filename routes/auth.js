@@ -14,5 +14,8 @@ router.get("/register", authController.renderRegisterPage);
 
 // Register POST route for Supermarket
 router.post("/register/supermarket", authController.registerSupermarket);
+
+router.post("/register/courier", authController.registerCourier);
+
   
 module.exports = router;
