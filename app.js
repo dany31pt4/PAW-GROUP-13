@@ -13,6 +13,7 @@ var indexRouter = require('./routes/index'); // Handles core/public routes
 var usersRouter = require('./routes/users'); // Handles user-related routes
 var authRouter = require('./routes/auth');   // Handles authentication routes (login, register)
 var adminRouter = require('./routes/admin');   // Handles admin-specific routes (dashboard, approvals, etc.)
+var apiRouter = require('./routes/api');   // Handles API routes (data endpoints for frontend JS)
 // 3. DATABASE CONNECTION
 // Establish connection to MongoDB using the URI stored in the .env file 
 mongoose.connect(process.env.MONGO_URI)
@@ -40,6 +41,8 @@ app.use('/', indexRouter);       // Base routes map to '/'
 app.use('/users', usersRouter);  // User routes map to '/users'
 app.use('/auth', authRouter);    // Auth routes map to '/auth'
 app.use('/admin', adminRouter);  // Admin routes map to '/admin'
+app.use('/api', apiRouter);  // API routes map to '/api'
+
 
 
 // 7. ERROR HANDLING

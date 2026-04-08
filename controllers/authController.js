@@ -2,7 +2,8 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const Supermarket = require("../models/supermarket");
 const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser");
+const userService = require("../utils/userServices");
+
 require("dotenv").config();
 
 const renderRegisterPage = (req, res) => {
@@ -11,105 +12,82 @@ const renderRegisterPage = (req, res) => {
 
 const registerSupermarket = async (req, res) => {
   try {
-    // "saltRounds" define a complexidade da encriptação (10 é o padrão recomendado)
-    const saltRounds = 10;
-
-    const { name, phone, address, email, password } = req.body;
-    const passwordEncrypt = await bcrypt.hash(password, saltRounds);
-
-    const newUserSupermarket = await User.create({
-      name: name,
-      phone: phone,
-      address: address,
-      email: email,
-      password: passwordEncrypt,
+    const userData = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      phone: req.body.phone,
+      address: req.body.address,
       role: "supermarket",
-    });
+    };
 
-    const newSupermarket = await Supermarket.create({
-      user: newUserSupermarket._id,
-      name: name,
-      location: address,
-      status: "pending",
-    });
-
-    console.log("Create User Supermarket successful:", newUserSupermarket);
-    console.log("Create Supermarket successful:", newSupermarket);
-
-    // Se correr bem, redireciona para o login
+    await userService.createUser(userData);
     res.redirect("/auth/login");
   } catch (erro) {
-    console.error("Erro:", erro);
-    res.render("auth/register", {
-      erro: "Erro ao gravar na base de dados. Vê o terminal.",
-    });
-    res.render("auth/register", {
-      erro: "Erro ao registar supermercado. Tente novamente.",
-    });
+    res.render("auth/register", { erro: "Erro ao registar." });
   }
 };
 
 const registerCourier = async (req, res) => {
   try {
-    const saltRounds = 10;
-    console.log("Dados recebidos para registo de entregador:", req.body);
-    const { name, phone, address, email, password } = req.body;
-    const passwordEncrypt = await bcrypt.hash(password, saltRounds);
-
-    const newUserCourier = await User.create({
-      name: name,
-      phone: phone,
-      address: address,
-      email: email,
-      password: passwordEncrypt,
+    const userData = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      phone: req.body.phone,
+      address: req.body.address,
       role: "courier",
-    });
+    };
 
-    console.log("Create User Courier successful:", newUserCourier);
+    await userService.createUser(userData);
     res.redirect("/auth/login");
   } catch (erro) {
-    console.error("Erro:", erro);
-    res.render("auth/register", {
-      erro: "Erro ao registar. Tente novamente.",
-    });
+    res.render("auth/register", { erro: "Erro ao registar." });
   }
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await User.findOne({ email: email }); // Procura o utilizador pelo email no mongo
-  const secretKey = process.env.secret;
-  if (!user) {
-    return res.render("auth/login", { erro: "Email ou password inválidos." });
-  }
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email }); // Procura o utilizador pelo email no mongo
+    const secretKey = process.env.secret;
+    if (!user) {
+      return res.render("auth/login", { erro: "Email ou password inválidos." });
+    }
 
-  const passwordValid = await bcrypt.compare(password, user.password);
+    const passwordValid = await bcrypt.compare(password, user.password);
 
-  if (!passwordValid) {
-    return res.render("auth/login", { erro: "Email ou password inválidos." });
-  }
+    if (!passwordValid) {
+      return res.render("auth/login", { erro: "Email ou password inválidos." });
+    }
 
-  const payload = {
-    id: user._id,
-    email: user.email,
-  };
-
-  const token = jwt.sign(
-    {
+    const payload = {
       id: user._id,
-      role: user.role,
-    },
-    secretKey,
-    { expiresIn: "1h" },
-  );
-  res.cookie("token", token, {
-    httpOnly: true, // JavaScript não consegue ler (Proteção XSS)
-    secure: true, // Só funciona em HTTPS (obrigatório em produção)
-    sameSite: "strict", // Protege contra ataques CSRF
-    maxAge: 3600000, // Tempo de vida do cookie em milissegundos (1 hora)
-  });
+      email: user.email,
+    };
 
-  return res.redirect("/");
+    const token = jwt.sign(
+      {
+        id: user._id,
+        role: user.role,
+      },
+      secretKey,
+      { expiresIn: "1h" },
+    );
+    res.cookie("token", token, {
+      httpOnly: true, // JavaScript não consegue ler (Proteção XSS)
+      secure: false, // Se True so  funciona em HTTPS , mas como tamos em desenvolvimento local, deixamos false.
+      sameSite: "strict", // Protege contra ataques CSRF
+      maxAge: 3600000, // Tempo de vida do cookie em milissegundos (1 hora)
+    });
+
+    return res.redirect("/");
+  } catch (erro) {
+    console.error("Erro durante o login:", erro);
+    return res.render("auth/login", {
+      erro: "Ocorreu um erro. Tente novamente.",
+    });
+  }
 };
 
 const logout = (req, res) => {

@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var { verifyToken, verifyRole } = require("../middlewares/authMiddleware");
+var { getUserByToken } = require("../utils/userServices");
 var User = require("../models/user");
 router.get(
   "/dashboard",
