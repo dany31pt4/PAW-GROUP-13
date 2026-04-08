@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registo — Marketplace Local</title>
+  <title>Registo — Marketplace</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <style>
@@ -44,21 +44,23 @@
             <div class="tab-content" id="pills-tabContent">
               
               <div class="tab-pane fade show active" id="pills-supermercado" role="tabpanel">
-                <form action="/auth/registo/supermercado" method="POST" id="formSuper">
+                
+                <form action="/auth/register/supermarket" method="POST">
+                  
                   <div class="row">
                     <div class="col-md-6 mb-3">
-                      <label class="form-label small fw-bold">Nome da Loja</label>
-                      <input type="text" class="form-control" name="nome" required>
+                      <label for="nomeSuper" class="form-label">Nome do Supermercado</label>
+                      <input type="text" class="form-control" id="nomeSuper" name="nome" required>
                     </div>
                     <div class="col-md-6 mb-3">
-                      <label class="form-label small fw-bold">Telefone</label>
-                      <input type="tel" class="form-control" name="telefone" required>
+                      <label for="telefoneSuper" class="form-label">Telefone</label>
+                      <input type="tel" class="form-control" id="telefoneSuper" name="telefone" required>
                     </div>
                   </div>
 
                   <div class="mb-3">
-                    <label class="form-label small fw-bold">Email de Negócio</label>
-                    <input type="email" class="form-control" name="email" required>
+                    <label for="moradaSuper" class="form-label">Morada / Localização</label>
+                    <input type="text" class="form-control" id="moradaSuper" name="morada" required>
                   </div>
 
                   <div class="row">
@@ -77,21 +79,23 @@
               </div>
 
               <div class="tab-pane fade" id="pills-estafeta" role="tabpanel">
-                <form action="/auth/registo/estafeta" method="POST" id="formEstafeta">
+                
+                <form action="/auth/registo/estafeta" method="POST">
+                  
                   <div class="row">
                     <div class="col-md-6 mb-3">
-                      <label class="form-label small fw-bold">Nome Completo</label>
-                      <input type="text" class="form-control" name="nome" required>
+                      <label for="nomeEstafeta" class="form-label">Nome Completo</label>
+                      <input type="text" class="form-control" id="nomeEstafeta" name="nome" required>
                     </div>
                     <div class="col-md-6 mb-3">
-                      <label class="form-label small fw-bold">Telemóvel</label>
-                      <input type="tel" class="form-control" name="telefone" required>
+                      <label for="telefoneEstafeta" class="form-label">Telemóvel</label>
+                      <input type="tel" class="form-control" id="telefoneEstafeta" name="telefone" required>
                     </div>
                   </div>
 
                   <div class="mb-3">
-                    <label class="form-label small fw-bold">Email Pessoal</label>
-                    <input type="email" class="form-control" name="email" required>
+                    <label for="moradaEstafeta" class="form-label">Morada / Zona de Atuação</label>
+                    <input type="text" class="form-control" id="moradaEstafeta" name="morada" required>
                   </div>
 
                   <div class="row">
@@ -109,11 +113,11 @@
                 </form>
               </div>
 
-            </div>
+            </div> <hr class="my-4">
 
-            <hr class="my-4">
-            <p class="text-center text-muted mb-0 small">
-              Já tem uma conta? <a href="/auth/login" class="text-decoration-none fw-bold">Entrar aqui</a>
+            <p class="text-center text-muted mb-0" style="font-size: 14px">
+              Já tem uma conta aprovada? 
+              <a href="/auth/login" class="text-decoration-none">Entrar aqui</a>
             </p>
 
           </div>

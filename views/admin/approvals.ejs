@@ -10,40 +10,7 @@
 </head>
 <body>
 
-    <aside class="sidebar">
-        <div class="sidebar-brand">
-            <i class="bi bi-box-seam" style="font-size:20px"></i>
-            IPP Marketplace
-        </div>
-
-        <nav style="padding: 12px 0;">
-            <a href="/admin/dashboard" class="nav-link-item <%= paginaAtiva === 'dashboard' ? 'active' : '' %>">
-                <i class="bi bi-grid-1x2"></i> Painel geral
-            </a>
-
-            <a href="/admin/aprovacoes" class="nav-link-item <%= paginaAtiva === 'aprovacoes' ? 'active' : '' %>">
-                <i class="bi bi-shop-window"></i> Aprovar lojas
-                <% if (totalPendentes > 0) { %>
-                    <span style="margin-left:auto; background:#e74c3c; color:#fff; border-radius:10px; font-size:11px; padding:1px 7px;">
-                        <%= totalPendentes %>
-                    </span>
-                <% } %>
-            </a>
-
-            <a href="/admin/utilizadores" class="nav-link-item <%= paginaAtiva === 'utilizadores' ? 'active' : '' %>">
-                <i class="bi bi-people"></i> Utilizadores
-            </a>
-            <a href="/admin/encomendas" class="nav-link-item <%= paginaAtiva === 'encomendas' ? 'active' : '' %>">
-                <i class="bi bi-truck"></i> Encomendas
-            </a>
-
-            <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 16px 0;"></div>
-
-            <a href="/auth/login" class="nav-link-item" style="color:#e74c3c;">
-                <i class="bi bi-box-arrow-left"></i> Sair
-            </a>
-        </nav>
-    </aside>
+    <%- include('../partials/sidebar') %>
 
     <main class="main-wrapper">
         <div class="mb-4">
@@ -64,15 +31,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% if (listaPendentes.length === 0) { %>
+                        <% if (pendingList.length === 0) { %>
                             <tr><td colspan="5" class="text-center py-4">Não há registos pendentes.</td></tr>
                         <% } else { %>
-                            <% listaPendentes.forEach(function(item) { %>
+                            <% pendingList.forEach(function(item) { %>
                             <tr>
-                                <td><strong><%= item.nome %></strong></td>
-                                <td><span class="badge bg-secondary"><%= item.tipo %></span></td>
+                                <td><strong><%= item.name %></strong></td>
+                                <td><span class="badge bg-secondary"><%= item.type %></span></td>
                                 <td><%= item.email %></td>
-                                <td><%= item.localidade %></td>
+                                <td><%= item.location %></td>
                                 <td class="text-end">
                                     <button class="btn btn-sm btn-success">Validar</button>
                                     <button class="btn btn-sm btn-outline-danger">Rejeitar</button>

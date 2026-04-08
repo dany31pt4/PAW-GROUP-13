@@ -1,41 +1,63 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+// 1. DEPENDENCIES & MODULE IMPORTS
+var createError = require('http-errors'); // Utility to create HTTP error objects
+var express = require('express');         // The core Express framework 
+var path = require('path');               // Node.js module to handle file paths
+var cookieParser = require('cookie-parser'); // Middleware to parse cookies
+var logger = require('morgan');           // HTTP request logger middleware
+var mongoose = require('mongoose');       // ODM library for MongoDB 
+require('dotenv').config();               // Loads environment variables from a .env file
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+// 2. ROUTER IMPORTS
+// Importing the separate router modules to handle specific path prefixes
+var indexRouter = require('./routes/index'); // Handles core/public routes
+var usersRouter = require('./routes/users'); // Handles user-related routes
+var authRouter = require('./routes/auth');   // Handles authentication routes (login, register)
+var adminRouter = require('./routes/admin');   // Handles admin-specific routes (dashboard, approvals, etc.)
+// 3. DATABASE CONNECTION
+// Establish connection to MongoDB using the URI stored in the .env file 
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('Db Connected..')) // Success callback
+  .catch((err) => console.error(err));       // Error handling callback
 
+// Initialize the Express application
 var app = express();
 
-// view engine setup
+// 4. VIEW ENGINE SETUP (EJS)
+// Define where the template files are located and which engine to use 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+// 5. GLOBAL MIDDLEWARE
+app.use(logger('dev'));                             // Logs requests to the console
+app.use(express.json());                            // Parses incoming JSON payloads
+app.use(express.urlencoded({ extended: false }));   // Parses URL-encoded bodies (form data)
+app.use(cookieParser());                            // Parses Cookie headers
+app.use(express.static(path.join(__dirname, 'public'))); // Serves static files (CSS, JS, images)
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// 6. ROUTE MOUNTING
+// Map the imported routers to their specific base URLs
+app.use('/', indexRouter);       // Base routes map to '/'
+app.use('/users', usersRouter);  // User routes map to '/users'
+app.use('/auth', authRouter);    // Auth routes map to '/auth'
+app.use('/admin', adminRouter);  // Admin routes map to '/admin'
 
-// catch 404 and forward to error handler
+
+// 7. ERROR HANDLING
+// Catch 404 (Not Found) errors and forward them to the error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
+// Global error handler middleware
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+  // Set locals: provides the error details only in the development environment
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // render the error page
+  // Render the default error view 
   res.status(err.status || 500);
   res.render('error');
 });
 
+// Export the configured app so it can be started by the server file (usually /bin/www)
 module.exports = app;

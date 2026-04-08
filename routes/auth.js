@@ -1,0 +1,30 @@
+var express = require("express");
+var router = express.Router();
+const User = require("../models/user");
+const Supermarket = require("../models/supermarket");
+const bcrypt = require('bcrypt');
+const authController = require('../controllers/authController');
+
+//Render login page
+router.get("/login", (req, res) => {
+  res.render("auth/login", { erro: null });
+});
+
+//Render register page
+router.get("/register", authController.renderRegisterPage);
+
+// Register POST route for Supermarket
+router.post("/register/supermarket", authController.registerSupermarket);
+
+// Register POST route for Courier
+router.post("/register/courier", authController.registerCourier);
+
+// Register POST route for Login
+router.post("/login", authController.login);
+
+
+// Register GET route for Logout
+router.get("/logout", authController.logout);
+
+
+module.exports = router;
