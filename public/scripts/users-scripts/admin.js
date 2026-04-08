@@ -120,7 +120,6 @@ function openRemoveAdminModal(adminId) {
             icon: "success",
           }).then(() => {
             loadAdminTable();
-            // window.location.reload();
           });
         } else {
           Swal.fire({
