@@ -77,7 +77,7 @@ const registerCourier = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email: email });
+  const user = await User.findOne({ email: email }); // Procura o utilizador pelo email no mongo
   const secretKey = process.env.secret;
   if (!user) {
     return res.render("auth/login", { erro: "Email ou password inválidos." });
@@ -94,8 +94,14 @@ const login = async (req, res) => {
     email: user.email,
   };
 
-  const token = jwt.sign(payload, secretKey, { expiresIn: "24h" });
-
+  const token = jwt.sign(
+    {
+      id: user._id,
+      role: user.role,
+    },
+    secretKey,
+    { expiresIn: "1h" },
+  );
   res.cookie("token", token, {
     httpOnly: true, // JavaScript não consegue ler (Proteção XSS)
     secure: true, // Só funciona em HTTPS (obrigatório em produção)
@@ -103,7 +109,7 @@ const login = async (req, res) => {
     maxAge: 3600000, // Tempo de vida do cookie em milissegundos (1 hora)
   });
 
-  return res.json({ info: "The Login was successful!", token: token });
+  return res.redirect("/");
 };
 
 const logout = (req, res) => {
@@ -117,5 +123,5 @@ module.exports = {
   registerSupermarket,
   registerCourier,
   login,
-  logout
+  logout,
 };
