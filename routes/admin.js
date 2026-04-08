@@ -1,73 +1,82 @@
 var express = require("express");
 var router = express.Router();
-var { verifyToken , verifyRole } = require("../middlewares/authMiddleware");
+var { verifyToken, verifyRole } = require("../middlewares/authMiddleware");
+var User = require("../models/user");
+router.get(
+  "/dashboard",
+  verifyToken,
+  verifyRole(["admin"]),
+  function (req, res) {
+    // Dados de teste (Mock Data) para a página não abrir vazia
+    res.render("admin/dashboard", {
+      // 1. Controle de Navegação (A nova melhoria)
+      activePage: "dashboard",
 
-router.get("/dashboard", verifyToken, verifyRole(["admin"]), function (req, res) {
-  // Dados de teste (Mock Data) para a página não abrir vazia
-  res.render("admin/dashboard", {
-    // 1. Controle de Navegação (A nova melhoria)
-    activePage: "dashboard",
+      // 2. Informações do Administrador
+      adminName: "Francisco Bernardo",
 
-    // 2. Informações do Administrador
-    adminName: "Francisco Bernardo",
+      // 3. Números para os Cards de Estatísticas
+      totalOrders: 42,
+      totalMarkets: 12,
+      allPending: 3,
+      totalComplaints: 1,
 
-    // 3. Números para os Cards de Estatísticas
-    totalOrders: 42,
-    totalMarkets: 12,
-    allPending: 3,
-    totalComplaints: 1,
+      // 4. Lista para a Tabela (Array de Objetos)
+      pendingMarkets: [
+        {
+          _id: "1",
+          name: "Supermercado Modelo Bragança",
+          email: "contacto@modelo.pt",
+          location: "Bragança",
+        },
+        {
+          _id: "2",
+          name: "Talho do Zé",
+          email: "ze@talho.pt",
+          location: "Mirandela",
+        },
+      ],
+    });
+  },
+);
 
-    // 4. Lista para a Tabela (Array de Objetos)
-    pendingMarkets: [
-      {
-        _id: "1",
-        name: "Supermercado Modelo Bragança",
-        email: "contacto@modelo.pt",
-        location: "Bragança",
-      },
-      {
-        _id: "2",
-        name: "Talho do Zé",
-        email: "ze@talho.pt",
-        location: "Mirandela",
-      },
-    ],
-  });
-});
-
-router.get("/approvals", verifyToken, verifyRole(["admin"]), function (req, res) {
-    
+router.get(
+  "/approvals",
+  verifyToken,
+  verifyRole(["admin"]),
+  function (req, res) {
     res.render("admin/approvals", {
-    // 1. Essencial para a sidebar saber onde está e acender a cor azul
-    activePage: "approvals",
+      // 1. Essencial para a sidebar saber onde está e acender a cor azul
+      activePage: "approvals",
 
-    // 2. Essencial para mostrar a bolinha vermelha com o número no menu
-    allPending: 3,
+      // 2. Essencial para mostrar a bolinha vermelha com o número no menu
+      allPending: 3,
 
-    // 3. Outros dados que a página pede
-    adminName: "Francisco Bernardo",
-    pendingList: [
-      {
-        name: "Mini Preço Central",
-        type: "Supermercado",
-        email: "loja@minipreco.pt",
-        location: "Maia",
-      },
-      {
-        name: "João Entregas",
-        type: "Estafeta",
-        email: "joao@email.com",
-        location: "Porto",
-      },
-      {
-        name: "Frutaria da Maria",
-        type: "Supermercado",
-        email: "maria@frutas.pt",
-        location: "Gaia",
-      },
-    ],
-  });
-});
+      // 3. Outros dados que a página pede
+      adminName: "Francisco Bernardo",
+      pendingList: [
+        {
+          name: "Mini Preço Central",
+          type: "Supermercado",
+          email: "loja@minipreco.pt",
+          location: "Maia",
+        },
+        {
+          name: "João Entregas",
+          type: "Estafeta",
+          email: "joao@email.com",
+          location: "Porto",
+        },
+        {
+          name: "Frutaria da Maria",
+          type: "Supermercado",
+          email: "maria@frutas.pt",
+          location: "Gaia",
+        },
+      ],
+    });
+  },
+);
 
 router.get("/orders", verifyToken, verifyRole(["admin"]), function (req, res) {
   res.render("admin/orders", {
@@ -100,25 +109,43 @@ router.get("/orders", verifyToken, verifyRole(["admin"]), function (req, res) {
   });
 });
 
-router.get("/users", verifyToken, verifyRole(["admin"]),function (req, res) {
-  res.render("admin/users", {
-    activePage: "users",
-    adminName: "Francisco Bernardo",
-    allPending: 3,
-    // Dados fictícios para as 3 tabelas
-    clients: [
-      { name: "Ana Martins", email: "ana@email.com", data: "01/04/2026" },
-      { name: "Carlos Costa", email: "carlos@email.com", data: "03/04/2026" },
-    ],
-    markets: [
-      { name: "Continente Bom Dia", location: "Paredes" },
-      { name: "Pingo Doce", location: "Penafiel" },
-    ],
-    couriers: [
-      { name: "Paulo Motard", vehicle: "Mota", totalDeliveries: 142 },
-      { name: "Sérgio Bike", vehicle: "Bicicleta", totalDeliveries: 89 },
-    ],
-  });
-});
+router.get(
+  "/users",
+  verifyToken,
+  verifyRole(["admin"]),
+  async function (req, res) {
+    try {
+      const adminsFromDB = await User.find({ role: "admin" });
+      console.log("Admins fetched from DB:", adminsFromDB);
+
+      res.render("admin/users", {
+        activePage: "users",
+        adminName: "Francisco Bernardo",
+        allPending: 3,
+        // Dados fictícios para as 3 tabelas
+        clients: [
+          { name: "Ana Martins", email: "ana@email.com", date: "01/04/2026" },
+          {
+            name: "Carlos Costa",
+            email: "carlos@email.com",
+            date: "03/04/2026",
+          },
+        ],
+        markets: [
+          { name: "Continente Bom Dia", location: "Paredes" },
+          { name: "Pingo Doce", location: "Penafiel" },
+        ],
+        couriers: [
+          { name: "Paulo Motard", vehicle: "Mota", totalDeliveries: 142 },
+          { name: "Sérgio Bike", vehicle: "Bicicleta", totalDeliveries: 89 },
+        ],
+        admins: adminsFromDB,
+      });
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  },
+);
 
 module.exports = router;

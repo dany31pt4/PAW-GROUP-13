@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,118 +9,183 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/stylesheets/admin.css">
 </head>
+
 <body>
 
-        <%- include('../partials/sidebar') %>
+    <%- include('../partials/sidebar') %>
 
-    <main class="main-wrapper">
-        <div class="mb-4">
-            <h4 class="fw-bold">Gestão de Utilizadores</h4>
-            <p class="text-muted">Consulta e controlo de todas as contas registadas.</p>
-        </div>
+        <main class="main-wrapper">
+            <div class="mb-4">
+                <h4 class="fw-bold">Gestão de Utilizadores</h4>
+                <p class="text-muted">Consulta e controlo de todas as contas registadas.</p>
+            </div>
 
-        <ul class="nav nav-tabs mb-4" id="userTabs" role="tablist">
-            <li class="nav-item">
-                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#clientes">Clientes</button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#lojas">Supermercados</button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#estafetas">Estafetas</button>
-            </li>
-        </ul>
+            <ul class="nav nav-tabs mb-4" id="userTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#clientes">Clientes</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#lojas">Supermercados</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#estafetas">Estafetas</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#admins">Admins</button>
+                </li>
+            </ul>
 
-        <div class="tab-content">
-            <div class="tab-pane fade show active" id="clientes">
-                <div class="table-card mt-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Email</th>
-                                    <th>Data Registo</th>
-                                    <th class="text-end">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% clients.forEach(function(c) { %>
-                                <tr>
-                                    <td><strong><%= c.name %></strong></td>
-                                    <td><%= c.email %></td>
-                                    <td><%= c.data %></td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-danger">Suspender</button>
-                                    </td>
-                                </tr>
-                                <% }); %>
-                            </tbody>
-                        </table>
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="clientes">
+                    <div class="table-card mt-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Data Registo</th>
+                                        <th class="text-end">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% clients.forEach(function(c) { %>
+                                        <tr>
+                                            <td><strong>
+                                                    <%= c.name %>
+                                                </strong></td>
+                                            <td>
+                                                <%= c.email %>
+                                            </td>
+                                            <td>
+                                                <%= c.date %>
+                                            </td>
+                                            <td class="text-end">
+                                                <button class="btn btn-sm btn-outline-danger">Suspender</button>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="lojas">
+                    <div class="table-card mt-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Supermercado</th>
+                                        <th>Localidade</th>
+                                        <th>Estado</th>
+                                        <th class="text-end">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% markets.forEach(function(l) { %>
+                                        <tr>
+                                            <td><strong>
+                                                    <%= l.name %>
+                                                </strong></td>
+                                            <td>
+                                                <%= l.location %>
+                                            </td>
+                                            <td><span class="badge bg-success">Ativo</span></td>
+                                            <td class="text-end">
+                                                <button class="btn btn-sm btn-light border">Ver Loja</button>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="estafetas">
+                    <div class="table-card mt-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Estafeta</th>
+                                        <th>Veículo</th>
+                                        <th>Entregas</th>
+                                        <th class="text-end">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% couriers.forEach(function(e) { %>
+                                        <tr>
+                                            <td><strong>
+                                                    <%= e.name %>
+                                                </strong></td>
+                                            <td>
+                                                <%= e.vehicle %>
+                                            </td>
+                                            <td>
+                                                <%= e.totalDeliveries %>
+                                            </td>
+                                            <td class="text-end">
+                                                <button class="btn btn-sm btn-outline-primary">Contactar</button>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="admins">
+                    <div class="d-flex justify-content-end mb-3 mt-2">
+                        <button class="btn btn-primary" onclick="openAddAdminModal()">
+                            <i class="bi bi-person-plus"></i> Adicionar Admin
+                        </button>
+                    </div>
+
+                    <div class="table-card mt-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Data Registo</th>
+                                        <th class="text-end">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% admins.forEach(function(a) { %>
+                                        <tr>
+                                            <td><strong>
+                                                    <%= a.name %>
+                                                </strong></td>
+                                            <td>
+                                                <%= a.email %>
+                                            </td>
+                                            <td>
+                                                <%= a.createdAt %>
+                                            </td>
+                                            <td class="text-end">
+                                                <button class="btn btn-sm btn-outline-secondary">Editar</button>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
+        </main>
 
-            <div class="tab-pane fade" id="lojas">
-                <div class="table-card mt-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Supermercado</th>
-                                    <th>Localidade</th>
-                                    <th>Estado</th>
-                                    <th class="text-end">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% markets.forEach(function(l) { %>
-                                <tr>
-                                    <td><strong><%= l.name %></strong></td>
-                                    <td><%= l.location %></td>
-                                    <td><span class="badge bg-success">Ativo</span></td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-light border">Ver Loja</button>
-                                    </td>
-                                </tr>
-                                <% }); %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="../scripts/user.js"></script>
 
-            <div class="tab-pane fade" id="estafetas">
-                <div class="table-card mt-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead>
-                                <tr>
-                                    <th>Estafeta</th>
-                                    <th>Veículo</th>
-                                    <th>Entregas</th>
-                                    <th class="text-end">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% couriers.forEach(function(e) { %>
-                                <tr>
-                                    <td><strong><%= e.name %></strong></td>
-                                    <td><%= e.vehicle %></td>
-                                    <td><%= e.totalDeliveries %></td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-primary">Contactar</button>
-                                    </td>
-                                </tr>
-                                <% }); %>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
