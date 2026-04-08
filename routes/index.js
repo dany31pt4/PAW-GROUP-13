@@ -15,85 +15,85 @@ router.get('/admin/dashboard', function(req, res) {
     // Dados de teste (Mock Data) para a página não abrir vazia
     res.render('admin/dashboard', {
         // 1. Controle de Navegação (A nova melhoria)
-        paginaAtiva: 'dashboard', 
+        activePage: 'dashboard', 
 
         // 2. Informações do Administrador
-        nomeAdmin: "Francisco Bernardo",
+        adminName: "Francisco Bernardo",
 
         // 3. Números para os Cards de Estatísticas
-        totalEncomendas: 42,
-        totalSupermercados: 12,
-        totalPendentes: 3,
-        totalDenuncias: 1,
+        totalOrders: 42,
+        totalMarkets: 12,
+        allPending: 3,
+        totalComplaints: 1,
 
         // 4. Lista para a Tabela (Array de Objetos)
-        supermercadosPendentes: [
+        pendingMarkets: [
             { 
                 _id: '1', 
-                nome: 'Supermercado Modelo Bragança', 
+                name: 'Supermercado Modelo Bragança', 
                 email: 'contacto@modelo.pt', 
-                localidade: 'Bragança' 
+                location: 'Bragança' 
             },
             { 
                 _id: '2', 
-                nome: 'Talho do Zé', 
+                name: 'Talho do Zé', 
                 email: 'ze@talho.pt', 
-                localidade: 'Mirandela' 
+                location: 'Mirandela' 
             }
         ]
     });
 });
 
-router.get('/admin/aprovacoes', function(req, res) {
-    res.render('admin/aprovacoes', {
+router.get('/admin/approvals', function(req, res) {
+    res.render('admin/approvals', {
         // 1. Essencial para a sidebar saber onde está e acender a cor azul
-        paginaAtiva: 'aprovacoes', 
+        activePage: 'approvals', 
 
         // 2. Essencial para mostrar a bolinha vermelha com o número no menu
-        totalPendentes: 3, 
+        allPending: 3, 
 
         // 3. Outros dados que a página pede
-        nomeAdmin: "Francisco Bernardo",
-        listaPendentes: [
-            { nome: 'Mini Preço Central', tipo: 'Supermercado', email: 'loja@minipreco.pt', localidade: 'Maia' },
-            { nome: 'João Entregas', tipo: 'Estafeta', email: 'joao@email.com', localidade: 'Porto' },
-            { nome: 'Frutaria da Maria', tipo: 'Supermercado', email: 'maria@frutas.pt', localidade: 'Gaia' }
+        adminName: "Francisco Bernardo",
+        pendingList: [
+            { name: 'Mini Preço Central', type: 'Supermercado', email: 'loja@minipreco.pt', location: 'Maia' },
+            { name: 'João Entregas', type: 'Estafeta', email: 'joao@email.com', location: 'Porto' },
+            { name: 'Frutaria da Maria', type: 'Supermercado', email: 'maria@frutas.pt', location: 'Gaia' }
         ]
     });
 });
 
 
-router.get('/admin/encomendas', function(req, res) {
-    res.render('admin/encomendas', {
-        paginaAtiva: 'encomendas',
-        nomeAdmin: "Francisco Bernardo",
-        totalPendentes: 3,
+router.get('/admin/orders', function(req, res) {
+    res.render('admin/orders', {
+        activePage: 'orders',
+        adminName: "Francisco Bernardo",
+        allPending: 3,
         listaEncomendas: [
-            { id: '1024', cliente: 'Maria Silva', loja: 'Pingo Doce', valor: '45.20', estado: 'Entregue' },
-            { id: '1025', cliente: 'José Santos', loja: 'Continente', valor: '12.80', estado: 'Pendente' },
-            { id: '1026', cliente: 'Carla Dias', loja: 'Lidl', valor: '89.00', estado: 'Entregue' }
+            { id: '1024', client: 'Maria Silva', market: 'Pingo Doce', value: '45.20', state: 'Entregue' },
+            { id: '1025', client: 'José Santos', market: 'Continente', value: '12.80', state: 'Pendente' },
+            { id: '1026', client: 'Carla Dias', market: 'Lidl', value: '89.00', state: 'Entregue' }
         ]
     });
 });
 
 
-router.get('/admin/utilizadores', function(req, res) {
-    res.render('admin/utilizadores', {
-        paginaAtiva: 'utilizadores',
-        nomeAdmin: "Francisco Bernardo",
-        totalPendentes: 3,
+router.get('/admin/users', function(req, res) {
+    res.render('admin/users', {
+        activePage: 'users',
+        adminName: "Francisco Bernardo",
+        allPending: 3,
         // Dados fictícios para as 3 tabelas
-        clientes: [
-            { nome: "Ana Martins", email: "ana@email.com", data: "01/04/2026" },
-            { nome: "Carlos Costa", email: "carlos@email.com", data: "03/04/2026" }
+        clients: [
+            { name: "Ana Martins", email: "ana@email.com", data: "01/04/2026" },
+            { name: "Carlos Costa", email: "carlos@email.com", data: "03/04/2026" }
         ],
-        lojas: [
-            { nome: "Continente Bom Dia", localidade: "Paredes" },
-            { nome: "Pingo Doce", localidade: "Penafiel" }
+        markets: [
+            { name: "Continente Bom Dia", location: "Paredes" },
+            { name: "Pingo Doce", location: "Penafiel" }
         ],
-        estafetas: [
-            { nome: "Paulo Motard", veiculo: "Mota", totalEntregas: 142 },
-            { nome: "Sérgio Bike", veiculo: "Bicicleta", totalEntregas: 89 }
+        couriers: [
+            { name: "Paulo Motard", vehicle: "Mota", totalDeliveries: 142 },
+            { name: "Sérgio Bike", vehicle: "Bicicleta", totalDeliveries: 89 }
         ]
     });
 });
