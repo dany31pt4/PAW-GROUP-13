@@ -1,18 +1,19 @@
 const jwt = require("jsonwebtoken");
 
-verifyToken = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (!token) res.redirect("/auth/login");
+const verifyToken = (req, res, next) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.redirect("/auth/login");
+  }
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = payload; // Guarda os dados do token (ex: id do utilizador)
-    next(); // continues to the controller 
+    const secretKey = process.env.secret;
+    const payload = jwt.verify(token, secretKey);
+    req.user = payload; 
+    next(); 
   } catch (erro) {
     console.error("Erro de autenticação:", erro);
-    res.redirect("/auth/login");
+    return res.redirect("/auth/login");
   }
 };
 

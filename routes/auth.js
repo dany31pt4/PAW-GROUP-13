@@ -22,4 +22,9 @@ router.post("/register/courier", authController.registerCourier);
 // Register POST route for Login
 router.post("/login", authController.login);
 
+
+// Register GET route for Logout
+router.get("/logout", authController.logout);
+
+
 module.exports = router;

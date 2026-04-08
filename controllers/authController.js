@@ -70,10 +70,7 @@ const registerCourier = async (req, res) => {
   } catch (erro) {
     console.error("Erro:", erro);
     res.render("auth/register", {
-      erro: "Erro ao gravar na base de dados. Vê o terminal.",
-    });
-    res.render("auth/register", {
-      erro: "Erro ao registar entregador. Tente novamente.",
+      erro: "Erro ao registar. Tente novamente.",
     });
   }
 };
@@ -109,15 +106,16 @@ const login = async (req, res) => {
   return res.json({ info: "The Login was successful!", token: token });
 };
 
-app.post('/logout', (req, res) => {
-    res.clearCookie('token');
-    console.log("Logout successful, token cookie cleared.");
-});
-
+const logout = (req, res) => {
+  res.clearCookie("token");
+  console.log("Logout successful, token cookie cleared.");
+  return res.redirect("/auth/login"); // ou res.json
+};
 
 module.exports = {
   renderRegisterPage,
   registerSupermarket,
   registerCourier,
   login,
+  logout
 };
