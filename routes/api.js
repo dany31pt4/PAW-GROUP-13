@@ -6,6 +6,7 @@ var { verifyToken, verifyRole , listAdmins } = require("../middlewares/authMiddl
 router.post("/users/createAdmin",verifyToken,verifyRole(["admin"]),userController.createAdmin,);
 router.delete("/users/deleteAdmin/:id",verifyToken,verifyRole(["admin"]),userController.deleteAdmin,);
 router.get("/users/listAdmins", verifyToken, verifyRole(["admin"]), userController.listAdmins);
+//  Get admin by ID 
 router.get("/users/admin/:id", verifyToken, verifyRole(["admin"]), userController.getAdminById);
 router.put("/users/updateAdmin/:id", verifyToken, verifyRole(["admin"]), userController.updateAdmin);
 module.exports = router;

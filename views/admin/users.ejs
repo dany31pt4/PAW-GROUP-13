@@ -13,7 +13,7 @@
 <body>
 
     <%- include('../partials/sidebar') %>
-    
+
         <main class="main-wrapper">
             <div class="mb-4">
                 <h4 class="fw-bold">Gestão de Utilizadores</h4>
@@ -92,7 +92,17 @@
                                             <td>
                                                 <%= l.location %>
                                             </td>
-                                            <td><span class="badge bg-success">Ativo</span></td>
+                                            <td>
+                                                <% if (l.status==="approved" ) { %>
+                                                   <span class="badge bg-success">Ativo</span>
+                                                <% } %>
+                                                <% if (l.status==="pending" ) { %>
+                                                   <span class="badge bg-warning">Pendente</span>
+                                                <% } %>
+                                                <% if (l.status==="rejected" ) { %>
+                                                   <span class="badge bg-danger">Rejeitado</span>
+                                                <% } %>
+                                            </td>
                                             <td class="text-end">
                                                 <button class="btn btn-sm btn-light border">Ver Loja</button>
                                             </td>
@@ -104,15 +114,14 @@
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="estafetas">
+               <div class="tab-pane fade" id="estafetas">
                     <div class="table-card mt-0">
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
                                         <th>Estafeta</th>
-                                        <th>Veículo</th>
-                                        <th>Entregas</th>
+                                        <th>Data da Última Encomenda</th> <th>Total Entregas</th>
                                         <th class="text-end">Ações</th>
                                     </tr>
                                 </thead>
@@ -123,7 +132,7 @@
                                                     <%= e.name %>
                                                 </strong></td>
                                             <td>
-                                                <%= e.vehicle %>
+                                                <%= e.lastOrderDate %>
                                             </td>
                                             <td>
                                                 <%= e.totalDeliveries %>
@@ -138,7 +147,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="tab-pane fade" id="admins">
                     <div class="d-flex justify-content-end mb-3 mt-2">
                         <button class="btn btn-primary" onclick="openAddAdminModal()">
@@ -170,8 +178,10 @@
                                                 <%= a.createdAt %>
                                             </td>
                                             <td class="text-end">
-                                                <button class="btn btn-sm btn-outline-secondary" onclick="openEditAdminModal('<%= a.id %>')">Editar</button>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="openRemoveAdminModal('<%= a.id %>')">Eliminar</button>
+                                                <button class="btn btn-sm btn-outline-secondary"
+                                                    onclick="openEditAdminModal('<%= a.id %>')">Editar</button>
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="openRemoveAdminModal('<%= a.id %>')">Eliminar</button>
                                             </td>
                                         </tr>
                                         <% }); %>

@@ -3,6 +3,12 @@ const { verifyRole } = require("../middlewares/authMiddleware");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 
+/*
+=======================================================
+ADMIN CONTROLLERs
+=======================================================
+*/ 
+
 const createAdmin = async (req, res) => {
   try {
     console.log("REQ BODY:", req.user); // Verificar o conteúdo do corpo da requisição
@@ -51,7 +57,6 @@ const deleteAdmin = async (req, res) => {
         message: "Administrador não encontrado.",
       });
     }
-
     return res.json({
       success: true,
       message: "Administrador removido com sucesso.",
@@ -107,15 +112,13 @@ const updateAdmin = async (req, res) => {
 
     if (password && password.trim() !== "") {
       const hashed = await bcrypt.hash(password, saltRounds);
-      updateData.password = hashed; 
+      updateData.password = hashed;
     }
 
     // Atualiza na base de dados
-    const updatedAdmin = await User.findByIdAndUpdate(
-      adminId,
-      updateData,
-      { new: true },
-    );
+    const updatedAdmin = await User.findByIdAndUpdate(adminId, updateData, {
+      new: true,
+    });
 
     if (!updatedAdmin) {
       return res
@@ -133,6 +136,12 @@ const updateAdmin = async (req, res) => {
       .status(500)
       .json({ success: false, message: "Erro interno ao guardar alterações." });
   }
+
+/*
+=======================================================
+END OF ADMIN CONTROLLER
+=======================================================
+*/ 
 };
 module.exports = {
   createAdmin,

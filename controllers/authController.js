@@ -3,7 +3,7 @@ const User = require("../models/user");
 const Supermarket = require("../models/supermarket");
 const jwt = require("jsonwebtoken");
 const userService = require("../utils/userServices");
-
+const supermarketService = require("../utils/supermarketService");
 require("dotenv").config();
 
 const renderRegisterPage = (req, res) => {
@@ -21,9 +21,23 @@ const registerSupermarket = async (req, res) => {
       role: "supermarket",
     };
 
-    await userService.createUser(userData);
+    console.log(userData);
+
+    const user = await userService.createUser(userData);
+    const marketData = {
+      userid: user._id,
+      name: req.body.name,
+      email: req.body.email,
+      location: req.body.address,
+      status: "pending",
+    };
+
+    console.log(marketData);
+    await supermarketService.createSupermarket(marketData);
+
     res.redirect("/auth/login");
   } catch (erro) {
+    console.log(erro);
     res.render("auth/register", { erro: "Erro ao registar." });
   }
 };
@@ -51,6 +65,12 @@ const login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email }); // Procura o utilizador pelo email no mongo
     const secretKey = process.env.secret;
+    const rememberMe = req.body.remember === "on";
+    
+    console.log(req.body);
+    let jwtExpiration = "1h";
+    var age = 3600000; // 1 hora
+
     if (!user) {
       return res.render("auth/login", { erro: "Email ou password inválidos." });
     }
@@ -66,19 +86,25 @@ const login = async (req, res) => {
       email: user.email,
     };
 
+    if (rememberMe) {
+      jwtExpiration = "30d";
+    }
+
     const token = jwt.sign(
-      {
-        id: user._id,
-        role: user.role,
-      },
+      { id: user._id, role: user.role, name: user.name },
       secretKey,
-      { expiresIn: "1h" },
+      { expiresIn: jwtExpiration }, 
     );
+
+    if (rememberMe) {
+      age = 2592000000; // 30 dias
+    }   
+
     res.cookie("token", token, {
       httpOnly: true, // JavaScript não consegue ler (Proteção XSS)
       secure: false, // Se True so  funciona em HTTPS , mas como tamos em desenvolvimento local, deixamos false.
       sameSite: "strict", // Protege contra ataques CSRF
-      maxAge: 3600000, // Tempo de vida do cookie em milissegundos (1 hora)
+      maxAge: age, // Tempo de vida do cookie em milissegundos (1 hora)
     });
 
     return res.redirect("/");

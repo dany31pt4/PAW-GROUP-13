@@ -23,6 +23,7 @@ const verifyToken = (req, res, next) => {
     const secretKey = process.env.secret;
     const payload = jwt.verify(token, secretKey);
     req.user = payload;
+    console.log(req.user);
     next();
   } catch (erro) {
     console.error("Erro de autenticação:", erro);

@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
-
 require("dotenv").config();
+
 const createUser = async (userData) => {
   const saltRounds = 10;
   const hashed = await bcrypt.hash(userData.password, saltRounds);
