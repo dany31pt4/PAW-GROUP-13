@@ -227,6 +227,99 @@ const deleteCourier = async (req, res) => {
     res.status(500).json({ message: "Erro ao eliminar" });
   }
 };
+
+
+
+/*
+Supermarket controller
+*/  
+
+const registerCourier = async (req, res) => {
+  try {
+    const userData = {
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      phone: req.body.phone,
+      address: req.body.address,
+      role: "courier",
+    };
+
+    await userService.createUser(userData);
+    res.redirect("/auth/login");
+  } catch (erro) {
+    res.render("auth/register", { erro: "Erro ao registar." });
+  }
+};
+
+
+/*
+=======================================================
+START OF CUSTOMER (CLIENTES) CONTROLLER
+=======================================================
+*/
+
+// 1. Listar Clientes
+const listCustomers = async (req, res) => {
+  try {
+    const customers = await User.find({ role: "customer" });
+    res.json(customers);
+  } catch (err) {
+    res.status(500).json({ message: "Erro ao listar clientes." });
+  }
+};
+
+// 2. Ver Cliente por ID
+const getCustomerById = async (req, res) => {
+  try {
+    const customer = await User.findById(req.params.id);
+    if (!customer) {
+      return res.status(404).json({ message: "Cliente não encontrado." });
+    }
+    res.json(customer);
+  } catch (err) {
+    res.status(500).json({ message: "Erro ao procurar cliente." });
+  }
+};
+
+// 3. Atualizar Cliente
+const updateCustomer = async (req, res) => {
+  try {
+    const { name, email, address, phone, password } = req.body;
+    let updateData = { name, email, address, phone };
+
+    // Se o admin escrever uma password nova
+    if (password && password.trim() !== "") {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(password, salt);
+    }
+
+    const updated = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    
+    if (!updated) {
+        return res.status(404).json({ success: false, message: "Cliente não encontrado." });
+    }
+
+    res.json({ success: true, message: "Cliente atualizado com sucesso!" });
+  } catch (err) {
+    res.status(400).json({ success: false, message: "Erro ao atualizar os dados do cliente." });
+  }
+};
+
+// 4. Eliminar Cliente
+const deleteCustomer = async (req, res) => {
+  try {
+    const deleted = await User.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+        return res.status(404).json({ success: false, message: "Cliente já não existe." });
+    }
+    res.json({ success: true, message: "Cliente eliminado com sucesso!" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Erro ao tentar eliminar." });
+  }
+};
+
+
 module.exports = {
   createAdmin,
   deleteAdmin,
@@ -238,4 +331,10 @@ module.exports = {
   getCourierById,
   updateCourier,
   deleteCourier,
+  registerCourier,
+  listCustomers,
+  getCustomerById,
+  updateCustomer,
+  deleteCustomer,
+  
 };

@@ -48,11 +48,11 @@
                                         <th class="text-end">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <% clients.forEach(function(c) { %>
+                                <tbody id="customerTableBody">
+                                    <% customers.forEach(function(c) { %>
                                         <tr>
                                             <td><strong>
-                                                    <%= c.name %>
+                                                <%= c.name %>
                                                 </strong></td>
                                             <td>
                                                 <%= c.email %>
@@ -61,7 +61,12 @@
                                                 <%= c.date %>
                                             </td>
                                             <td class="text-end">
-                                                <button class="btn btn-sm btn-outline-danger">Suspender</button>
+                                                <button class="btn btn-sm btn-outline-primary"
+                                                    onclick="openViewCustomerModal('<%= c.id %>')">Ver</button>
+                                                <button class="btn btn-sm btn-outline-secondary"
+                                                    onclick="openEditCustomerModal('<%= c.id %>')">Editar</button>
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="openRemoveCustomerModal('<%= c.id %>')">Eliminar</button>
                                             </td>
                                         </tr>
                                         <% }); %>
@@ -72,6 +77,12 @@
                 </div>
 
                 <div class="tab-pane fade" id="lojas">
+                    <div class="d-flex justify-content-end mb-3 mt-2">
+                        <button class="btn btn-primary" onclick="openAddMarketModal()">
+                            <i class="bi bi-shop"></i> Adicionar Supermercado
+                        </button>
+                    </div>
+
                     <div class="table-card mt-0">
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
@@ -83,7 +94,7 @@
                                         <th class="text-end">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="marketTableBody">
                                     <% markets.forEach(function(l) { %>
                                         <tr>
                                             <td><strong>
@@ -94,17 +105,20 @@
                                             </td>
                                             <td>
                                                 <% if (l.status==="approved" ) { %>
-                                                   <span class="badge bg-success">Ativo</span>
-                                                <% } %>
-                                                <% if (l.status==="pending" ) { %>
-                                                   <span class="badge bg-warning">Pendente</span>
-                                                <% } %>
-                                                <% if (l.status==="rejected" ) { %>
-                                                   <span class="badge bg-danger">Rejeitado</span>
-                                                <% } %>
+                                                    <span class="badge bg-success">Ativo</span>
+                                                    <% } else if (l.status==="pending" ) { %>
+                                                        <span class="badge bg-warning text-dark">Pendente</span>
+                                                        <% } else { %>
+                                                            <span class="badge bg-danger">Rejeitado</span>
+                                                            <% } %>
                                             </td>
                                             <td class="text-end">
-                                                <button class="btn btn-sm btn-light border">Ver Loja</button>
+                                                <button class="btn btn-sm btn-outline-primary"
+                                                    onclick="openViewMarketModal('<%= l._id %>')">Ver</button>
+                                                <button class="btn btn-sm btn-outline-secondary"
+                                                    onclick="openEditMarketModal('<%= l._id %>')">Editar</button>
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="openRemoveMarketModal('<%= l._id %>')">Eliminar</button>
                                             </td>
                                         </tr>
                                         <% }); %>
@@ -114,14 +128,21 @@
                     </div>
                 </div>
 
-               <div class="tab-pane fade" id="estafetas">
+                <div class="tab-pane fade" id="estafetas">
+                    <div class="d-flex justify-content-end mb-3 mt-2">
+                        <button class="btn btn-primary" onclick="openAddCourierModal()">
+                            <i class="bi bi-bicycle"></i> Adicionar Estafeta
+                        </button>
+                    </div>
+
                     <div class="table-card mt-0">
                         <div class="table-responsive">
                             <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
                                         <th>Estafeta</th>
-                                        <th>Data da Última Encomenda</th> <th>Total Entregas</th>
+                                        <th>Última Encomenda</th>
+                                        <th>Total Entregas</th>
                                         <th class="text-end">Ações</th>
                                     </tr>
                                 </thead>
@@ -129,19 +150,21 @@
                                     <% couriers.forEach(function(e) { %>
                                         <tr>
                                             <td><strong>
-                                                <%= e.name %>
+                                                    <%= e.name %>
                                                 </strong></td>
                                             <td>
                                                 <%= e.lastOrderDate %>
                                             </td>
                                             <td>
-                                                <%= e.totalDeliveries %>
+                                                <%= e.totalDeliveries %> ent.
                                             </td>
                                             <td class="text-end">
-                                                <button class="btn btn-sm btn-outline-primary" onclick="openViewCourierModal('<%= e.id %>')">Ver</button>
-                                                <button class="btn btn-sm btn-outline-secondary" onclick="openEditCourierModal('<%= e.id %>')">Editar</button>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="openRemoveCourierModal('<%= e.id %>')">Eliminar</button>
-                                            </td>
+                                                <button class="btn btn-sm btn-outline-primary"
+                                                    onclick="openViewCourierModal('<%= e.id %>')">Ver</button>
+                                                <button class="btn btn-sm btn-outline-secondary"
+                                                    onclick="openEditCourierModal('<%= e.id %>')">Editar</button>
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                    onclick="openRemoveCourierModal('<%= e.id %>')">Eliminar</button>
                                             </td>
                                         </tr>
                                         <% }); %>
@@ -200,6 +223,10 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="/scripts/users-scripts/admin.js"></script>
         <script src="/scripts/users-scripts/courier.js"></script>
+        <script src="/scripts/users-scripts/supermarket.js"></script>
+        <script src="/scripts/users-scripts/customer.js"></script>
+
+
 
 </body>
 

@@ -4,10 +4,9 @@ require("dotenv").config();
 
 const createSupermarket = async (marketData) => {
   return await Supermarket.create({
-    user: marketData.userid, 
+    user: marketData.user,         
     name: marketData.name,
-    email: marketData.email,
-    location: marketData.location,
+    location: marketData.location, 
     status: marketData.status,
   });
 };

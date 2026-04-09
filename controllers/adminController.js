@@ -148,7 +148,7 @@ const getUsers = async (req, res) => {
       activePage: "users",
       adminName: req.user.name,
       allPending: 3,
-      clients: customersFinal,
+      customers: customersFinal,
       markets: supermarketsFromDB,
       couriers: couriersFinal,
       admins: adminsFromDB,

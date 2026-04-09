@@ -42,7 +42,7 @@ function openAddCourierModal() {
         password: password,
         address: document.getElementById("swal-address").value,
         phone: document.getElementById("swal-phone").value,
-        role: "courier", // Define automaticamente como estafeta
+        role: "courier",
       };
     },
   }).then((result) => {

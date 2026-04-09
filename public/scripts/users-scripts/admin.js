@@ -55,11 +55,10 @@ function openAddAdminModal() {
         },
       });
 
-      // Pedido AJAX (POST) para o servidor
       fetch("/api/users/createAdmin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result.value), // req body
+        body: JSON.stringify(result.value),
       })
         .then(async (response) => {
           const data = await response.json();
@@ -70,9 +69,8 @@ function openAddAdminModal() {
               "Administrador criado com sucesso.",
               "success",
             );
-            loadAdminTable(); // Atualiza a lista sem refresh
+            loadAdminTable(); 
           } else {
-            // Se o servidor deu erro (ex: 400), mostra a mensagem que veio do back-end
             Swal.fire(
               "Erro!",
               data.message || "Não foi possível criar o utilizador.",

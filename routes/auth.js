@@ -4,7 +4,8 @@ const User = require("../models/user");
 const Supermarket = require("../models/supermarket");
 const bcrypt = require('bcrypt');
 const authController = require('../controllers/authController');
-
+const userController = require('../controllers/userController');
+const supermarketController = require('../controllers/supermarketController');
 //Render login page
 router.get("/login", (req, res) => {
   res.render("auth/login", { erro: null });
@@ -14,10 +15,10 @@ router.get("/login", (req, res) => {
 router.get("/register", authController.renderRegisterPage);
 
 // Register POST route for Supermarket
-router.post("/register/supermarket", authController.registerSupermarket);
+router.post("/register/supermarket", supermarketController.registerSupermarket);
 
 // Register POST route for Courier
-router.post("/register/courier", authController.registerCourier);
+router.post("/register/courier", userController.registerCourier);
 
 // Register POST route for Login
 router.post("/login", authController.login);

@@ -10,55 +10,6 @@ const renderRegisterPage = (req, res) => {
   res.render("auth/register.ejs", { erro: null });
 };
 
-const registerSupermarket = async (req, res) => {
-  try {
-    const userData = {
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      phone: req.body.phone,
-      address: req.body.address,
-      role: "supermarket",
-    };
-
-    console.log(userData);
-
-    const user = await userService.createUser(userData);
-    const marketData = {
-      userid: user._id,
-      name: req.body.name,
-      email: req.body.email,
-      location: req.body.address,
-      status: "pending",
-    };
-
-    console.log(marketData);
-    await supermarketService.createSupermarket(marketData);
-
-    res.redirect("/auth/login");
-  } catch (erro) {
-    console.log(erro);
-    res.render("auth/register", { erro: "Erro ao registar." });
-  }
-};
-
-const registerCourier = async (req, res) => {
-  try {
-    const userData = {
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      phone: req.body.phone,
-      address: req.body.address,
-      role: "courier",
-    };
-
-    await userService.createUser(userData);
-    res.redirect("/auth/login");
-  } catch (erro) {
-    res.render("auth/register", { erro: "Erro ao registar." });
-  }
-};
 
 const login = async (req, res) => {
   try {
@@ -124,8 +75,6 @@ const logout = (req, res) => {
 
 module.exports = {
   renderRegisterPage,
-  registerSupermarket,
-  registerCourier,
   login,
   logout,
 };
