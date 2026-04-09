@@ -108,7 +108,7 @@ const getUsers = async (req, res) => {
         });
       }
       return {
-        id: customer._id,
+        id: customer._id.toString(),
         name: customer.name,
         email: customer.email,
         date: newDate,
@@ -143,7 +143,7 @@ const getUsers = async (req, res) => {
         totalDeliveries: total,
       });
     }
-
+    console.log(couriersFinal);
     res.render("admin/users", {
       activePage: "users",
       adminName: req.user.name,

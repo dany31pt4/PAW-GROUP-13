@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 =======================================================
 ADMIN CONTROLLERs
 =======================================================
-*/ 
+*/
 
 const createAdmin = async (req, res) => {
   try {
@@ -136,12 +136,96 @@ const updateAdmin = async (req, res) => {
       .status(500)
       .json({ success: false, message: "Erro interno ao guardar alterações." });
   }
+};
 
 /*
 =======================================================
 END OF ADMIN CONTROLLER
 =======================================================
-*/ 
+*/
+
+/*
+=======================================================
+START OF COURIER CONTROLLER
+=======================================================
+*/
+const listCouriers = async (req, res) => {
+  try {
+    const couriers = await User.find({ role: "courier" });
+    res.json(couriers);
+  } catch (err) {
+    res.status(500).json({ message: "Erro ao listar estafetas" });
+  }
+};
+
+// 2. BUSCAR POR ID (A tua rota específica: /users/courier/69d4dbb...)
+const getCourierById = async (req, res) => {
+  try {
+    // req.params.id apanha o ID da URL
+    const courier = await User.findById(req.params.id);
+
+    if (!courier) {
+      return res.status(404).json({ message: "Estafeta não encontrado" });
+    }
+
+    res.json(courier);
+  } catch (err) {
+    res.status(500).json({ message: "Erro ao procurar estafeta" });
+  }
+};
+
+// 3. CRIAR ESTAFETA
+const createCourier = async (req, res) => {
+  try {
+    const { name, email, password, address, phone } = req.body;
+    
+    // Hash da password (Importante!)
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      address,
+      phone,
+      role: "courier"
+    });
+
+    await newUser.save();
+    res.status(201).json({ success: true });
+  } catch (err) {
+    res.status(400).json({ message: "Email já existe ou dados inválidos" });
+  }
+};
+
+// 4. ATUALIZAR ESTAFETA
+const updateCourier = async (req, res) => {
+  try {
+    const { name, email, address, phone, password } = req.body;
+    let updateData = { name, email, address, phone };
+
+    // Se o admin escreveu uma password nova, fazemos hash
+    if (password && password.trim() !== "") {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(password, salt);
+    }
+
+    await User.findByIdAndUpdate(req.params.id, updateData);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(400).json({ message: "Erro ao atualizar" });
+  }
+};
+
+// 5. ELIMINAR ESTAFETA
+const deleteCourier = async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: "Erro ao eliminar" });
+  }
 };
 module.exports = {
   createAdmin,
@@ -149,4 +233,9 @@ module.exports = {
   listAdmins,
   getAdminById,
   updateAdmin,
+  listCouriers,
+  createCourier,
+  getCourierById,
+  updateCourier,
+  deleteCourier,
 };
