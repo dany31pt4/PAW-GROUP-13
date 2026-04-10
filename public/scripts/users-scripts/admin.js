@@ -258,7 +258,7 @@ async function openEditAdminModal(adminId) {
             body: JSON.stringify(result.value),
           },
         );
-
+        
         const updateData = await updateResponse.json();
 
         if (updateResponse.ok && updateData.success) {

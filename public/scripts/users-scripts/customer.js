@@ -79,7 +79,7 @@ async function openEditCustomerModal(customerId) {
             if (result.isConfirmed) {
                 Swal.fire({ title: "A atualizar...", didOpen: () => Swal.showLoading() });
                 
-                const updateRes = await fetch(`/api/customer/updateCustomer/${customerId}`, {
+                const updateRes = await fetch(`/api/customer/update/${customerId}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json", "Accept": "application/json" },
                     body: JSON.stringify(result.value)

@@ -75,6 +75,8 @@ const registerSupermarket = async (req, res) => {
 const getSupermarketById = async (req, res) => {
   try {
     const id = req.params.id;
+                                                  // o populate é um join, ele vai buscar a referencia ao model,
+                                                  // fica o user:{email: "email", phone: "phone"}
     const market = await Supermarket.findById(id).populate("user", "email phone");
 
     if (!market) {

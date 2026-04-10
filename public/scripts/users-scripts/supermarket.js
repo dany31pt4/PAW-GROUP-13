@@ -118,7 +118,6 @@ async function openEditMarketModal(marketId) {
     Swal.fire({ title: "A carregar...", didOpen: () => Swal.showLoading() });
 
     try {
-        // O backend usa o .populate("user") para trazer o email e telefone
         const res = await fetch(`/api/markets/${marketId}`);
         const market = await res.json();
 
@@ -217,7 +216,6 @@ function openRemoveMarketModal(marketId) {
 // 5. ATUALIZAR TABELA DE SUPERMERCADOS (SEM REFRESH)
 async function loadMarketTable() {
     try {
-        // Confirma no teu ficheiro de rotas se o URL que chama a função 'listSupermarkets' é este:
         const response = await fetch("/api/markets/list"); 
         
         if (!response.ok) {
@@ -235,7 +233,6 @@ async function loadMarketTable() {
         let html = "";
 
         markets.forEach((m) => {
-            // Definir a cor da badge do estado
             let statusBadge = '';
             if (m.status === 'approved') {
                 statusBadge = '<span class="badge bg-success">Ativo</span>';

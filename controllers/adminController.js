@@ -1,8 +1,7 @@
 const User = require("../models/user");
 const Supermarket = require("../models/supermarket");
 const Order = require("../models/order");
-
-// Função para o Dashboard
+const Category = require("../models/category");
 const getDashboard = (req, res) => {
   res.render("admin/dashboard", {
     activePage: "dashboard",
@@ -159,10 +158,25 @@ const getUsers = async (req, res) => {
   }
 };
 
+
+const getCategories = async (req, res) => {
+  const categories = await Category.find();
+  console.log(categories);
+  res.render("admin/categories", {
+    activePage: "categories",
+    adminName: req.user.name,
+    allPending: 3,
+    categories: categories,
+  });
+};
+
+
+
 // Exportamos tudo para usar nas rotas
 module.exports = {
   getDashboard,
   getApprovals,
   getOrders,
   getUsers,
+  getCategories,
 };
