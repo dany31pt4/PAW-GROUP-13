@@ -44,6 +44,10 @@ router.get("/markets/:id", marketController.getSupermarketById);
 router.put("/markets/update/:id", marketController.updateSupermarket);
 router.delete("/markets/delete/:id", marketController.deleteSupermarket);
 
+
+//GET PENDING MARKETS
+router.get("/markets/listPending", marketController.listPendingSupermarkets);
+
 /*
 =====
 CUSTOMER ROUTES

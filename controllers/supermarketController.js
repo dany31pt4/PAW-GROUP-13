@@ -16,6 +16,17 @@ const listSupermarkets = async (req, res) => {
   }
 };
 
+
+const listPendingSupermarkets = async (req, res) => {
+  try {
+    const supermarkets = await Supermarket.find({ status: "pending" }).populate("user", "email phone");
+    return res.status(200).json(supermarkets);
+  } catch (error) {
+    console.error("Erro no Controller de listar supermarkets:", error);
+    return res.status(500).json({ message: "Erro interno no servidor." });
+  }
+};
+
 // 2. Criar / Registar Supermercado
 const registerSupermarket = async (req, res) => {
   try {
@@ -184,4 +195,5 @@ module.exports = {
     getSupermarketById,
     updateSupermarket,
     deleteSupermarket,
+    listPendingSupermarkets,
 };
