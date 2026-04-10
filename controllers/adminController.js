@@ -2,13 +2,18 @@ const User = require("../models/user");
 const Supermarket = require("../models/supermarket");
 const Order = require("../models/order");
 const Category = require("../models/category");
-const getDashboard = (req, res) => {
+const supermarketService = require("../utils/supermarketService");
+var { listPendingSupermarkets } = require("./supermarketController");
+const getDashboard = async (req, res) => {
+  const pending = await Supermarket.countDocuments({ status: "pending" });
+  const pendingMarkets = await listPendingSupermarkets(req, res);
+
   res.render("admin/dashboard", {
     activePage: "dashboard",
     adminName: req.user.name,
     totalOrders: 42,
     totalMarkets: 12,
-    allPending: 3,
+    allPending: pending,
     totalComplaints: 1,
     pendingMarkets: [
       {
@@ -28,31 +33,15 @@ const getDashboard = (req, res) => {
 };
 
 // Função para a página de Aprovações
-const getApprovals = (req, res) => {
+const getApprovals = async (req, res) => {
+  const pendingListFromDB = await supermarketService.getPending();
+  const pending = pendingListFromDB.length;
+  console.log("Supermercados pendentes encontrados:", pendingListFromDB);
   res.render("admin/approvals", {
     activePage: "approvals",
-    allPending: 3,
+    allPending: pending,
     adminName: "Francisco Bernardo",
-    pendingList: [
-      {
-        name: "Mini Preço Central",
-        type: "Supermercado",
-        email: "loja@minipreco.pt",
-        location: "Maia",
-      },
-      {
-        name: "João Entregas",
-        type: "Estafeta",
-        email: "joao@email.com",
-        location: "Porto",
-      },
-      {
-        name: "Frutaria da Maria",
-        type: "Supermercado",
-        email: "maria@frutas.pt",
-        location: "Gaia",
-      },
-    ],
+    pendingList: pendingListFromDB
   });
 };
 
@@ -158,7 +147,6 @@ const getUsers = async (req, res) => {
   }
 };
 
-
 const getCategories = async (req, res) => {
   const categories = await Category.find();
   console.log(categories);
@@ -169,8 +157,6 @@ const getCategories = async (req, res) => {
     categories: categories,
   });
 };
-
-
 
 // Exportamos tudo para usar nas rotas
 module.exports = {

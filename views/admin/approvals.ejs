@@ -22,9 +22,9 @@
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
-                        <tr>
+                        <tr>    
+                            <th>ID (Supermercado)</th>
                             <th>Entidade</th>
-                            <th>Tipo</th>
                             <th>Contacto</th>
                             <th>Localidade</th>
                             <th class="text-end">Ações</th>
@@ -36,13 +36,14 @@
                         <% } else { %>
                             <% pendingList.forEach(function(item) { %>
                             <tr>
+                                <td><strong><%= item._id %></strong></td>
                                 <td><strong><%= item.name %></strong></td>
-                                <td><span class="badge bg-secondary"><%= item.type %></span></td>
-                                <td><%= item.email %></td>
+                                <td><%= item.user.email %></td>
                                 <td><%= item.location %></td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-success">Validar</button>
-                                    <button class="btn btn-sm btn-outline-danger">Rejeitar</button>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="openViewModal('<%= item._id %>')">Ver</button>
+                                    <button class="btn btn-sm btn-success" onclick="openApproveModal('<%= item._id %>')">Validar</button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="openRejectModal('<%= item._id %>')">Rejeitar</button>
                                 </td>
                             </tr>
                             <% }); %>
@@ -52,7 +53,8 @@
             </div>
         </div>
     </main>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/approvals.js"></script>
 </body>
 </html>

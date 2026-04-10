@@ -38,15 +38,18 @@ SUPERMARKET ROUTES
 
 
 // Criar (POST) - /api/markets/create
-router.post("/markets/create", marketController.registerSupermarket);
-router.get("/markets/list", marketController.listSupermarkets);
-router.get("/markets/:id", marketController.getSupermarketById);
-router.put("/markets/update/:id", marketController.updateSupermarket);
-router.delete("/markets/delete/:id", marketController.deleteSupermarket);
+router.post("/markets/create",  verifyToken, verifyRole(["admin"]),marketController.registerSupermarket);
+router.get("/markets/list",  verifyToken, verifyRole(["admin"]),marketController.listSupermarkets);
+router.get("/markets/:id",  verifyToken, verifyRole(["admin"]),marketController.getSupermarketById);
+router.put("/markets/update/:id",  verifyToken, verifyRole(["admin"]),marketController.updateSupermarket);
+router.delete("/markets/delete/:id",  verifyToken, verifyRole(["admin"]),marketController.deleteSupermarket);
 
 
 //GET PENDING MARKETS
-router.get("/markets/listPending", marketController.listPendingSupermarkets);
+router.get("/markets/listPending",  verifyToken, verifyRole(["admin"]),marketController.listPendingSupermarkets);
+router.get("/supermarkets/:id",  verifyToken, verifyRole(["admin"]),marketController.getSupermarketDetails); 
+router.put("/supermarkets/approve/:id",  verifyToken, verifyRole(["admin"]),marketController.approveSupermarket); 
+router.put("/supermarkets/reject/:id",  verifyToken, verifyRole(["admin"]),marketController.rejectSupermarket); 
 
 /*
 =====

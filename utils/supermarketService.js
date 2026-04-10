@@ -10,7 +10,11 @@ const createSupermarket = async (marketData) => {
     status: marketData.status,
   });
 };
-
+const getPending = async () => {
+    return await Supermarket.find({ status: "pending" }).populate("user", "email phone");
+};
 module.exports = {
   createSupermarket,
+  getPending,
 };
+
