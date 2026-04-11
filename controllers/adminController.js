@@ -6,7 +6,7 @@ const supermarketService = require("../utils/supermarketService");
 var { listPendingSupermarkets } = require("./supermarketController");
 const getDashboard = async (req, res) => {
   const pending = await Supermarket.countDocuments({ status: "pending" });
-  const pendingMarkets = await listPendingSupermarkets(req, res);
+  const pendingMarkets = await supermarketService.getPending();
 
   res.render("admin/dashboard", {
     activePage: "dashboard",
@@ -15,20 +15,7 @@ const getDashboard = async (req, res) => {
     totalMarkets: 12,
     allPending: pending,
     totalComplaints: 1,
-    pendingMarkets: [
-      {
-        _id: "1",
-        name: "Supermercado Modelo Bragança",
-        email: "contacto@modelo.pt",
-        location: "Bragança",
-      },
-      {
-        _id: "2",
-        name: "Talho do Zé",
-        email: "ze@talho.pt",
-        location: "Mirandela",
-      },
-    ],
+    pendingMarkets: pendingMarkets
   });
 };
 
@@ -87,7 +74,6 @@ const getUsers = async (req, res) => {
 
     const customersFinal = customersFromDB.map((customer) => {
       let dataFormatada = "---------";
-      // converter a  data
       if (customer.createdAt) {
         newDate = customer.createdAt.toLocaleDateString("pt-PT", {
           day: "2-digit",
