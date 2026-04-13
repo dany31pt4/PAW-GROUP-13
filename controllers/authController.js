@@ -32,19 +32,10 @@ const login = async (req, res) => {
       return res.render("auth/login", { erro: "Email ou password inválidos." });
     }
 
-    const payload = {
-      id: user._id,
-      email: user.email,
-    };
-
-    if (rememberMe) {
-      jwtExpiration = "30d";
-    }
-
     const token = jwt.sign(
       { id: user._id, role: user.role, name: user.name },
       secretKey,
-      { expiresIn: jwtExpiration }, 
+      { expiresIn: jwtExpiration },
     );
 
     if (rememberMe) {

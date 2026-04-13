@@ -46,7 +46,7 @@ function openAddCategoryModal() {
 
       fetch("/api/category/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" }, // ver o data size
         body: JSON.stringify(result.value),
       })
         .then(async (response) => {

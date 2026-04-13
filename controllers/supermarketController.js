@@ -1,9 +1,8 @@
 const userService = require("../utils/userServices");
 const { verifyRole } = require("../middlewares/authMiddleware");
-const Supermarket = require("../models/supermarket"); // Corrigido para maiúscula conforme o modelo
+const Supermarket = require("../models/supermarket");
 const User = require("../models/user");
 const supermarketService = require("../utils/supermarketService");
-const bcrypt = require("bcrypt");
 
 // 1. Listar Supermercados
 const listSupermarkets = async (req, res) => {
@@ -154,8 +153,7 @@ const updateSupermarket = async (req, res) => {
       };
 
       if (password && password.trim() !== "") {
-        const saltRounds = 10;
-        userUpdateData.password = await bcrypt.hash(password, saltRounds);
+        userUpdateData.password = await userService.hashPassword(password);
       }
 
       await User.findByIdAndUpdate(updatedMarket.user, userUpdateData);

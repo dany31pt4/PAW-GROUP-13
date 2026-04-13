@@ -1,6 +1,4 @@
 const Supermarket = require("../models/supermarket");
-const bcrypt = require("bcrypt");
-require("dotenv").config();
 
 const createSupermarket = async (marketData) => {
   return await Supermarket.create({
@@ -17,4 +15,3 @@ module.exports = {
   createSupermarket,
   getPending,
 };
-

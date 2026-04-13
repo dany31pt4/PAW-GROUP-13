@@ -1,18 +1,26 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 
-// Importar middlewares
-var { verifyToken, verifyRole } = require("../middlewares/authMiddleware");
+const { verifyToken, verifyRole } = require("../middlewares/authMiddleware");
+const adminController = require("../controllers/adminController");
+const Supermarket = require("../models/supermarket"); 
 
-// Importar o novo controlador
-var adminController = require("../controllers/adminController");
+router.use(verifyToken);
+router.use(verifyRole(["admin"]));
+router.use(async (req, res, next) => {
+    try {
+        res.locals.adminName = req.user.name; 
+        res.locals.allPending = await Supermarket.countDocuments({ status: "pending" });
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 
-// Rotas limpas a apontar para as funções do controlador
-router.get("/dashboard", verifyToken, verifyRole(["admin"]), adminController.getDashboard);
-router.get("/approvals", verifyToken, verifyRole(["admin"]), adminController.getApprovals);
-router.get("/orders", verifyToken, verifyRole(["admin"]), adminController.getOrders);
-router.get("/users", verifyToken, verifyRole(["admin"]), adminController.getUsers);
-router.get("/categories", verifyToken, verifyRole(["admin"]), adminController.getCategories);
-
+router.get("/dashboard", adminController.getDashboard);
+router.get("/approvals", adminController.getApprovals);
+router.get("/orders", adminController.getOrders);
+router.get("/users", adminController.getUsers);
+router.get("/categories", adminController.getCategories);
 
 module.exports = router;

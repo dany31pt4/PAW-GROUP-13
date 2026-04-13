@@ -42,6 +42,7 @@
                             <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
+                                        <th>ID</th>
                                         <th>Nome</th>
                                         <th>Email</th>
                                         <th>Data Registo</th>
@@ -52,7 +53,10 @@
                                     <% customers.forEach(function(c) { %>
                                         <tr>
                                             <td><strong>
-                                                <%= c.name %>
+                                                    <%= c.id %>
+                                                </strong></td>
+                                            <td><strong>
+                                                    <%= c.name %>
                                                 </strong></td>
                                             <td>
                                                 <%= c.email %>
@@ -88,6 +92,7 @@
                             <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
+                                        <th>ID</th>
                                         <th>Supermercado</th>
                                         <th>Localidade</th>
                                         <th>Estado</th>
@@ -97,6 +102,9 @@
                                 <tbody id="marketTableBody">
                                     <% markets.forEach(function(l) { %>
                                         <tr>
+                                            <td><strong>
+                                                    <%= l.id %>
+                                                </strong></td>
                                             <td><strong>
                                                     <%= l.name %>
                                                 </strong></td>
@@ -140,6 +148,7 @@
                             <table class="table table-hover align-middle">
                                 <thead>
                                     <tr>
+                                        <th>ID</th>
                                         <th>Estafeta</th>
                                         <th>Última Encomenda</th>
                                         <th>Total Entregas</th>
@@ -150,13 +159,16 @@
                                     <% couriers.forEach(function(e) { %>
                                         <tr>
                                             <td><strong>
+                                                    <%= e.id %>
+                                                </strong></td>
+                                            <td><strong>
                                                     <%= e.name %>
                                                 </strong></td>
                                             <td>
                                                 <%= e.lastOrderDate %>
                                             </td>
                                             <td>
-                                                <%= e.totalDeliveries %> 
+                                                <%= e.totalDeliveries %>
                                             </td>
                                             <td class="text-end">
                                                 <button class="btn btn-sm btn-outline-primary"
@@ -185,6 +197,7 @@
                             <table id="adminTable" class="table table-hover align-middle">
                                 <thead>
                                     <tr>
+                                        <th>ID</th>
                                         <th>Nome</th>
                                         <th>Email</th>
                                         <th>Data Registo</th>
@@ -194,6 +207,9 @@
                                 <tbody id="adminTableBody">
                                     <% admins.forEach(function(a) { %>
                                         <tr>
+                                                   <td><strong>
+                                                    <%= a.id %>
+                                                </strong></td>
                                             <td><strong>
                                                     <%= a.name %>
                                                 </strong></td>

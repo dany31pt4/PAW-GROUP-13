@@ -1,7 +1,5 @@
 const userService = require("../utils/userServices");
-const { verifyRole } = require("../middlewares/authMiddleware");
 const User = require("../models/user");
-const bcrypt = require("bcrypt");
 
 /*
 =======================================================
@@ -11,29 +9,15 @@ ADMIN CONTROLLERs
 
 const createAdmin = async (req, res) => {
   try {
-    console.log("REQ BODY:", req.user); // Verificar o conteúdo do corpo da requisição
-    await verifyRole(req.user.role);
-
     if (!req.body.password) {
-      return res
-        .status(400)
-        .json({ message: "A password não chegou ao servidor!" });
+      return res.status(400).json({ success: false, message: "A password é obrigatória." });
     }
 
-    const userData = {
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      phone: req.body.phone,
-      address: req.body.address,
-      role: "admin",
-    };
-
-    const newAdmin = await userService.createUser(userData);
-    res.status(201).json(newAdmin); // 201 == created with sucess
+    const newAdmin = await userService.createUser({ ...req.body, role: "admin" });
+    res.status(201).json({ success: true, data: newAdmin });
   } catch (err) {
-    console.error("ERRO NO CONTROLLER:", err.message);
-    res.status(400).json({ message: err.message });
+    console.error("Erro ao criar administrador:", err.message);
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
@@ -73,68 +57,37 @@ const deleteAdmin = async (req, res) => {
 
 const listAdmins = async (req, res) => {
   try {
-    const admins = await userService.getAdmins();
-
+    const admins = await userService.getUsersByRole("admin");
     return res.status(200).json(admins);
   } catch (error) {
-    console.error("Erro no Controller de listar admins:", error);
-    return res.status(500).json({ message: "Erro interno no servidor." });
+    console.error("Erro ao listar admins:", error);
+    return res.status(500).json({ success: false, message: "Erro interno no servidor." });
   }
 };
 
 const getAdminById = async (req, res) => {
   try {
-    const adminId = req.params.id;
-    const admin = await User.findById(adminId).select("-password"); // execto a password
-
+    const admin = await userService.getUserById(req.params.id);
     if (!admin) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Administrador não encontrado." });
+      return res.status(404).json({ success: false, message: "Administrador não encontrado." });
     }
-
     return res.status(200).json(admin);
   } catch (error) {
     console.error("Erro ao procurar admin:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Erro interno no servidor." });
+    return res.status(500).json({ success: false, message: "Erro interno no servidor." });
   }
 };
 
 const updateAdmin = async (req, res) => {
   try {
-    const saltRounds = 10;
-    const adminId = req.params.id;
-    const { name, email, password, address, phone } = req.body;
-
-    const updateData = { name, email, address, phone };
-
-    if (password && password.trim() !== "") {
-      const hashed = await bcrypt.hash(password, saltRounds);
-      updateData.password = hashed;
+    const updated = await userService.updateUser(req.params.id, req.body);
+    if (!updated) {
+      return res.status(404).json({ success: false, message: "Administrador não encontrado." });
     }
-
-    // Atualiza na base de dados
-    const updatedAdmin = await User.findByIdAndUpdate(adminId, updateData, {
-      new: true,
-    });
-
-    if (!updatedAdmin) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Administrador não encontrado." });
-    }
-
-    return res.json({
-      success: true,
-      message: "Administrador atualizado com sucesso!",
-    });
+    return res.json({ success: true, message: "Administrador atualizado com sucesso!" });
   } catch (error) {
     console.error("Erro ao atualizar admin:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Erro interno ao guardar alterações." });
+    return res.status(500).json({ success: false, message: "Erro interno ao guardar alterações." });
   }
 };
 
@@ -151,167 +104,107 @@ START OF COURIER CONTROLLER
 */
 const listCouriers = async (req, res) => {
   try {
-    const couriers = await User.find({ role: "courier" });
+    const couriers = await userService.getUsersByRole("courier");
     res.json(couriers);
   } catch (err) {
-    res.status(500).json({ message: "Erro ao listar estafetas" });
+    res.status(500).json({ success: false, message: "Erro ao listar estafetas." });
   }
 };
 
-// 2. BUSCAR POR ID (A tua rota específica: /users/courier/69d4dbb...)
 const getCourierById = async (req, res) => {
   try {
-    // req.params.id apanha o ID da URL
-    const courier = await User.findById(req.params.id);
-
+    const courier = await userService.getUserById(req.params.id);
     if (!courier) {
-      return res.status(404).json({ message: "Estafeta não encontrado" });
+      return res.status(404).json({ success: false, message: "Estafeta não encontrado." });
     }
-
     res.json(courier);
   } catch (err) {
-    res.status(500).json({ message: "Erro ao procurar estafeta" });
+    res.status(500).json({ success: false, message: "Erro ao procurar estafeta." });
   }
 };
 
-// 3. CRIAR ESTAFETA
 const createCourier = async (req, res) => {
   try {
-    const { name, email, password, address, phone } = req.body;
-    
-    // Hash da password (Importante!)
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-      address,
-      phone,
-      role: "courier"
-    });
-
-    await newUser.save();
-    res.status(201).json({ success: true });
+    const newCourier = await userService.createUser({ ...req.body, role: "courier" });
+    res.status(201).json({ success: true, data: newCourier });
   } catch (err) {
-    res.status(400).json({ message: "Email já existe ou dados inválidos" });
+    res.status(400).json({ success: false, message: "Email já existe ou dados inválidos." });
   }
 };
 
-// 4. ATUALIZAR ESTAFETA
 const updateCourier = async (req, res) => {
   try {
-    const { name, email, address, phone, password } = req.body;
-    let updateData = { name, email, address, phone };
-
-    // Se o admin escreveu uma password nova, fazemos hash
-    if (password && password.trim() !== "") {
-      const salt = await bcrypt.genSalt(10);
-      updateData.password = await bcrypt.hash(password, salt);
+    const updated = await userService.updateUser(req.params.id, req.body);
+    if (!updated) {
+      return res.status(404).json({ success: false, message: "Estafeta não encontrado." });
     }
-
-    await User.findByIdAndUpdate(req.params.id, updateData);
-    res.json({ success: true });
+    res.json({ success: true, message: "Estafeta atualizado com sucesso!" });
   } catch (err) {
-    res.status(400).json({ message: "Erro ao atualizar" });
+    res.status(400).json({ success: false, message: "Erro ao atualizar estafeta." });
   }
 };
 
-// 5. ELIMINAR ESTAFETA
 const deleteCourier = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.params.id);
-    res.json({ success: true });
+    const deleted = await userService.deleteUser(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Estafeta não encontrado." });
+    }
+    res.json({ success: true, message: "Estafeta eliminado com sucesso!" });
   } catch (err) {
-    res.status(500).json({ message: "Erro ao eliminar" });
+    res.status(500).json({ success: false, message: "Erro ao eliminar estafeta." });
   }
 };
 
-
-
-/*
-Supermarket controller
-*/  
-
+// registerCourier era duplicado de createCourier — agora delega para o mesmo service
 const registerCourier = async (req, res) => {
   try {
-    const userData = {
-      name: req.body.name,
-      email: req.body.email,
-      password: req.body.password,
-      phone: req.body.phone,
-      address: req.body.address,
-      role: "courier",
-    };
-
-    await userService.createUser(userData);
+    await userService.createUser({ ...req.body, role: "courier" });
     res.redirect("/auth/login");
-  } catch (erro) {
+  } catch (err) {
     res.render("auth/register", { erro: "Erro ao registar." });
   }
 };
 
 
-/*
-=======================================================
-START OF CUSTOMER (CLIENTES) CONTROLLER
-=======================================================
-*/
-
-// 1. Listar Clientes
 const listCustomers = async (req, res) => {
   try {
-    const customers = await User.find({ role: "customer" });
+    const customers = await userService.getUsersByRole("customer");
     res.json(customers);
   } catch (err) {
-    res.status(500).json({ message: "Erro ao listar clientes." });
+    res.status(500).json({ success: false, message: "Erro ao listar clientes." });
   }
 };
 
-// 2. Ver Cliente por ID
 const getCustomerById = async (req, res) => {
   try {
-    const customer = await User.findById(req.params.id);
+    const customer = await userService.getUserById(req.params.id);
     if (!customer) {
-      return res.status(404).json({ message: "Cliente não encontrado." });
+      return res.status(404).json({ success: false, message: "Cliente não encontrado." });
     }
     res.json(customer);
   } catch (err) {
-    res.status(500).json({ message: "Erro ao procurar cliente." });
+    res.status(500).json({ success: false, message: "Erro ao procurar cliente." });
   }
 };
 
-// 3. Atualizar Cliente
 const updateCustomer = async (req, res) => {
   try {
-    const { name, email, address, phone, password } = req.body;
-    let updateData = { name, email, address, phone };
-
-    // Se o admin escrever uma password nova
-    if (password && password.trim() !== "") {
-      const salt = await bcrypt.genSalt(10);
-      updateData.password = await bcrypt.hash(password, salt);
-    }
-
-    const updated = await User.findByIdAndUpdate(req.params.id, updateData, { new: true });
-    
+    const updated = await userService.updateUser(req.params.id, req.body);
     if (!updated) {
-        return res.status(404).json({ success: false, message: "Cliente não encontrado." });
+      return res.status(404).json({ success: false, message: "Cliente não encontrado." });
     }
-
     res.json({ success: true, message: "Cliente atualizado com sucesso!" });
   } catch (err) {
     res.status(400).json({ success: false, message: "Erro ao atualizar os dados do cliente." });
   }
 };
 
-// 4. Eliminar Cliente
 const deleteCustomer = async (req, res) => {
   try {
-    const deleted = await User.findByIdAndDelete(req.params.id);
+    const deleted = await userService.deleteUser(req.params.id);
     if (!deleted) {
-        return res.status(404).json({ success: false, message: "Cliente já não existe." });
+      return res.status(404).json({ success: false, message: "Cliente já não existe." });
     }
     res.json({ success: true, message: "Cliente eliminado com sucesso!" });
   } catch (err) {
@@ -336,5 +229,4 @@ module.exports = {
   getCustomerById,
   updateCustomer,
   deleteCustomer,
-  
 };

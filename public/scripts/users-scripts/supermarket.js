@@ -1,6 +1,5 @@
 // --- SUPERMERCADOS (MARKETS) ---
 
-// 1. CRIAR SUPERMERCADO E CONTA DE UTILIZADOR
 function openAddMarketModal() {
     Swal.fire({
         title: "Novo Supermercado",
@@ -113,7 +112,6 @@ async function openViewMarketModal(marketId) {
 }
 
 // 3. EDITAR LOJA
-// 3. EDITAR LOJA (Incluindo dados do User)
 async function openEditMarketModal(marketId) {
     Swal.fire({ title: "A carregar...", didOpen: () => Swal.showLoading() });
 
