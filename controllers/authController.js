@@ -2,7 +2,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const Supermarket = require("../models/supermarket");
 const jwt = require("jsonwebtoken");
-const userService = require("../utils/userServices");
+const userService = require("../utils/userService");
 const supermarketService = require("../utils/supermarketService");
 require("dotenv").config();
 
@@ -10,14 +10,13 @@ const renderRegisterPage = (req, res) => {
   res.render("auth/register.ejs", { erro: null });
 };
 
-
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email }); // Procura o utilizador pelo email no mongo
     const secretKey = process.env.secret;
     const rememberMe = req.body.remember === "on";
-    
+
     console.log(req.body);
     let jwtExpiration = "1h";
     var age = 3600000; // 1 hora
@@ -40,7 +39,7 @@ const login = async (req, res) => {
 
     if (rememberMe) {
       age = 2592000000; // 30 dias
-    }   
+    }
 
     res.cookie("token", token, {
       httpOnly: true, // JavaScript não consegue ler (Proteção XSS)

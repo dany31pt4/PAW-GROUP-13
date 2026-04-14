@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel de Administração - Marketplace</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+    />
+
+    <link rel="stylesheet" href="/style/admin.css" />
+  </head>
+
+  <body>
+    <%- include('../partials/sidebar-supermarket') %>
+
+    <main class="main-wrapper">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h4 style="font-weight: 700; color: #2c3e50; margin: 0">
+            Painel de administração
+          </h4>
+          <small class="text-muted"
+            >Olá,
+            <strong> <%= supermarket.name %> </strong>
+          </small>
+        </div>
+
+        <!-- 
+                
+                Aqui faz uma tabela com os produtos do supermercado, com as seguintes colunas:
+                        name: 
+                        category:
+                        price: 
+                        stock: 
+                        Ver , Editar, Eliminar
+
+
+                Na tabela em cima deve ter um botão "Adicionar Produto" que leva a um formulário para adicionar um novo produto, com os seguintes campos:
+                        name: 
+                        image: 
+                        category: 
+                        type: ( vai ser um select com as opções de categoria ) ref: "Category", 
+                        required: true,
+                        description: 
+                        price: 
+                        stock: 
+                
+                        
+                -->
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

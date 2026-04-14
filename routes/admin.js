@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { verifyToken, verifyRole } = require("../middlewares/authMiddleware");
-const adminController = require("../controllers/adminController");
+const adminController = require("../controllers/viewControllers/adminViewController");
 const Supermarket = require("../models/supermarket"); 
 
 router.use(verifyToken);

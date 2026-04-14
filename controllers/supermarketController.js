@@ -1,4 +1,4 @@
-const userService = require("../utils/userServices");
+const userService = require("../utils/userService");
 const Supermarket = require("../models/supermarket");
 const supermarketService = require("../utils/supermarketService");
 
@@ -56,7 +56,7 @@ const registerSupermarket = async (req, res) => {
       user: newUser._id,
       name: req.body.name,
       location: req.body.address,
-      status: "approved",
+      status: "pending",
     };
 
     await supermarketService.createSupermarket(marketData);
