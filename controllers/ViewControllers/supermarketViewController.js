@@ -6,8 +6,7 @@ const Category = require("../../models/category");
 
 const getDashboard = async (req, res) => {
   try {
-    const supermarket = req.supermarket;
-
+    const supermarket = await Supermarket.findOne({ user: req.user.id });
     const [totalOrders, totalProducts] = await Promise.all([
       Order.countDocuments({ supermarket: supermarket._id }),
       Product.countDocuments({ supermarket: supermarket._id }),
@@ -47,16 +46,17 @@ const getSettings = async (req, res) => {
 };
 const getProducts = async (req, res) => {
   try {
-    const supermarket = req.supermarket;
-
+    const supermarket = await Supermarket.findOne({ user: req.user.id });
     const [products, categories] = await Promise.all([
-      Product.find({ supermarket: supermarket._id }).populate("category").sort({ name: 1 }),
+      Product.find({ supermarket: supermarket._id })
+        .populate("category")
+        .sort({ name: 1 }),
       Category.find({ status: true }),
     ]);
 
     res.render("supermarket/products", {
       activePage: "products",
-      supermarketName: supermarket.name,
+      supermarket,
       products,
       categories,
     });
@@ -71,7 +71,7 @@ const getProducts = async (req, res) => {
 
 const getOrders = async (req, res) => {
   try {
-    const supermarket = req.supermarket;
+    const supermarket = await Supermarket.findOne({ user: req.user.id });
 
     const orders = await Order.find({ supermarket: supermarket._id })
       .populate("customer", "name email")
@@ -80,7 +80,7 @@ const getOrders = async (req, res) => {
 
     res.render("supermarket/orders", {
       activePage: "orders",
-      supermarketName: supermarket.name,
+      supermarket,
       orders,
     });
   } catch (error) {
@@ -94,16 +94,18 @@ const getOrders = async (req, res) => {
 
 const getNewSale = async (req, res) => {
   try {
-    const supermarket = req.supermarket;
+    const supermarket = await Supermarket.findOne({ user: req.user.id });
 
     const [products, categories] = await Promise.all([
-      Product.find({ supermarket: supermarket._id, stock: { $gt: 0 } }).populate("category").sort({ name: 1 }),
+      Product.find({ supermarket: supermarket._id, stock: { $gt: 0 } })
+        .populate("category")
+        .sort({ name: 1 }),
       Category.find({ status: true }),
     ]);
 
     res.render("supermarket/newsale", {
       activePage: "newsale",
-      supermarketName: supermarket.name,
+      supermarket,
       products,
       categories,
     });

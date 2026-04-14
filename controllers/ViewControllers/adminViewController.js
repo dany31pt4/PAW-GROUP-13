@@ -1,8 +1,8 @@
-const User = require("../models/user");
-const Supermarket = require("../models/supermarket");
-const Order = require("../models/order");
-const Category = require("../models/category");
-const supermarketService = require("../utils/supermarketService");
+const User = require("../../models/user");
+const Supermarket = require("../../models/supermarket");
+const Order = require("../../models/order");
+const Category = require("../../models/category");
+const supermarketService = require("../../utils/supermarketService");
 
 const getDashboard = async (req, res) => {
   try {

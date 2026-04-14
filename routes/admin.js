@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { verifyToken, verifyRole } = require("../middlewares/authMiddleware");
-const adminController = require("../controllers/viewControllers/adminViewController");
+const adminViewController = require("../controllers/ViewControllers/adminViewController");
 const Supermarket = require("../models/supermarket"); 
 
 router.use(verifyToken);
@@ -17,10 +17,10 @@ router.use(async (req, res, next) => {
     }
 });
 
-router.get("/dashboard", adminController.getDashboard);
-router.get("/approvals", adminController.getApprovals);
-router.get("/orders", adminController.getOrders);
-router.get("/users", adminController.getUsers);
-router.get("/categories", adminController.getCategories);
+router.get("/dashboard", adminViewController.getDashboard);
+router.get("/approvals", adminViewController.getApprovals);
+router.get("/orders", adminViewController.getOrders);
+router.get("/users", adminViewController.getUsers);
+router.get("/categories", adminViewController.getCategories);
 
 module.exports = router;
