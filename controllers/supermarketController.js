@@ -1,7 +1,5 @@
 const userService = require("../utils/userServices");
-const { verifyRole } = require("../middlewares/authMiddleware");
 const Supermarket = require("../models/supermarket");
-const User = require("../models/user");
 const supermarketService = require("../utils/supermarketService");
 
 // 1. Listar Supermercados
@@ -54,16 +52,12 @@ const registerSupermarket = async (req, res) => {
       throw new Error("Falha ao obter o ID do utilizador criado.");
     }
 
-    console.log("Utilizador criado com sucesso com o ID:", newUser._id);
-
     const marketData = {
       user: newUser._id,
       name: req.body.name,
       location: req.body.address,
       status: "approved",
     };
-
-    console.log("Dados a enviar para o supermercado:", marketData);
 
     await supermarketService.createSupermarket(marketData);
 
@@ -96,34 +90,6 @@ const registerSupermarket = async (req, res) => {
   }
 };
 
-// 3. Ver Supermercado (Get by ID)
-const getSupermarketById = async (req, res) => {
-  try {
-    const id = req.params.id;
-    // o populate é um join, ele vai buscar a referencia ao model,
-    // fica o user:{email: "email", phone: "phone"}
-    const market = await Supermarket.findById(id).populate(
-      "user",
-      "email phone",
-    );
-
-    if (!market) {
-      return res.status(404).json({
-        success: false,
-        message: "Supermercado não encontrado.",
-      });
-    }
-
-    res.json(market);
-  } catch (error) {
-    console.error("Erro ao buscar supermercado:", error);
-    res.status(500).json({
-      success: false,
-      message: "Erro interno ao procurar os dados.",
-    });
-  }
-};
-
 // 4. Atualizar Supermercado (e o respetivo Utilizador)
 const updateSupermarket = async (req, res) => {
   try {
@@ -145,18 +111,13 @@ const updateSupermarket = async (req, res) => {
     }
 
     if (updatedMarket.user) {
-      const userUpdateData = {
-        name: name,
-        email: email,
-        phone: phone,
+      await userService.updateUser(updatedMarket.user, {
+        name,
+        email,
+        phone,
         address: location,
-      };
-
-      if (password && password.trim() !== "") {
-        userUpdateData.password = await userService.hashPassword(password);
-      }
-
-      await User.findByIdAndUpdate(updatedMarket.user, userUpdateData);
+        password,
+      });
     }
 
     res.json({
@@ -189,7 +150,7 @@ const deleteSupermarket = async (req, res) => {
     await Supermarket.findByIdAndDelete(id);
 
     if (marketToDelete.user) {
-      await User.findByIdAndDelete(marketToDelete.user);
+      await userService.deleteUser(marketToDelete.user);
     }
 
     res.json({
@@ -222,11 +183,9 @@ const approveSupermarket = async (req, res) => {
       });
     }
 
-    console.log(`Supermercado ${updatedMarket.name} aprovado com sucesso.`);
-
-    res.status(200).json({ 
-      success: true, 
-      message: "Supermercado validado e ativado com sucesso!" 
+    res.status(200).json({
+      success: true,
+      message: "Supermercado validado e ativado com sucesso!",
     });
   } catch (error) {
     console.error("Erro ao aprovar supermercado:", error);
@@ -254,8 +213,6 @@ const rejectSupermarket = async (req, res) => {
         message: "Supermercado não encontrado.",
       });
     }
-    console.log(`Registo do supermercado ${id} foi rejeitado.`);
-
     res.status(200).json({
       success: true,
       message: "O registo foi rejeitado com sucesso!",
@@ -292,11 +249,10 @@ const getSupermarketDetails = async (req, res) => {
 module.exports = {
   listSupermarkets,
   registerSupermarket,
-  getSupermarketById,
+  getSupermarketDetails,
   updateSupermarket,
   deleteSupermarket,
   listPendingSupermarkets,
   rejectSupermarket,
   approveSupermarket,
-  getSupermarketDetails
 };

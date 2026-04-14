@@ -156,7 +156,6 @@ const deleteCourier = async (req, res) => {
   }
 };
 
-// registerCourier era duplicado de createCourier — agora delega para o mesmo service
 const registerCourier = async (req, res) => {
   try {
     await userService.createUser({ ...req.body, role: "courier" });

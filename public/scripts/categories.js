@@ -44,7 +44,7 @@ function openAddCategoryModal() {
         didOpen: () => Swal.showLoading(),
       });
 
-      fetch("/api/category/create", {
+      fetch("/api/categories/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" }, // ver o data size
         body: JSON.stringify(result.value),
@@ -185,7 +185,7 @@ async function openEditCategoryModal(id) {
         Swal.fire({ title: "A guardar...", didOpen: () => Swal.showLoading() });
 
         try {
-          const updateResponse = await fetch(`/api/category/update/${id}`, {
+          const updateResponse = await fetch(`/api/categories/update/${id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -239,7 +239,7 @@ function openRemoveCategoryModal(id) {
   }).then(async (result) => {
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`/api/category/delete/${id}`, {
+        const response = await fetch(`/api/categories/delete/${id}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",

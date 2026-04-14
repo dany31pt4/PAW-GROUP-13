@@ -3,7 +3,7 @@ var router = express.Router();
 const userController = require("../controllers/userController");
 const marketController = require("../controllers/supermarketController");
 const categoryController = require("../controllers/categoryController");
-var { verifyToken, verifyRole , listAdmins } = require("../middlewares/authMiddleware");
+var { verifyToken, verifyRole } = require("../middlewares/authMiddleware");
 
 
 /*
@@ -12,8 +12,8 @@ ADMIN ROUTES
 =====
 */
 
-router.post("/users/createAdmin",verifyToken,verifyRole(["admin"]),userController.createAdmin,);
-router.delete("/users/deleteAdmin/:id",verifyToken,verifyRole(["admin"]),userController.deleteAdmin,);
+router.post("/users/createAdmin", verifyToken, verifyRole(["admin"]), userController.createAdmin);
+router.delete("/users/deleteAdmin/:id", verifyToken, verifyRole(["admin"]), userController.deleteAdmin);
 router.get("/users/listAdmins", verifyToken, verifyRole(["admin"]), userController.listAdmins);
 router.get("/users/admin/:id", verifyToken, verifyRole(["admin"]), userController.getAdminById);
 router.put("/users/updateAdmin/:id", verifyToken, verifyRole(["admin"]), userController.updateAdmin);
@@ -36,40 +36,36 @@ SUPERMARKET ROUTES
 =====
 */
 
-
-// Criar (POST) - /api/markets/create
-router.post("/markets/create",  verifyToken, verifyRole(["admin"]),marketController.registerSupermarket);
-router.get("/markets/list",  verifyToken, verifyRole(["admin"]),marketController.listSupermarkets);
-router.get("/markets/:id",  verifyToken, verifyRole(["admin"]),marketController.getSupermarketById);
-router.put("/markets/update/:id",  verifyToken, verifyRole(["admin"]),marketController.updateSupermarket);
-router.delete("/markets/delete/:id",  verifyToken, verifyRole(["admin"]),marketController.deleteSupermarket);
-
-
-//GET PENDING MARKETS
-router.get("/markets/listPending",  verifyToken, verifyRole(["admin"]),marketController.listPendingSupermarkets);
-router.get("/supermarkets/:id",  verifyToken, verifyRole(["admin"]),marketController.getSupermarketDetails); 
-router.put("/supermarkets/approve/:id",  verifyToken, verifyRole(["admin"]),marketController.approveSupermarket); 
-router.put("/supermarkets/reject/:id",  verifyToken, verifyRole(["admin"]),marketController.rejectSupermarket); 
+router.post("/supermarkets/create", verifyToken, verifyRole(["admin"]), marketController.registerSupermarket);
+router.get("/supermarkets/list", verifyToken, verifyRole(["admin"]), marketController.listSupermarkets);
+router.get("/supermarkets/listPending", verifyToken, verifyRole(["admin"]), marketController.listPendingSupermarkets);
+router.put("/supermarkets/approve/:id", verifyToken, verifyRole(["admin"]), marketController.approveSupermarket);
+router.put("/supermarkets/reject/:id", verifyToken, verifyRole(["admin"]), marketController.rejectSupermarket);
+router.put("/supermarkets/update/:id", verifyToken, verifyRole(["admin"]), marketController.updateSupermarket);
+router.delete("/supermarkets/delete/:id", verifyToken, verifyRole(["admin"]), marketController.deleteSupermarket);
+router.get("/supermarkets/:id", verifyToken, verifyRole(["admin"]), marketController.getSupermarketDetails);
 
 /*
 =====
 CUSTOMER ROUTES
 =====
 */
-router.get("/customer/listCustomers", verifyToken, verifyRole(["admin"]), userController.listCustomers);
-router.get("/customer/:id", verifyToken, verifyRole(["admin"]), userController.getCustomerById);
-router.put("/customer/update/:id", verifyToken, verifyRole(["admin"]), userController.updateCustomer);
-router.delete("/customer/delete/:id", verifyToken, verifyRole(["admin"]), userController.deleteCustomer);
 
+router.get("/customers/list", verifyToken, verifyRole(["admin"]), userController.listCustomers);
+router.get("/customers/:id", verifyToken, verifyRole(["admin"]), userController.getCustomerById);
+router.put("/customers/update/:id", verifyToken, verifyRole(["admin"]), userController.updateCustomer);
+router.delete("/customers/delete/:id", verifyToken, verifyRole(["admin"]), userController.deleteCustomer);
 
 /*
 =====
 CATEGORY ROUTES
 =====
 */
-router.post("/category/create", verifyToken, verifyRole(["admin"]), categoryController.createCategory);
+
+router.post("/categories/create", verifyToken, verifyRole(["admin"]), categoryController.createCategory);
 router.get("/categories/list", verifyToken, verifyRole(["admin"]), categoryController.listCategories);
+router.put("/categories/update/:id", verifyToken, verifyRole(["admin"]), categoryController.updateCategory);
+router.delete("/categories/delete/:id", verifyToken, verifyRole(["admin"]), categoryController.deleteCategory);
 router.get("/categories/:id", verifyToken, verifyRole(["admin"]), categoryController.getCategoryById);
-router.put("/category/update/:id", verifyToken, verifyRole(["admin"]), categoryController.updateCategory);
-router.delete("/category/delete/:id", verifyToken, verifyRole(["admin"]), categoryController.deleteCategory);
+
 module.exports = router;

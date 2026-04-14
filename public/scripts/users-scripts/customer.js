@@ -4,7 +4,7 @@
 async function openViewCustomerModal(customerId) {
     Swal.fire({ title: "A carregar...", didOpen: () => Swal.showLoading() });
     try {
-        const res = await fetch(`/api/customer/${customerId}`);
+        const res = await fetch(`/api/customers/${customerId}`);
         const customer = await res.json();
         
         // Formatar data de registo
@@ -33,7 +33,7 @@ async function openViewCustomerModal(customerId) {
 async function openEditCustomerModal(customerId) {
     Swal.fire({ title: "A carregar...", didOpen: () => Swal.showLoading() });
     try {
-        const res = await fetch(`/api/customer/${customerId}`);
+        const res = await fetch(`/api/customers/${customerId}`);
         const customer = await res.json();
 
         Swal.fire({
@@ -79,7 +79,7 @@ async function openEditCustomerModal(customerId) {
             if (result.isConfirmed) {
                 Swal.fire({ title: "A atualizar...", didOpen: () => Swal.showLoading() });
                 
-                const updateRes = await fetch(`/api/customer/update/${customerId}`, {
+                const updateRes = await fetch(`/api/customers/update/${customerId}`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json", "Accept": "application/json" },
                     body: JSON.stringify(result.value)
@@ -112,7 +112,7 @@ function openRemoveCustomerModal(customerId) {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const delRes = await fetch(`/api/customer/deleteCustomer/${customerId}`, { method: "DELETE" });
+                const delRes = await fetch(`/api/customers/delete/${customerId}`, { method: "DELETE" });
                 const data = await delRes.json();
                 
                 if (delRes.ok && data.success) {
@@ -127,10 +127,10 @@ function openRemoveCustomerModal(customerId) {
     });
 }
 
-// 4. ATUALIZAR TABELA DE ClienteS (SEM REFRESH)
+// 4. ATUALIZAR TABELA DE ClienteS 
 async function loadcustomerTable() {
     try {
-        const response = await fetch("/api/customer/listCustomers");
+        const response = await fetch("/api/customers/list");
         const customers = await response.json();
         
         const tbody = document.getElementById("customerTableBody");
