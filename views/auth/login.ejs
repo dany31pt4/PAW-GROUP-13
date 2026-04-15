@@ -35,7 +35,7 @@
           required>
       </div>
 
-      <div class="mb-4">
+      <div class="mb-3">
         <label for="password" class="form-label-custom">Password</label>
         <input 
           type="password" 
@@ -44,6 +44,18 @@
           name="password" 
           placeholder="••••••••" 
           required>
+      </div>
+
+      <div class="mb-4 form-check d-flex align-items-center">
+        <input 
+          type="checkbox" 
+          class="form-check-input mt-0 me-2" 
+          id="remember" 
+          name="remember"
+          style="background-color: var(--input-bg, #252525); border-color: var(--border-muted, #333); cursor: pointer;">
+        <label class="form-check-label text-muted small" for="remember" style="cursor: pointer; user-select: none;">
+          Lembrar-me neste dispositivo
+        </label>
       </div>
 
       <button type="submit" class="btn-submit btn-super">
