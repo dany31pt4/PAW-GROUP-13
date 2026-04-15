@@ -17,6 +17,7 @@ const productSchema = new mongoose.Schema(
     description: { type: String },
     price: { type: Number, required: true },
     stock: { type: Number, required: true, default: 0 },
+    isActive: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

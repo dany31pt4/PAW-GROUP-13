@@ -29,12 +29,10 @@ const listPendingSupermarkets = async (req, res) => {
 const registerSupermarket = async (req, res) => {
   try {
     if (!req.body.name || !req.body.email || !req.body.password) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Nome, email e password são obrigatórios.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Nome, email e password são obrigatórios.",
+      });
     }
 
     const userData = {
@@ -62,12 +60,10 @@ const registerSupermarket = async (req, res) => {
     await supermarketService.createSupermarket(marketData);
 
     if (req.xhr || req.headers.accept.includes("application/json")) {
-      return res
-        .status(201)
-        .json({
-          success: true,
-          message: "Supermercado registado com sucesso!",
-        });
+      return res.status(201).json({
+        success: true,
+        message: "Supermercado registado com sucesso!",
+      });
     }
     res.redirect("/auth/login");
   } catch (erro) {
@@ -75,12 +71,10 @@ const registerSupermarket = async (req, res) => {
 
     if (req.xhr || req.headers.accept.includes("application/json")) {
       if (erro.message && erro.message.includes("E11000")) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "Este email já está registado no sistema.",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "Este email já está registado no sistema.",
+        });
       }
       return res
         .status(500)
@@ -173,13 +167,13 @@ const approveSupermarket = async (req, res) => {
     const updatedMarket = await Supermarket.findByIdAndUpdate(
       id,
       { status: "approved" },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedMarket) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Supermercado não encontrado." 
+      return res.status(404).json({
+        success: false,
+        message: "Supermercado não encontrado.",
       });
     }
 
@@ -189,13 +183,12 @@ const approveSupermarket = async (req, res) => {
     });
   } catch (error) {
     console.error("Erro ao aprovar supermercado:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Erro ao tentar aprovar o registo." 
+    res.status(500).json({
+      success: false,
+      message: "Erro ao tentar aprovar o registo.",
     });
   }
 };
-
 
 const rejectSupermarket = async (req, res) => {
   try {
@@ -228,20 +221,23 @@ const rejectSupermarket = async (req, res) => {
 
 const getSupermarketDetails = async (req, res) => {
   try {
-    const market = await Supermarket.findById(req.params.id).populate("user", "email phone");
-    
+    const market = await Supermarket.findById(req.params.id).populate(
+      "user",
+      "email phone",
+    );
+
     if (!market) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Supermercado não encontrado." 
+      return res.status(404).json({
+        success: false,
+        message: "Supermercado não encontrado.",
       });
     }
-        res.status(200).json(market);
+    res.status(200).json(market);
   } catch (error) {
     console.error("Erro ao procurar supermercado:", error);
-    res.status(500).json({ 
-      success: false, 
-      message: "Erro interno ao procurar os detalhes." 
+    res.status(500).json({
+      success: false,
+      message: "Erro interno ao procurar os detalhes.",
     });
   }
 };

@@ -3,7 +3,9 @@ var router = express.Router();
 const userController = require("../controllers/userController");
 const marketController = require("../controllers/supermarketController");
 const categoryController = require("../controllers/categoryController");
+const productController = require("../controllers/productController");
 var { verifyToken, verifyRole } = require("../middlewares/authMiddleware");
+const upload = require("../middlewares/upload");
 
 
 /*
@@ -67,5 +69,21 @@ router.get("/categories/list", verifyToken, verifyRole(["admin"]), categoryContr
 router.put("/categories/update/:id", verifyToken, verifyRole(["admin"]), categoryController.updateCategory);
 router.delete("/categories/delete/:id", verifyToken, verifyRole(["admin"]), categoryController.deleteCategory);
 router.get("/categories/:id", verifyToken, verifyRole(["admin"]), categoryController.getCategoryById);
+
+/*
+=====
+PRODUCT ROUTES
+=====
+*/
+
+router.post("/product/create", verifyToken, verifyRole(["admin","supermarket"]), upload.single("image"), productController.createProduct);
+router.get("/product/list/:id", verifyToken, verifyRole(["admin","supermarket"]), productController.listProduct);
+router.put("/product/update/:id", verifyToken, verifyRole(["admin","supermarket"]), upload.single("image"), productController.updateProduct);
+router.delete("/product/delete/:id", verifyToken, verifyRole(["admin","supermarket"]), productController.deleteProduct);
+router.put("/product/toggle/:id", verifyToken, verifyRole(["admin","supermarket"]), productController.toggleProduct);
+
+
+
+
 
 module.exports = router;
