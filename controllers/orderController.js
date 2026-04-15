@@ -23,7 +23,7 @@ const createSaleOrder = async (req, res) => {
     const orderProducts = [];
     let total = 0;
 
-    for (item of products) {
+    for (const item of products) {
       const doc = await Product.findById(item.productId);
       if (!doc) {
         return res.status(404).json({ success: false, message: "Produto não encontrado." });
