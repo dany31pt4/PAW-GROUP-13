@@ -88,12 +88,11 @@ const registerSupermarket = async (req, res) => {
 const updateSupermarket = async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, location, email, status, phone, password } = req.body;
+    const { name, location, email, status, phone, password, description, schedule, deliveryMethods, deliveryCosts } = req.body;
 
-    // 1. Atualiza os dados no modelo Supermarket
     const updatedMarket = await Supermarket.findByIdAndUpdate(
       id,
-      { name, location, status },
+      { name, location, status, description, schedule, deliveryMethods, deliveryCosts },
       { new: true },
     );
 

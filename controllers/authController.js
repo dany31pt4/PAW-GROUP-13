@@ -17,7 +17,6 @@ const login = async (req, res) => {
     const secretKey = process.env.secret;
     const rememberMe = req.body.remember === "on";
 
-    console.log(req.body);
     let jwtExpiration = "1h";
     var age = 3600000; // 1 hora
 
@@ -31,11 +30,31 @@ const login = async (req, res) => {
       return res.render("auth/login", { erro: "Email ou password inválidos." });
     }
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role, name: user.name },
-      secretKey,
-      { expiresIn: jwtExpiration },
-    );
+    let token;
+    if (user.role == "supermarket") {
+      const supermarket = await Supermarket.findOne({ user: user._id });
+      token = jwt.sign(
+        { id: user._id, supermarket_id: supermarket._id, role: user.role, name: user.name },
+        secretKey,
+        { expiresIn: jwtExpiration },
+      );
+    } else {
+      token = jwt.sign(
+        { id: user._id, role: user.role, name: user.name },
+        secretKey,
+        { expiresIn: jwtExpiration },
+      );
+    }
+
+    /*
+     token = jwt.sign(
+        { id: user._id, role: user.role, name: user.name },
+        secretKey,
+        { expiresIn: jwtExpiration },
+      );
+    }
+    
+    */
 
     if (rememberMe) {
       age = 2592000000; // 30 dias

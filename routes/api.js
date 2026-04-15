@@ -4,7 +4,8 @@ const userController = require("../controllers/userController");
 const marketController = require("../controllers/supermarketController");
 const categoryController = require("../controllers/categoryController");
 const productController = require("../controllers/productController");
-var { verifyToken, verifyRole } = require("../middlewares/authMiddleware");
+const orderController = require("../controllers/orderController");
+var { verifyToken, verifyRole, verifySupermarketStatus } = require("../middlewares/authMiddleware");
 const upload = require("../middlewares/upload");
 
 
@@ -54,6 +55,7 @@ CUSTOMER ROUTES
 */
 
 router.get("/customers/list", verifyToken, verifyRole(["admin"]), userController.listCustomers);
+router.get("/customers/email/:email", verifyToken, verifyRole(["admin", "supermarket"]), userController.getCustomerByEmail);
 router.get("/customers/:id", verifyToken, verifyRole(["admin"]), userController.getCustomerById);
 router.put("/customers/update/:id", verifyToken, verifyRole(["admin"]), userController.updateCustomer);
 router.delete("/customers/delete/:id", verifyToken, verifyRole(["admin"]), userController.deleteCustomer);
@@ -76,14 +78,24 @@ PRODUCT ROUTES
 =====
 */
 
-router.post("/product/create", verifyToken, verifyRole(["admin","supermarket"]), upload.single("image"), productController.createProduct);
+router.post("/product/create", verifyToken, verifyRole(["admin","supermarket"]), verifySupermarketStatus, upload.single("image"), productController.createProduct);
 router.get("/product/list/:id", verifyToken, verifyRole(["admin","supermarket"]), productController.listProduct);
-router.put("/product/update/:id", verifyToken, verifyRole(["admin","supermarket"]), upload.single("image"), productController.updateProduct);
-router.delete("/product/delete/:id", verifyToken, verifyRole(["admin","supermarket"]), productController.deleteProduct);
-router.put("/product/toggle/:id", verifyToken, verifyRole(["admin","supermarket"]), productController.toggleProduct);
+router.put("/product/update/:id", verifyToken, verifyRole(["admin","supermarket"]), verifySupermarketStatus, upload.single("image"), productController.updateProduct);
+router.delete("/product/delete/:id", verifyToken, verifyRole(["admin","supermarket"]), verifySupermarketStatus, productController.deleteProduct);
+router.put("/product/toggle/:id", verifyToken, verifyRole(["admin","supermarket"]), verifySupermarketStatus, productController.toggleProduct);
 
+/*
+=====
+ORDER ROUTES
+=====
+*/
 
-
-
+router.post("/orders/sale", verifyToken, verifyRole(["supermarket"]), verifySupermarketStatus, orderController.createSaleOrder);
+router.get("/orders/list", verifyToken, verifyRole(["admin"]), orderController.getAllOrders);
+router.get("/orders/supermarket/:id", verifyToken, verifyRole(["admin", "supermarket"]), orderController.getOrdersBySupermarket);
+router.get("/orders/customer/:id", verifyToken, verifyRole(["admin", "supermarket"]), orderController.getOrdersByCustomer);
+router.get("/orders/:id", verifyToken, verifyRole(["admin", "supermarket"]), orderController.getOrderById);
+router.put("/orders/status/:id", verifyToken, verifyRole(["admin", "supermarket"]), orderController.updateOrderStatus);
+router.put("/orders/cancel/:id", verifyToken, verifyRole(["admin", "supermarket"]), orderController.cancelOrder);
 
 module.exports = router;
