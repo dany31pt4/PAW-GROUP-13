@@ -1,179 +1,133 @@
 <!DOCTYPE html>
 <html lang="pt">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registo — Marketplace</title>
+  <title>Registo — Marketplace Local</title>
+  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/style/auth.css">
 </head>
-<style>
-  .nav-pills .nav-link.active {
-    background-color: #0d6efd;
-  }
+<body>
 
-  #pills-estafeta-tab.active {
-    background-color: #198754;
-  }
-</style>
+  <div class="auth-card register-card">
+    
+    <div class="brand-title">Marketplace Local</div>
+    <div class="brand-subtitle">Registo de Parceiros</div>
 
-<body class="bg-light">
-
-  <div class="container py-5">
-    <div class="row justify-content-center">
-      <div class="col-12 col-sm-10 col-md-8 col-lg-6">
-
-        <div class="text-center mb-4">
-          <h3 class="fw-bold">Marketplace Local</h3>
-          <p class="text-muted">Crie a sua conta</p>
-        </div>
-
-        <div class="card border-0 shadow-sm">
-          <div class="card-body p-4 p-md-5">
-
-            <% if (locals.erro) { %>
-              <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle me-2"></i>
-                <%= locals.erro %>
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-              </div>
-              <% } %>
-
-                <ul class="nav nav-pills nav-justified mb-4" id="pills-tab" role="tablist">
-                  <li class="nav-item" role="presentation">
-                    <button class="nav-link active fw-semibold" id="pills-supermercado-tab" data-bs-toggle="pill"
-                      data-bs-target="#pills-supermercado" type="button" role="tab">Supermercado</button>
-                  </li>
-                  <li class="nav-item" role="presentation">
-                    <button class="nav-link fw-semibold" id="pills-estafeta-tab" data-bs-toggle="pill"
-                      data-bs-target="#pills-estafeta" type="button" role="tab">Estafeta</button>
-                  </li>
-                </ul>
-
-                <div class="tab-content" id="pills-tabContent">
-
-                  <div class="tab-pane fade show active" id="pills-supermercado" role="tabpanel">
-
-                    <form action="/auth/register/supermarket" method="POST">
-
-                      <div class="row">
-                        <div class="col-md-6 mb-3">
-                          <label for="nomeSuper" class="form-label">Nome do Supermercado</label>
-                          <input type="text" class="form-control" id="nomeSuper" name="name" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                          <label for="telefoneSuper" class="form-label">Telefone</label>
-                          <input type="tel" class="form-control" id="telefoneSuper" name="phone">
-                        </div>
-                      </div>
-
-                      <div class="mb-3">
-                        <label for="emailSuper" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="emailSuper" name="email" required>
-                      </div>
-
-
-                      <div class="mb-3">
-                        <label for="moradaSuper" class="form-label">Morada / Localização</label>
-                        <input type="text" class="form-control" id="moradaSuper" name="address">
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-6 mb-3">
-                          <label class="form-label small fw-bold">Password</label>
-                          <input type="password" class="form-control" id="passwordSuper" name="password" required>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                          <label class="form-label small fw-bold">Confirmar Password</label>
-                          <input type="password" class="form-control" id="confirmPasswordSuper" required>
-                        </div>
-                      </div>
-
-                      <button type="submit" class="btn btn-primary w-100">Registar Supermercado</button>
-                    </form>
-                  </div>
-
-                  <div class="tab-pane fade" id="pills-estafeta" role="tabpanel">
-
-                    <form action="/auth/register/courier" method="POST">
-
-                      <div class="row">
-                        <div class="col-md-6 mb-3">
-                          <label for="nomeEstafeta" class="form-label">Nome Completo</label>
-                          <input type="text" class="form-control" id="nomeEstafeta" name="name" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                          <label for="telefoneEstafeta" class="form-label">Telemóvel</label>
-                          <input type="tel" class="form-control" id="telefoneEstafeta" name="phone" required>
-                        </div>
-                      </div>
-
-                      <div class="mb-3">
-                        <label for="emailEstafeta" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="emailEstafeta" name="email" required>
-                      </div>
-
-                      <div class="mb-3">
-                        <label for="moradaEstafeta" class="form-label">Morada / Zona de Atuação</label>
-                        <input type="text" class="form-control" id="moradaEstafeta" name="address" required>
-                      </div>
-
-                      <div class="row">
-                        <div class="col-md-6 mb-3">
-                          <label class="form-label small fw-bold">Password</label>
-                          <input type="password" class="form-control" id="passwordEstafeta" name="password" required>
-                        </div>
-                        <div class="col-md-6 mb-4">
-                          <label class="form-label small fw-bold">Confirmar Password</label>
-                          <input type="password" class="form-control" id="confirmPasswordEstafeta"
-                            name="confirmPassword" required>
-                        </div>
-                      </div>
-
-                      <button type="submit" class="btn btn-success w-100">Registar Estafeta</button>
-                    </form>
-                  </div>
-
-                </div>
-                <hr class="my-4">
-
-                <p class="text-center text-muted mb-0" style="font-size: 14px">
-                  Já tem uma conta aprovada?
-                  <a href="/auth/login" class="text-decoration-none">Entrar aqui</a>
-                </p>
-
-          </div>
-        </div>
+    <% if (locals.erro) { %>
+      <div class="alert alert-danger bg-danger bg-opacity-10 text-danger border-0 small rounded-3 mb-4">
+        <i class="bi bi-exclamation-circle-fill me-2"></i> <%= locals.erro %>
       </div>
+    <% } %>
+
+    <ul class="nav nav-pills nav-pills-custom nav-justified mb-4" id="pills-tab" role="tablist">
+      <li class="nav-item">
+        <button class="nav-link active" id="pills-supermercado-tab" data-bs-toggle="pill" data-bs-target="#pills-supermercado" type="button" role="tab">Supermercado</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" id="pills-estafeta-tab" data-bs-toggle="pill" data-bs-target="#pills-estafeta" type="button" role="tab">Estafeta</button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent">
+      
+      <div class="tab-pane fade show active" id="pills-supermercado" role="tabpanel">
+        <form action="/auth/register/supermarket" method="POST" id="formSuper">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label-custom">Nome Comercial</label>
+              <input type="text" name="name" class="form-control-custom" placeholder="Ex: Pingo Doce" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label-custom">Telefone</label>
+              <input type="tel" name="phone" class="form-control-custom" placeholder="255 000 000">
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label-custom">Email de Gestão</label>
+            <input type="email" name="email" class="form-control-custom" placeholder="gestao@loja.pt" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label-custom">Morada Completa</label>
+            <input type="text" name="address" class="form-control-custom" placeholder="Rua, Número, Localidade">
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label-custom">Password</label>
+              <input type="password" name="password" id="passwordSuper" class="form-control-custom" placeholder="••••••••" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label-custom">Confirmar Password</label>
+              <input type="password" id="confirmPasswordSuper" class="form-control-custom" placeholder="••••••••" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit btn-super mt-3">Registar</button>
+        </form>
+      </div>
+
+      <div class="tab-pane fade" id="pills-estafeta" role="tabpanel">
+        <form action="/auth/register/courier" method="POST" id="formEstafeta">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label-custom">Nome Completo</label>
+              <input type="text" name="name" class="form-control-custom" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label-custom">Telemóvel</label>
+              <input type="tel" name="phone" class="form-control-custom" required>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label-custom">Email Pessoal</label>
+            <input type="email" name="email" class="form-control-custom" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label-custom">Zona de Atuação (Cidade)</label>
+            <input type="text" name="address" class="form-control-custom" required>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label-custom">Password</label>
+              <input type="password" name="password" id="passwordEstafeta" class="form-control-custom" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label-custom">Confirmar Password</label>
+              <input type="password" id="confirmPasswordEstafeta" class="form-control-custom" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit btn-estafeta mt-3">Registar como Estafeta</button>
+        </form>
+      </div>
+
     </div>
+
+    <div class="hr-custom"></div>
+    <div class="text-center">
+      <span class="text-muted small">Já faz parte da rede?</span>
+      <a href="/auth/login" class="footer-link ms-1 fw-bold">Entrar agora</a>
+    </div>
+
   </div>
 
   <script>
-    function validarSenhas(idSenha, idConfirma) {
-      const senha = document.getElementById(idSenha);
-      const confirma = document.getElementById(idConfirma);
-
-      if (senha.value !== confirma.value) {
-        alert("Erro: As passwords não coincidem. Por favor, verifique.");
-        confirma.style.borderColor = "#dc3545";
-        confirma.focus();
-        return false; // Bloqueia o envio do formulário
-      }
-      return true; // Permite o envio
+    function setupValidation(formId, passId, confirmId) {
+      const form = document.getElementById(formId);
+      form.onsubmit = function() {
+        const pass = document.getElementById(passId).value;
+        const confirm = document.getElementById(confirmId).value;
+        if (pass !== confirm) {
+          alert("As passwords não coincidem!");
+          return false;
+        }
+        return true;
+      };
     }
-
-    // Aplicar ao formulário do Supermercado
-    document.getElementById('formSuper').onsubmit = function () {
-      return validarSenhas('passwordSuper', 'confirmPasswordSuper');
-    };
-
-    // Aplicar ao formulário do Estafeta
-    document.getElementById('formEstafeta').onsubmit = function () {
-      return validarSenhas('passwordEstafeta', 'confirmPasswordEstafeta');
-    };
+    setupValidation('formSuper', 'passwordSuper', 'confirmPasswordSuper');
+    setupValidation('formEstafeta', 'passwordEstafeta', 'confirmPasswordEstafeta');
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
