@@ -1,0 +1,64 @@
+
+:root {
+  --swal-bg: #1e1e1e;
+  --input-bg: #252525;
+  --border-muted: #333333;
+  --text-primary: #ffffff;
+  --text-muted: #aaaaaa;
+}
+
+.form-control-custom {
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--border-muted) !important;
+  color: var(--text-primary) !important;
+  padding: 12px 15px !important;
+  border-radius: 10px !important;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.form-control-custom:focus {
+  border-color: #3498db !important;
+  outline: none;
+}
+
+.form-label-small {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.product-img-sm {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  background-color: #252525;
+}
+
+.table td {
+  padding: 16px 12px !important;
+}
+
+.btn-action {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: var(--text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+
+.btn-action:hover {
+  background: #3498db;
+  color: #fff;
+}
+
+.btn-delete:hover {
+  background: #e74c3c;
+}

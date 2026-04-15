@@ -1,0 +1,141 @@
+/* public/stylesheets/auth.css */
+
+:root {
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+  --input-bg: #252525;
+  --border-color: #333333;
+  --text-main: #ffffff;
+  --text-muted: #888888;
+  --accent-white: #ffffff;
+  --accent-green: #198754;
+}
+
+body {
+  background-color: var(--bg-color) !important;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 40px 20px; 
+}
+
+.auth-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 40px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+}
+
+/* Classe extra para o Registo ser mais largo */
+.register-card {
+  max-width: 850px;
+}
+
+.brand-title {
+  font-weight: 800;
+  font-size: 1.6rem;
+  letter-spacing: -0.5px;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.brand-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Tabs do Registo */
+.nav-pills-custom .nav-link {
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  margin: 0 5px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.nav-pills-custom .nav-link.active#pills-supermercado-tab {
+  background-color: var(--accent-white);
+  color: #000000;
+  border-color: var(--accent-white);
+}
+
+.nav-pills-custom .nav-link.active#pills-estafeta-tab {
+  background-color: var(--accent-green);
+  color: #ffffff;
+  border-color: var(--accent-green);
+}
+
+/* Labels e Inputs */
+.form-label-custom {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #aaaaaa;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.form-control-custom {
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+
+.form-control-custom:focus {
+  border-color: var(--accent-white) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
+  outline: none;
+}
+
+/* Botões */
+.btn-submit {
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 700;
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-super { background-color: var(--accent-white); color: #000000; }
+.btn-estafeta { background-color: var(--accent-green); color: #ffffff; }
+
+.btn-submit:hover { opacity: 0.9; }
+
+.hr-custom {
+  border-top: 1px solid var(--border-color);
+  margin: 30px 0;
+  opacity: 1;
+}
+
+.text-muted.small {
+  color: var(--text-muted) !important; 
+}
+
+.footer-link {
+  color: var(--text-muted) !important;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.footer-link:hover {
+    color: var(--text-main) !important;
+    text-decoration: underline;
+}
