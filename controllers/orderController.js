@@ -131,7 +131,7 @@ const updateOrderStatus = async (req, res) => {
     const order = await orderService.updateOrderStatus(req.params.id, status);
     if (!order) return res.status(404).json({ success: false, message: "Encomenda não encontrada." });
 
-    res.status(200).json({ success: true, data: order });
+    res.status(200).json({ success: true, message: "Estado atualizado com sucesso." });
   } catch (error) {
     console.error("Erro ao atualizar estado:", error.message);
     res.status(500).json({ success: false, message: "Erro ao atualizar estado." });
@@ -164,8 +164,8 @@ const cancelOrder = async (req, res) => {
       await Product.findByIdAndUpdate(item.product._id, { $inc: { stock: item.quantity } });
     }
 
-    const cancelled = await orderService.updateOrderStatus(req.params.id, "cancelled");
-    res.status(200).json({ success: true, data: cancelled });
+    await orderService.updateOrderStatus(req.params.id, "cancelled");
+    res.status(200).json({ success: true, message: "Encomenda cancelada com sucesso." });
   } catch (error) {
     console.error("Erro ao cancelar encomenda:", error.message);
     res.status(500).json({ success: false, message: "Erro ao cancelar encomenda." });

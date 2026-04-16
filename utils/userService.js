@@ -39,7 +39,7 @@ const updateUser = async (id, data) => {
     updateData.password = await hashPassword(data.password);
   }
 
-  return await User.findByIdAndUpdate(id, updateData, { new: true }).select("-password");
+  return await User.findByIdAndUpdate(id, updateData, {}).select("-password");
 };
 
 const deleteUser = async (id) => {

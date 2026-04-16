@@ -53,8 +53,7 @@ const updateCategory = async (req, res) => {
 
     const updated = await Category.findByIdAndUpdate(
       req.params.id,
-      { name, description, status },
-      { new: true }
+      { name, description, status }
     );
 
     if (!updated) {

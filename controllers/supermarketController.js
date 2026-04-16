@@ -93,7 +93,7 @@ const updateSupermarket = async (req, res) => {
     const updatedMarket = await Supermarket.findByIdAndUpdate(
       id,
       { name, location, status, description, schedule, deliveryMethods, deliveryCosts },
-      { new: true },
+      {},
     );
 
     if (!updatedMarket) {
@@ -167,7 +167,7 @@ const updateMySupermarket = async (req, res) => {
     const updatedMarket = await Supermarket.findByIdAndUpdate(
       req.user.supermarket_id,
       { name, description, location, schedule, deliveryMethods, deliveryCosts },
-      { new: true },
+      {},
     );
 
     if (!updatedMarket) {
@@ -190,7 +190,7 @@ const approveSupermarket = async (req, res) => {
     const updatedMarket = await Supermarket.findByIdAndUpdate(
       id,
       { status: "approved" },
-      { new: true },
+      {},
     );
 
     if (!updatedMarket) {
@@ -220,7 +220,6 @@ const rejectSupermarket = async (req, res) => {
     const updatedMarket = await Supermarket.findByIdAndUpdate(
       id,
       { status: "rejected" },
-      { new: true },
     );
 
     if (!updatedMarket) {

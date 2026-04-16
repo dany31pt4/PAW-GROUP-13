@@ -37,7 +37,7 @@ const getAllOrders = async () => {
 };
 
 const updateOrderStatus = async (id, status) => {
-  return await Order.findByIdAndUpdate(id, { status }, { new: true });
+  return await Order.findByIdAndUpdate(id, { status });
 };
 
 module.exports = {
