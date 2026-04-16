@@ -55,6 +55,8 @@ const registerSupermarket = async (req, res) => {
       name: req.body.name,
       location: req.body.address,
       status: "pending",
+      deliveryMethods: ["pickup"],
+      deliveryCost: 0,
     };
 
     await supermarketService.createSupermarket(marketData);
@@ -88,11 +90,11 @@ const registerSupermarket = async (req, res) => {
 const updateSupermarket = async (req, res) => {
   try {
     const id = req.params.id;
-    const { name, location, email, status, phone, password, description, schedule, deliveryMethods, deliveryCosts } = req.body;
+    const { name, location, email, status, phone, password, description, schedule, deliveryMethods, deliveryCost } = req.body;
 
     const updatedMarket = await Supermarket.findByIdAndUpdate(
       id,
-      { name, location, status, description, schedule, deliveryMethods, deliveryCosts },
+      { name, location, status, description, schedule, deliveryMethods, deliveryCost },
       { new: true },
     );
 
@@ -162,11 +164,11 @@ const deleteSupermarket = async (req, res) => {
 // Supermercado atualiza as suas próprias definições
 const updateMySupermarket = async (req, res) => {
   try {
-    const { name, description, location, schedule, deliveryMethods, deliveryCosts, email, phone, password } = req.body;
+    const { name, description, location, schedule, deliveryMethods, deliveryCost, email, phone, password } = req.body;
 
     const updatedMarket = await Supermarket.findByIdAndUpdate(
       req.user.supermarket_id,
-      { name, description, location, schedule, deliveryMethods, deliveryCosts },
+      { name, description, location, schedule, deliveryMethods, deliveryCost },
       { new: true },
     );
 

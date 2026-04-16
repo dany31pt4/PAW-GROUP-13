@@ -8,10 +8,16 @@ const User = require("../models/user");
 // Venda em caixa (M1) — backoffice do supermercado
 const createSaleOrder = async (req, res) => {
   try {
-    const { customerId, products } = req.body;
+    const { customerId, products, deliveryMethod = "pickup", deliveryCost = 0 } = req.body;
 
     if (!products || products.length === 0) {
       return res.status(400).json({ success: false, message: "Produtos são obrigatórios." });
+    }
+
+    const supermarket = await Supermarket.findById(req.user.supermarket_id);
+    if (!supermarket.deliveryMethods || !supermarket.deliveryMethods.includes(deliveryMethod)) {
+      const label = deliveryMethod === "courier" ? "entrega por estafeta" : "levantamento em loja";
+      return res.status(400).json({ success: false, message: `Este supermercado não tem ${label} ativo.` });
     }
 
     const customer = await User.findById(customerId);
@@ -45,8 +51,8 @@ const createSaleOrder = async (req, res) => {
       customer: customerId,
       supermarket: req.user.supermarket_id,
       products: orderProducts,
-      deliveryMethod: "pickup",
-      deliveryCost: 0,
+      deliveryMethod,
+      deliveryCost: deliveryMethod === "courier" ? deliveryCost : 0,
       total,
       status: "confirmed",
     });

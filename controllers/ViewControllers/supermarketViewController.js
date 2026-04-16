@@ -100,7 +100,7 @@ const getNewSale = async (req, res) => {
     const supermarket = await Supermarket.findOne({ user: req.user.id });
 
     const [products, categories] = await Promise.all([
-      Product.find({ supermarket: supermarket._id, stock: { $gt: 0 } })
+      Product.find({ supermarket: supermarket._id, stock: { $gt: 0 }, isActive: true })
         .populate("category")
         .sort({ name: 1 }),
       Category.find({ status: true }),

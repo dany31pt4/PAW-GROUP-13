@@ -38,11 +38,41 @@ const getApprovals = async (req, res) => {
   });
 };
 
-const getOrders = (req, res) => {
-  res.render("admin/orders", {
-    activePage: "orders",
-    listaEncomendas: [],
-  });
+const getOrders = async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate("customer", "name email")
+      .populate("supermarket", "name")
+      .populate("courier", "name")
+      .populate("products.product", "name")
+      .sort({ createdAt: -1 });
+
+    // Dados para gráfico: vendas por supermercado
+    const salesByMarket = {};
+    orders.forEach(o => {
+      const name = o.supermarket ? o.supermarket.name : "Desconhecido";
+      salesByMarket[name] = (salesByMarket[name] || 0) + 1;
+    });
+
+    // Dados para gráfico: entregas por estafeta
+    const deliveriesByCourier = {};
+    orders.filter(o => o.courier).forEach(o => {
+      const name = o.courier.name;
+      deliveriesByCourier[name] = (deliveriesByCourier[name] || 0) + 1;
+    });
+
+    res.render("admin/orders", {
+      activePage: "orders",
+      orders,
+      chartMarketLabels: JSON.stringify(Object.keys(salesByMarket)),
+      chartMarketData: JSON.stringify(Object.values(salesByMarket)),
+      chartCourierLabels: JSON.stringify(Object.keys(deliveriesByCourier)),
+      chartCourierData: JSON.stringify(Object.values(deliveriesByCourier)),
+    });
+  } catch (error) {
+    console.error("Erro ao carregar encomendas:", error);
+    res.status(500).render("error", { status: 500, message: "Erro ao carregar encomendas." });
+  }
 };
 
 const getUsers = async (req, res) => {

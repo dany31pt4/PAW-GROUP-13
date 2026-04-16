@@ -85,7 +85,7 @@
                             <label class="form-label small fw-bold text-muted uppercase">Custo de Entrega Genérico (€)</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-white"><i class="bi bi-currency-euro"></i></span>
-                                <input type="number" step="0.01" id="dc-cost" class="form-control" value="<%= supermarket.deliveryCost !== undefined ? supermarket.deliveryCost : 0 %>">
+                                <input type="number" step="0.01" id="dc-cost" class="form-control" value="<%= supermarket.deliveryCost || 0 %>">
                             </div>
                         </div>
                     </div>

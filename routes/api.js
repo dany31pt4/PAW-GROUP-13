@@ -56,6 +56,7 @@ CUSTOMER ROUTES
 */
 
 router.get("/customers/list", verifyToken, verifyRole(["admin"]), userController.listCustomers);
+router.post("/customers/create", verifyToken, verifyRole(["admin", "supermarket"]), userController.createCustomer);
 router.get("/customers/email/:email", verifyToken, verifyRole(["admin", "supermarket"]), userController.getCustomerByEmail);
 router.get("/customers/:id", verifyToken, verifyRole(["admin"]), userController.getCustomerById);
 router.put("/customers/update/:id", verifyToken, verifyRole(["admin"]), userController.updateCustomer);

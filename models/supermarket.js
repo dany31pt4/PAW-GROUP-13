@@ -13,10 +13,7 @@ const supermarketSchema = new mongoose.Schema(
     location: { type: String, required: true },
     schedule: { type: String },
     deliveryMethods: [{ type: String, enum: ["pickup", "courier"] }],
-    deliveryCosts: {
-      pickup: { type: Number, default: 0 },
-      courier: { type: Number, default: 0 },
-    },
+    deliveryCost: { type: Number, default: 0 },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

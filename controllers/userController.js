@@ -202,6 +202,22 @@ const registerCourier = async (req, res) => {
   }
 };
 
+const createCustomer = async (req, res) => {
+  try {
+    const { name, email, phone, password } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ success: false, message: "Nome, email e password são obrigatórios." });
+    }
+    const newCustomer = await userService.createUser({ name, email, phone, password, role: "customer" });
+    res.status(201).json({ success: true, data: newCustomer });
+  } catch (err) {
+    if (err.message && err.message.includes("E11000")) {
+      return res.status(400).json({ success: false, message: "Este email já está registado." });
+    }
+    res.status(500).json({ success: false, message: "Erro ao criar cliente." });
+  }
+};
+
 const listCustomers = async (req, res) => {
   try {
     const customers = await userService.getUsersByRole("customer");
@@ -289,6 +305,7 @@ module.exports = {
   updateCourier,
   deleteCourier,
   registerCourier,
+  createCustomer,
   listCustomers,
   getCustomerById,
   updateCustomer,

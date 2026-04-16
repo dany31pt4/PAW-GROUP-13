@@ -10,7 +10,6 @@ require('dotenv').config();               // Loads environment variables from a 
 // 2. ROUTER IMPORTS
 // Importing the separate router modules to handle specific path prefixes
 var indexRouter = require('./routes/index'); // Handles core/public routes
-var usersRouter = require('./routes/users'); // Handles user-related routes
 var authRouter = require('./routes/auth');   // Handles authentication routes (login, register)
 var adminRouter = require('./routes/admin');   // Handles admin-specific routes (dashboard, approvals, etc.)
 var apiRouter = require('./routes/api');   // Handles API routes (data endpoints for frontend JS)
@@ -39,7 +38,6 @@ app.use(express.static(path.join(__dirname, 'public'))); // Serves static files 
 // 6. ROUTE MOUNTING
 // Map the imported routers to their specific base URLs
 app.use('/', indexRouter);       // Base routes map to '/'
-app.use('/users', usersRouter);  // User routes map to '/users'
 app.use('/auth', authRouter);    // Auth routes map to '/auth'
 app.use('/admin', adminRouter);  // Admin routes map to '/admin'
 app.use('/api', apiRouter);  // API routes map to '/api'
