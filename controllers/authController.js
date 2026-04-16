@@ -13,12 +13,12 @@ const renderRegisterPage = (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email: email }); // Procura o utilizador pelo email no mongo
+    const user = await User.findOne({ email: email.toLowerCase() }); // Procura o utilizador pelo email no mongo
     const secretKey = process.env.secret;
     const rememberMe = req.body.remember === "on";
 
-    let jwtExpiration = "1h";
-    var age = 3600000; // 1 hora
+    let jwtExpiration = "1h"; // token age
+    let age = 3600000; // cookie age
 
     if (!user) {
       return res.render("auth/login", { erro: "Email ou password inválidos." });
@@ -30,11 +30,26 @@ const login = async (req, res) => {
       return res.render("auth/login", { erro: "Email ou password inválidos." });
     }
 
+    if (rememberMe) {
+      age = 2592000000; // 30 dias
+      jwtExpiration = "30d";
+    }
+
     let token;
     if (user.role == "supermarket") {
       const supermarket = await Supermarket.findOne({ user: user._id });
+      if (!supermarket) {
+        return res.render("auth/login", {
+          erro: "Conta de supermercado inválida. Contacte o suporte.",
+        });
+      }
       token = jwt.sign(
-        { id: user._id, supermarket_id: supermarket._id, role: user.role, name: user.name },
+        {
+          id: user._id,
+          supermarket_id: supermarket._id,
+          role: user.role,
+          name: user.name,
+        },
         secretKey,
         { expiresIn: jwtExpiration },
       );
@@ -44,10 +59,6 @@ const login = async (req, res) => {
         secretKey,
         { expiresIn: jwtExpiration },
       );
-    }
-
-    if (rememberMe) {
-      age = 2592000000; // 30 dias
     }
 
     res.cookie("token", token, {

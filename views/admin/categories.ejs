@@ -34,39 +34,12 @@
                         </tr>
                     </thead>
                     <tbody id="categoryTableBody">
-                        <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
-                            <% categories.forEach(function(cat) { %>
-                                <tr>
-                                    <td><strong><%= cat.name %></strong></td>
-                                    <td>
-                                        <% if (cat.status === true) { %>
-                                            <span class="badge bg-success">Ativa</span>
-                                        <% } else { %>
-                                            <span class="badge bg-secondary">Inativa</span>
-                                        <% } %>
-                                    </td>
-                                    <td class="text-end">
-                                        <button class="btn btn-sm btn-outline-primary"  
-                                                onclick="openViewCategoryModal('<%= cat._id %>')">
-                                            Ver
-                                        </button>
-
-                                        <button class="btn btn-sm btn-outline-secondary"  
-                                                onclick="openEditCategoryModal('<%= cat._id %>')">
-                                            Editar
-                                        </button>
-                                        <button class="btn btn-sm btn-outline-danger ms-1"  
-                                                onclick="openRemoveCategoryModal('<%= cat._id %>')">
-                                            Eliminar
-                                        </button>
-                                    </td>
-                                </tr>
-                            <% }); %>
-                        <% } else { %>
-                            <tr>
-                                <td colspan="4" class="text-center py-4 text-muted">Nenhuma categoria registada.</td>
+                         <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                    A carregar produtos...
+                                </td>
                             </tr>
-                        <% } %>
                     </tbody>
                 </table>
             </div>

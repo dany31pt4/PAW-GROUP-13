@@ -159,6 +159,30 @@ const deleteSupermarket = async (req, res) => {
   }
 };
 
+// Supermercado atualiza as suas próprias definições
+const updateMySupermarket = async (req, res) => {
+  try {
+    const { name, description, location, schedule, deliveryMethods, deliveryCosts, email, phone, password } = req.body;
+
+    const updatedMarket = await Supermarket.findByIdAndUpdate(
+      req.user.supermarket_id,
+      { name, description, location, schedule, deliveryMethods, deliveryCosts },
+      { new: true },
+    );
+
+    if (!updatedMarket) {
+      return res.status(404).json({ success: false, message: "Supermercado não encontrado." });
+    }
+
+    await userService.updateUser(req.user.id, { name, email, phone, address: location, password });
+
+    res.json({ success: true, message: "Definições atualizadas com sucesso!" });
+  } catch (error) {
+    console.error("Erro ao atualizar definições:", error);
+    res.status(500).json({ success: false, message: "Erro ao atualizar as definições." });
+  }
+};
+
 const approveSupermarket = async (req, res) => {
   try {
     const id = req.params.id;
@@ -246,6 +270,7 @@ module.exports = {
   registerSupermarket,
   getSupermarketDetails,
   updateSupermarket,
+  updateMySupermarket,
   deleteSupermarket,
   listPendingSupermarkets,
   rejectSupermarket,

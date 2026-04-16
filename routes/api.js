@@ -45,6 +45,7 @@ router.get("/supermarkets/listPending", verifyToken, verifyRole(["admin"]), mark
 router.put("/supermarkets/approve/:id", verifyToken, verifyRole(["admin"]), marketController.approveSupermarket);
 router.put("/supermarkets/reject/:id", verifyToken, verifyRole(["admin"]), marketController.rejectSupermarket);
 router.put("/supermarkets/update/:id", verifyToken, verifyRole(["admin"]), marketController.updateSupermarket);
+router.put("/supermarkets/me", verifyToken, verifyRole(["supermarket"]), marketController.updateMySupermarket);
 router.delete("/supermarkets/delete/:id", verifyToken, verifyRole(["admin"]), marketController.deleteSupermarket);
 router.get("/supermarkets/:id", verifyToken, verifyRole(["admin"]), marketController.getSupermarketDetails);
 

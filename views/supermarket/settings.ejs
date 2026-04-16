@@ -1,59 +1,139 @@
 <!DOCTYPE html>
 <html lang="pt">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Painel de Administração - Marketplace</title>
-
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
-    />
-
+    <title>Definições - Marketplace</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="/style/admin.css" />
-  </head>
-
-  <body>
-    <%- include('../partials/sidebar-supermarket') %>
+</head>
+<body>
+    <%- include('../partials/sidebar-supermarket', { activePage: 'settings' }) %>
 
     <main class="main-wrapper">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h4 style="font-weight: 700; color: #2c3e50; margin: 0">
-            Painel de administração
-          </h4>
-          <small class="text-muted"
-            >Olá,
-            <strong> <%= supermarket.name %> </strong>
-          </small>
+        <div class="mb-4">
+            <h4 class="fw-bold">Definições</h4>
+            <p class="text-muted">Gerir os dados da loja e da conta.</p>
         </div>
 
-        <!-- 
-         o supermercado pode configurar:
-                 Dados do supermercado:
-                - Nome
-                - Descrição
-                - Localização
-                - Horário de funcionamento
+        <div class="row g-4">
 
-                Métodos de entrega:
-                - Ativar/desativar levantamento em loja
-                - Ativar/desativar entrega por estafeta
-                - Custo de entrega por método
+            <!-- Dados do Supermercado -->
+            <div class="col-12">
+                <div class="table-card mt-0">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-shop me-2"></i>Dados da Loja</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nome</label>
+                            <input type="text" id="s-name" class="form-control" value="<%= supermarket.name || '' %>">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Localização</label>
+                            <input type="text" id="s-location" class="form-control" value="<%= supermarket.location || '' %>">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Horário</label>
+                            <input type="text" id="s-schedule" class="form-control" placeholder="Ex: Seg-Sex 09:00-20:00" value="<%= supermarket.schedule || '' %>">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descrição</label>
+                            <textarea id="s-description" class="form-control" rows="3"><%= supermarket.description || '' %></textarea>
+                        </div>
+                    </div>
 
-                Dados da conta (utilizador):
-                - Email
-                - Password
-                - Telefone
+                    <h6 class="fw-bold mt-4 mb-3"><i class="bi bi-truck me-2"></i>Métodos de Entrega</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="dm-pickup" <%= supermarket.deliveryMethods && supermarket.deliveryMethods.includes('pickup') ? 'checked' : '' %>>
+                                <label class="form-check-label" for="dm-pickup">Levantamento em loja</label>
+                            </div>
+                            <label class="form-label">Custo levantamento (€)</label>
+                            <input type="number" step="0.01" id="dc-pickup" class="form-control" value="<%= supermarket.deliveryCosts && supermarket.deliveryCosts.pickup !== undefined ? supermarket.deliveryCosts.pickup : 0 %>">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="dm-courier" <%= supermarket.deliveryMethods && supermarket.deliveryMethods.includes('courier') ? 'checked' : '' %>>
+                                <label class="form-check-label" for="dm-courier">Entrega por estafeta</label>
+                            </div>
+                            <label class="form-label">Custo entrega (€)</label>
+                            <input type="number" step="0.01" id="dc-courier" class="form-control" value="<%= supermarket.deliveryCosts && supermarket.deliveryCosts.courier !== undefined ? supermarket.deliveryCosts.courier : 0 %>">
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            -->
-      </div>
+            <!-- Dados da Conta -->
+            <div class="col-12">
+                <div class="table-card mt-0">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-person me-2"></i>Dados da Conta</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" id="u-email" class="form-control" value="<%= user.email || '' %>">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Telefone</label>
+                            <input type="text" id="u-phone" class="form-control" value="<%= user.phone || '' %>">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nova Password <span class="text-muted small">(deixar vazio para não alterar)</span></label>
+                            <input type="password" id="u-password" class="form-control" placeholder="••••••••">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="d-flex justify-content-end mt-3">
+            <button class="btn btn-primary px-4" onclick="saveSettings()">
+                <i class="bi bi-floppy me-2"></i>Guardar Alterações
+            </button>
+        </div>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+    <script>
+        async function saveSettings() {
+            const deliveryMethods = [];
+            if (document.getElementById('dm-pickup').checked) deliveryMethods.push('pickup');
+            if (document.getElementById('dm-courier').checked) deliveryMethods.push('courier');
+
+            const payload = {
+                name:            document.getElementById('s-name').value,
+                location:        document.getElementById('s-location').value,
+                schedule:        document.getElementById('s-schedule').value,
+                description:     document.getElementById('s-description').value,
+                deliveryMethods,
+                deliveryCosts: {
+                    pickup:  parseFloat(document.getElementById('dc-pickup').value) || 0,
+                    courier: parseFloat(document.getElementById('dc-courier').value) || 0,
+                },
+                email:    document.getElementById('u-email').value,
+                phone:    document.getElementById('u-phone').value,
+                password: document.getElementById('u-password').value || undefined,
+            };
+
+            try {
+                const response = await fetch('/api/supermarkets/me', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                    body: JSON.stringify(payload),
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    Swal.fire('Sucesso!', data.message, 'success');
+                } else {
+                    Swal.fire('Erro!', data.message || 'Não foi possível guardar.', 'error');
+                }
+            } catch {
+                Swal.fire('Erro!', 'Erro de conexão.', 'error');
+            }
+        }
+    </script>
+</body>
 </html>

@@ -11,7 +11,7 @@ const createUser = async (userData) => {
   const hashed = await hashPassword(userData.password);
   return await User.create({
     name: userData.name,
-    email: userData.email,
+    email: userData.email.toLowerCase(),
     password: hashed,
     address: userData.address,
     phone: userData.phone,

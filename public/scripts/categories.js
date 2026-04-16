@@ -322,3 +322,5 @@ async function loadCategoryTable() {
     console.error("Erro ao carregar tabela de supermercados:", err);
   }
 }
+
+loadCategoryTable();

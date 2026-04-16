@@ -14,7 +14,6 @@ const createSaleOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Produtos são obrigatórios." });
     }
 
-    // Verificar que o cliente existe
     const customer = await User.findById(customerId);
     if (!customer) {
       return res.status(404).json({ success: false, message: "Cliente não encontrado." });
@@ -30,6 +29,9 @@ const createSaleOrder = async (req, res) => {
       }
       if (doc.supermarket.toString() !== req.user.supermarket_id.toString()) {
         return res.status(400).json({ success: false, message: `Produto ${doc.name} não pertence a este supermercado.` });
+      }
+      if (!doc.isActive) {
+        return res.status(400).json({ success: false, message: `Produto ${doc.name} está desativado.` });
       }
       if (doc.stock < item.quantity) {
         return res.status(400).json({ success: false, message: `Stock insuficiente para ${doc.name}.` });

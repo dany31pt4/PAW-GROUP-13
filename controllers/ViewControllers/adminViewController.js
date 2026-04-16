@@ -6,7 +6,7 @@ const supermarketService = require("../../utils/supermarketService");
 
 const getDashboard = async (req, res) => {
   try {
-    const [countActiveMarkets, pendingMarkets, totalOrders, totalCustomers] =
+    const [countActiveMarkets, pendingMarkets, totalOrders, totalUsers] =
       await Promise.all([
         Supermarket.countDocuments({ status: "approved" }),
         supermarketService.getPending(),
@@ -18,7 +18,7 @@ const getDashboard = async (req, res) => {
       activePage: "dashboard",
       totalOrders,
       totalMarkets: countActiveMarkets,
-      totalCustomers,
+      totalUsers,
       pendingMarkets,
     });
   } catch (error) {
