@@ -1,64 +1,472 @@
 <!DOCTYPE html>
 <html lang="pt">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Painel de Administração - Marketplace</title>
+    <title>Nova Venda - Marketplace</title>
 
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    
     <link rel="stylesheet" href="/style/admin.css" />
-  </head>
+    <link rel="stylesheet" href="/style/supermarket.css">
 
-  <body>
-    <%- include('../partials/sidebar-supermarket') %>
+    <style>
+        /* Estilos específicos para a grelha de produtos no POS */
+        .pos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .pos-grid::-webkit-scrollbar { width: 6px; }
+        .pos-grid::-webkit-scrollbar-thumb { background-color: #dee2e6; border-radius: 10px; }
+
+        .pos-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .pos-card:hover {
+            border-color: #3498db;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .pos-card.out-of-stock {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .cart-sticky {
+            position: sticky;
+            top: 20px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <%- include('../partials/sidebar-supermarket', { activePage: 'newsale' }) %>
 
     <main class="main-wrapper">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h4 style="font-weight: 700; color: #2c3e50; margin: 0">
-            Painel de administração
-          </h4>
-          <small class="text-muted"
-            >Olá,
-            <strong> <%= supermarket.name %> </strong>
-          </small>
+
+        <div class="dash-header mb-4">
+            <div class="dash-header-left">
+                <h2>Registar Nova Venda</h2>
+                <p>Ponto de Venda — <strong><%= supermarket.name %></strong></p>
+            </div>
+            <div class="dash-header-right">
+                <div class="avatar-circle">
+                    <%= supermarket.name ? supermarket.name.slice(0,2).toUpperCase() : 'SM' %>
+                </div>
+            </div>
         </div>
 
-        <!-- 
+        <div class="row g-4">
+            <div class="col-xl-8 col-lg-7">
                 
-            1. Procurar/Criar cliente
-            - campo de pesquisa por email ou nome
-            - se não existir → formulário rápido para criar (nome, email, telefone, password)
+                <div class="table-card mt-0 mb-4">
+                    <h6 class="fw-bold mb-3" style="color:#2c3e50;"><i class="bi bi-person-badge me-2 text-primary"></i>1. Identificar Cliente</h6>
+                    
+                    <div id="clientSearchBlock">
+                        <div class="input-group mb-2">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" id="clientSearch" class="form-control border-start-0 ps-0" placeholder="Pesquisar cliente por nome ou email...">
+                            <button class="btn btn-primary px-4" type="button" onclick="searchClient()">Procurar</button>
+                        </div>
+                        <div class="text-end">
+                            <button class="btn btn-sm btn-link text-decoration-none text-muted" onclick="toggleNewClientForm()">
+                                <i class="bi bi-plus-circle me-1"></i> Criar novo cliente
+                            </button>
+                        </div>
+                    </div>
 
-            2. Adicionar produtos
-            - pesquisa de produtos por nome
-            - filtro por categoria
-            - listagem com nome, preço, stock disponível
-            - botão para adicionar ao carrinho com quantidade
+                    <div id="selectedClientBlock" class="d-none p-3 bg-light rounded border border-success-subtle d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                            <span id="clientNameDisplay" class="fw-bold text-dark"></span>
+                            <span id="clientEmailDisplay" class="text-muted ms-2 small"></span>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="resetClient()">Alterar</button>
+                    </div>
 
-            3. Resumo da venda
-            - lista de produtos adicionados + quantidades
-            - alterar quantidade / remover produto
-            - método de entrega (pickup ou estafeta)
-            - custo de entrega calculado automaticamente
-            - total
+                    <div id="newClientForm" class="d-none mt-3 p-4 border rounded bg-light">
+                        <h7 class="fw-bold mb-3 d-block">Novo Cliente</h7>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold">Nome</label>
+                                <input type="text" id="nc-name" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold">Email</label>
+                                <input type="email" id="nc-email" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold">Telefone</label>
+                                <input type="text" id="nc-phone" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small text-muted fw-bold">Password (Temporária)</label>
+                                <input type="password" id="nc-password" class="form-control form-control-sm">
+                            </div>
+                            <div class="col-12 text-end mt-3">
+                                <button class="btn btn-sm btn-secondary me-2" onclick="toggleNewClientForm()">Cancelar</button>
+                                <button class="btn btn-sm btn-success" onclick="createClient()">Criar e Selecionar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            4. Confirmar venda
-            - cria a Order na DB com status confirmed (já foi paga em loja)
-            - desconta o stock dos produtos
-            - associa ao cliente
+                <div class="table-card mt-0">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold m-0" style="color:#2c3e50;"><i class="bi bi-box-seam me-2 text-primary"></i>2. Adicionar Produtos</h6>
                         
-                -->
-      </div>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="prodSearch" class="form-control form-control-sm" placeholder="Procurar produto..." onkeyup="filterProducts()">
+                            <select id="catFilter" class="form-select form-select-sm" style="width: 150px;" onchange="filterProducts()">
+                                <option value="all">Categorias</option>
+                                <% categories.forEach(cat => { %>
+                                    <option value="<%= cat._id %>"><%= cat.name %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="pos-grid" id="productGrid">
+                        <% if (products.length === 0) { %>
+                            <div class="col-12 text-center py-5 text-muted" style="grid-column: 1 / -1;">
+                                <i class="bi bi-box fs-1 d-block mb-2 opacity-50"></i>
+                                Não existem produtos com stock disponível.
+                            </div>
+                        <% } else { %>
+                            <% products.forEach(p => { %>
+                                <div class="pos-card product-item <%= p.stock <= 0 ? 'out-of-stock' : '' %>" 
+                                     data-name="<%= p.name.toLowerCase() %>" 
+                                     data-cat="<%= p.category ? p.category._id : '' %>"
+                                     onclick="addToCart('<%= p._id %>', '<%= p.name %>', <%= p.price %>, <%= p.stock %>)">
+                                    
+                                    <div>
+                                        <div class="fw-bold text-dark lh-sm mb-1" style="font-size: 14px;"><%= p.name %></div>
+                                        <div class="small text-muted mb-2"><%= p.category ? p.category.name : '' %></div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-end mt-2">
+                                        <span class="fs-5 fw-bold text-success"><%= p.price.toFixed(2) %>€</span>
+                                        <span class="badge <%= p.stock > 5 ? 'bg-light text-dark' : 'bg-warning-subtle text-warning' %> border">
+                                            Stock: <%= p.stock %>
+                                        </span>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        <% } %>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-xl-4 col-lg-5">
+                <div class="table-card mt-0 cart-sticky p-0 overflow-hidden border border-primary-subtle shadow-sm">
+                    
+                    <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold m-0" style="color:#2c3e50;"><i class="bi bi-cart3 me-2 text-primary"></i>3. Resumo da Venda</h6>
+                        <button class="btn btn-sm btn-outline-danger py-1" onclick="clearCart()"><i class="bi bi-trash"></i></button>
+                    </div>
+
+                    <div id="cartItemsList" class="p-3" style="min-height: 200px; max-height: 350px; overflow-y: auto;">
+                        <div class="text-center text-muted my-4" id="emptyCartMsg">
+                            <i class="bi bi-cart-x fs-1 d-block mb-2 opacity-25"></i>
+                            O carrinho está vazio.
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light border-top">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Método de Entrega</label>
+                            <select id="deliveryMethod" class="form-select form-select-sm" onchange="updateTotals()">
+                                <option value="pickup">Levantamento em Loja (0.00€)</option>
+                                <option value="courier">Estafeta (+<%= (supermarket.deliveryCost || 0).toFixed(2) %>€)</option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted small fw-medium">Subtotal</span>
+                            <span id="subtotalDisplay" class="fw-bold">0.00€</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fw-bold text-dark fs-5">Total a Pagar</span>
+                            <span id="totalDisplay" class="fw-bold fs-4 text-primary">0.00€</span>
+                        </div>
+
+                        <button id="btnConfirmSale" class="btn btn-primary w-100 py-2 fw-bold" onclick="processSale()" disabled>
+                            <i class="bi bi-check-circle me-2"></i>FINALIZAR VENDA
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+
+    <script>
+        // Variáveis de Estado
+        let cart = [];
+        let selectedClient = null; // Guardará o ID do cliente selecionado
+        const deliveryFee = <%= supermarket.deliveryCost ? supermarket.deliveryCost : 0 %>;
+
+        // ==========================================
+        // 1. LÓGICA DE CLIENTES
+        // ==========================================
+        function toggleNewClientForm() {
+            const form = document.getElementById('newClientForm');
+            const search = document.getElementById('clientSearchBlock');
+            if (form.classList.contains('d-none')) {
+                form.classList.remove('d-none');
+                search.classList.add('d-none');
+            } else {
+                form.classList.add('d-none');
+                search.classList.remove('d-none');
+            }
+        }
+
+        async function searchClient() {
+            const query = document.getElementById('clientSearch').value;
+            if(!query) return Swal.fire('Aviso', 'Insira um nome ou email para pesquisar.', 'warning');
+
+            Swal.fire({ title: 'A procurar...', didOpen: () => Swal.showLoading() });
+            
+            try {
+                // FETCH REAL PARA A TUA API:
+                // const res = await fetch(`/api/users/search?q=${query}`);
+                // const data = await res.json();
+                
+                // SIMULAÇÃO VISUAL:
+                setTimeout(() => {
+                    Swal.close();
+                    setClient("ID_SIMULADO", "Cliente Balcão", query);
+                }, 500);
+
+            } catch (err) {
+                Swal.fire('Erro', 'Não foi possível contactar o servidor.', 'error');
+            }
+        }
+
+        async function createClient() {
+            const name = document.getElementById('nc-name').value;
+            const email = document.getElementById('nc-email').value;
+            const phone = document.getElementById('nc-phone').value;
+            const password = document.getElementById('nc-password').value;
+
+            if(!name || !email || !password) return Swal.fire('Aviso', 'Preencha os campos obrigatórios.', 'warning');
+
+            Swal.fire({ title: 'A criar cliente...', didOpen: () => Swal.showLoading() });
+
+            try {
+                // FETCH REAL PARA A TUA API:
+                // const res = await fetch('/api/users/createClient', { method: 'POST', body: JSON.stringify({name, email, phone, password}) });
+                // const data = await res.json();
+
+                // SIMULAÇÃO VISUAL:
+                setTimeout(() => {
+                    Swal.close();
+                    setClient("NOVO_ID", name, email);
+                    toggleNewClientForm();
+                }, 500);
+
+            } catch (err) {
+                Swal.fire('Erro', 'Falha ao criar cliente.', 'error');
+            }
+        }
+
+        function setClient(id, name, email) {
+            selectedClient = id;
+            document.getElementById('clientNameDisplay').innerText = name;
+            document.getElementById('clientEmailDisplay').innerText = email;
+            document.getElementById('clientSearchBlock').classList.add('d-none');
+            document.getElementById('selectedClientBlock').classList.remove('d-none');
+            checkSaleValidity();
+        }
+
+        function resetClient() {
+            selectedClient = null;
+            document.getElementById('clientSearchBlock').classList.remove('d-none');
+            document.getElementById('selectedClientBlock').classList.add('d-none');
+            document.getElementById('clientSearch').value = '';
+            checkSaleValidity();
+        }
+
+        // ==========================================
+        // 2. LÓGICA DE PRODUTOS E CARRINHO
+        // ==========================================
+        function filterProducts() {
+            const search = document.getElementById('prodSearch').value.toLowerCase();
+            const cat = document.getElementById('catFilter').value;
+            const items = document.querySelectorAll('.product-item');
+
+            items.forEach(item => {
+                const matchName = item.dataset.name.includes(search);
+                const matchCat = cat === 'all' || item.dataset.cat === cat;
+                item.style.display = (matchName && matchCat) ? 'flex' : 'none';
+            });
+        }
+
+        function addToCart(id, name, price, stock) {
+            if (stock <= 0) return;
+
+            const existingItem = cart.find(i => i.id === id);
+            if (existingItem) {
+                if (existingItem.qty < stock) {
+                    existingItem.qty++;
+                } else {
+                    Swal.fire('Aviso', 'Não há mais stock disponível deste produto.', 'warning');
+                }
+            } else {
+                cart.push({ id, name, price, qty: 1, stock });
+            }
+            renderCart();
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty > item.stock) { item.qty = item.stock; Swal.fire('Aviso', 'Stock máximo atingido.', 'info'); }
+                if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+                renderCart();
+            }
+        }
+
+        function clearCart() {
+            cart = [];
+            renderCart();
+        }
+
+        function renderCart() {
+            const list = document.getElementById('cartItemsList');
+            const emptyMsg = document.getElementById('emptyCartMsg');
+
+            if (cart.length === 0) {
+                list.innerHTML = `<div class="text-center text-muted my-4" id="emptyCartMsg">
+                                    <i class="bi bi-cart-x fs-1 d-block mb-2 opacity-25"></i> O carrinho está vazio.
+                                  </div>`;
+            } else {
+                list.innerHTML = cart.map(item => `
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3 border-bottom">
+                        <div class="flex-grow-1 pe-2">
+                            <div class="fw-bold text-dark lh-sm" style="font-size: 13px;">${item.name}</div>
+                            <div class="text-muted small">${item.price.toFixed(2)}€ / un</div>
+                        </div>
+                        <div class="d-flex align-items-center gap-1 bg-light rounded border p-1">
+                            <button class="btn btn-light qty-btn border text-secondary" onclick="changeQty('${item.id}', -1)"><i class="bi bi-dash"></i></button>
+                            <span class="fw-bold text-center" style="width: 25px; font-size: 13px;">${item.qty}</span>
+                            <button class="btn btn-light qty-btn border text-secondary" onclick="changeQty('${item.id}', 1)"><i class="bi bi-plus"></i></button>
+                        </div>
+                        <div class="fw-bold ms-3 text-end" style="width: 55px; font-size: 14px;">
+                            ${(item.price * item.qty).toFixed(2)}€
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            updateTotals();
+            checkSaleValidity();
+        }
+
+        function updateTotals() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const deliveryMethod = document.getElementById('deliveryMethod').value;
+            const extra = deliveryMethod === 'courier' ? deliveryFee : 0;
+            const total = subtotal + extra;
+
+            document.getElementById('subtotalDisplay').innerText = subtotal.toFixed(2) + '€';
+            document.getElementById('totalDisplay').innerText = total.toFixed(2) + '€';
+        }
+
+        // ==========================================
+        // 3. FINALIZAR VENDA
+        // ==========================================
+        function checkSaleValidity() {
+            const btn = document.getElementById('btnConfirmSale');
+            // Só ativa se houver produtos E um cliente selecionado
+            btn.disabled = !(cart.length > 0 && selectedClient !== null);
+        }
+
+        async function processSale() {
+            const result = await Swal.fire({
+                title: 'Finalizar Venda?',
+                text: "Será criada uma encomenda confirmada e o stock descontado.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, registar venda',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'A processar...', didOpen: () => Swal.showLoading() });
+                
+                const payload = {
+                    customer: selectedClient, // ID do cliente
+                    deliveryMethod: document.getElementById('deliveryMethod').value,
+                    status: 'confirmed', // Como é POS, já foi pago
+                    products: cart.map(item => ({
+                        product: item.id,
+                        quantity: item.qty,
+                        unitPrice: item.price
+                    }))
+                };
+
+                try {
+                    // FETCH REAL PARA A TUA API (precisas de criar a rota POST /api/orders no teu backend)
+                    /*
+                    const response = await fetch('/api/orders/pos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.message);
+                    */
+
+                    // SIMULAÇÃO VISUAL:
+                    setTimeout(() => {
+                        Swal.fire('Sucesso!', 'Venda registada com sucesso.', 'success')
+                            .then(() => window.location.reload());
+                    }, 1000);
+
+                } catch (error) {
+                    Swal.fire('Erro!', 'Não foi possível registar a venda.', 'error');
+                }
+            }
+        }
+    </script>
+</body>
 </html>

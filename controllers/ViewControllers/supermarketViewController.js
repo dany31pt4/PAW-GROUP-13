@@ -12,8 +12,11 @@ const getDashboard = async (req, res) => {
       Product.countDocuments({ supermarket: supermarket._id }),
     ]);
 
+
     res.render("supermarket/dashboard", {
       activePage: "dashboard",
+      supermarketStatus: supermarket.status,
+
       supermarketName: supermarket.name,
       totalOrders,
       totalProducts,

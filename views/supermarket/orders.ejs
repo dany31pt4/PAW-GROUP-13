@@ -1,60 +1,227 @@
 <!DOCTYPE html>
 <html lang="pt">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Painel de Administração - Marketplace</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Encomendas - Marketplace</title>
 
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <link rel="stylesheet" href="/style/admin.css">
+    <link rel="stylesheet" href="/style/supermarket.css">
+</head>
+<body>
 
-    <link rel="stylesheet" href="/style/admin.css" />
-  </head>
-
-  <body>
-    <%- include('../partials/sidebar-supermarket') %>
+    <%- include('../partials/sidebar-supermarket', { activePage: 'orders' }) %>
 
     <main class="main-wrapper">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h4 style="font-weight: 700; color: #2c3e50; margin: 0">
-            Painel de administração
-          </h4>
-          <small class="text-muted"
-            >Olá,
-            <strong> <%= supermarket.name %> </strong>
-          </small>
+
+        <div class="dash-header mb-4">
+            <div class="dash-header-left">
+                <h2>Gestão de Encomendas</h2>
+                <p>Acompanha, gere e atualiza o estado de todas as encomendas da tua loja.</p>
+            </div>
+            <div class="dash-header-right">
+                <div class="avatar-circle">
+                    <%= supermarket.name ? supermarket.name.slice(0,2).toUpperCase() : 'SM' %>
+                </div>
+            </div>
         </div>
 
-        <!-- 
+        <div class="table-card mt-0">
+            <div class="table-head-bar mb-3">
+                <h6 class="m-0 fw-bold">Todas as Encomendas</h6>
+            </div>
 
-                    Lista de encomendas com:
-                    - Nome do cliente
-                    - Produtos e quantidades
-                    - Valor total + custo de entrega
-                    - Método de entrega (pickup / estafeta)
-                    - Estado atual (pendente, confirmada, em preparação, em entrega, entregue, cancelada)
-                    - Data da encomenda
+            <div class="table-responsive">
+                <table class="table orders-table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th style="min-width: 200px;">Produtos</th>
+                            <th>Total (c/ Entrega)</th>
+                            <th>Método</th>
+                            <th>Data</th>
+                            <th>Estado</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (typeof orders !== 'undefined' && orders.length > 0) { %>
+                            <% orders.forEach(order => { %>
+                            <tr>
+                                <td>
+                                    <span class="text-muted fw-bold">#<%= order._id.toString().slice(-6).toUpperCase() %></span>
+                                </td>
+                                
+                                <td>
+                                    <strong><%= order.customer ? order.customer.name : 'N/A' %></strong>
+                                </td>
 
-                    Ações que o supermercado pode fazer:
-                    - Confirmar encomenda (pendente → confirmada)
-                    - Marcar como em preparação (confirmada → em preparação)
-                    - Marcar como pronta para entrega (em preparação → em entrega)
+                                <td>
+                                    <ul class="list-unstyled mb-0 text-muted" style="font-size: 13px;">
+                                        <% order.products.forEach(item => { %>
+                                            <li><span class="fw-bold text-dark"><%= item.quantity %>x</span> <%= item.product ? item.product.name : 'Produto Indisponível' %></li>
+                                        <% }) %>
+                                    </ul>
+                                </td>
 
-                    Os estados em entrega, entregue e cancelada já não são controlados pelo supermercado:
-                    - em entrega → é o estafeta que aceita e atualiza
-                    - entregue → estafeta marca como entregue
-                    - cancelada → cliente cancela (até 5 minutos após confirmação)              
-                -->
-      </div>
+                                <td>
+                                    <strong class="text-dark"><%= (order.total + order.deliveryCost).toFixed(2) %> €</strong>
+                                    <br>
+                                    <small class="text-muted" style="font-size: 11px;">(Entrega: <%= order.deliveryCost.toFixed(2) %> €)</small>
+                                </td>
+
+                                <td>
+                                    <% if (order.deliveryMethod === 'pickup') { %>
+                                        <span class="badge bg-light text-dark border"><i class="bi bi-shop me-1"></i> Levantamento</span>
+                                    <% } else { %>
+                                        <span class="badge bg-light text-dark border"><i class="bi bi-bicycle me-1"></i> Estafeta</span>
+                                    <% } %>
+                                </td>
+
+                                <td class="text-muted" style="font-size: 13px;">
+                                    <%= new Date(order.createdAt).toLocaleDateString('pt-PT') %><br>
+                                    <%= new Date(order.createdAt).toLocaleTimeString('pt-PT', {hour: '2-digit', minute:'2-digit'}) %>
+                                </td>
+
+                                <td>
+                                    <% 
+                                        let badgeClass = '';
+                                        let statusText = '';
+                                        switch(order.status) {
+                                            case 'pending': 
+                                                badgeClass = 'bg-warning-subtle text-warning border-warning-subtle'; 
+                                                statusText = 'Pendente'; 
+                                                break;
+                                            case 'confirmed': 
+                                                badgeClass = 'bg-info-subtle text-info border-info-subtle'; 
+                                                statusText = 'Confirmada'; 
+                                                break;
+                                            case 'preparing': 
+                                                badgeClass = 'bg-primary-subtle text-primary border-primary-subtle'; 
+                                                statusText = 'Em Preparação'; 
+                                                break;
+                                            case 'delivering': 
+                                                badgeClass = 'bg-secondary-subtle text-secondary border-secondary-subtle'; 
+                                                statusText = order.deliveryMethod === 'pickup' ? 'Aguardar Cliente' : 'Com Estafeta'; 
+                                                break;
+                                            case 'delivered': 
+                                                badgeClass = 'bg-success-subtle text-success border-success-subtle'; 
+                                                statusText = 'Entregue'; 
+                                                break;
+                                            case 'cancelled': 
+                                                badgeClass = 'bg-danger-subtle text-danger border-danger-subtle'; 
+                                                statusText = 'Cancelada'; 
+                                                break;
+                                            default:
+                                                badgeClass = 'bg-light text-dark';
+                                                statusText = order.status;
+                                        }
+                                    %>
+                                    <span class="badge border <%= badgeClass %> px-2 py-1"><%= statusText %></span>
+                                </td>
+
+                                <td class="text-center">
+                                    <% if (order.status === 'pending') { %>
+                                        <button class="btn btn-sm btn-success w-100 mb-1" onclick="updateOrderStatus('<%= order._id %>', 'confirmed')">
+                                            <i class="bi bi-check-lg me-1"></i> Confirmar
+                                        </button>
+                                    <% } else if (order.status === 'confirmed') { %>
+                                        <button class="btn btn-sm btn-primary w-100 mb-1" onclick="updateOrderStatus('<%= order._id %>', 'preparing')">
+                                            <i class="bi bi-box-seam me-1"></i> Preparar
+                                        </button>
+                                    <% } else if (order.status === 'preparing') { %>
+                                        <button class="btn btn-sm btn-info text-white w-100 mb-1" onclick="updateOrderStatus('<%= order._id %>', 'delivering')">
+                                            <i class="bi bi-send me-1"></i> Pronta
+                                        </button>
+                                    <% } else { %>
+                                        <button class="btn btn-sm btn-light border w-100 disabled text-muted" aria-disabled="true">
+                                            <i class="bi bi-lock-fill me-1"></i> Bloqueado
+                                        </button>
+                                    <% } %>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        <% } else { %>
+                            <tr>
+                                <td colspan="8" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
+                                    Não existem encomendas registadas na sua loja.
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
+    
+    <script>
+        // Função para atualizar o estado da encomenda via fetch API
+        async function updateOrderStatus(orderId, newStatus) {
+            
+            let actionText = "";
+            let actionColor = "";
+
+            if(newStatus === 'confirmed') {
+                actionText = "confirmar esta encomenda";
+                actionColor = "#198754"; 
+            } else if (newStatus === 'preparing') {
+                actionText = "iniciar a preparação desta encomenda";
+                actionColor = "#0d6efd"; 
+            } else if (newStatus === 'delivering') {
+                actionText = "marcar esta encomenda como pronta (aguarda cliente/estafeta)";
+                actionColor = "#0dcaf0"; 
+            }
+
+            const result = await Swal.fire({
+                title: 'Confirmar ação',
+                text: `Pretende ${actionText}? O cliente será notificado da alteração.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: actionColor,
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, atualizar!',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'A processar...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+                try {
+                    // Podes ajustar o endpoint /api/orders/ para o endpoint correto que trata do teu backend
+                    const response = await fetch(`/api/orders/${orderId}/status`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire('Sucesso!', 'O estado da encomenda foi atualizado.', 'success')
+                            .then(() => window.location.reload());
+                    } else {
+                        Swal.fire('Erro!', data.message || 'Não foi possível atualizar o estado.', 'error');
+                    }
+                } catch (error) {
+                    Swal.fire('Erro de Ligação', 'Ocorreu um problema ao comunicar com o servidor.', 'error');
+                }
+            }
+        }
+    </script>
+</body>
 </html>
