@@ -28,6 +28,7 @@ var app = express();
 // Define where the template files are located and which engine to use 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+app.set('view cache', false);
 
 // 5. GLOBAL MIDDLEWARE
 app.use(logger('dev'));                             // Logs requests to the console
@@ -35,7 +36,6 @@ app.use(express.json());                            // Parses incoming JSON payl
 app.use(express.urlencoded({ extended: false }));   // Parses URL-encoded bodies (form data)
 app.use(cookieParser());                            // Parses Cookie headers
 app.use(express.static(path.join(__dirname, 'public'))); // Serves static files (CSS, JS, images)
-
 // 6. ROUTE MOUNTING
 // Map the imported routers to their specific base URLs
 app.use('/', indexRouter);       // Base routes map to '/'

@@ -57,13 +57,12 @@ function openAddMarketModal() {
         didOpen: () => Swal.showLoading(),
       });
 
-      // Certifica-te que esta é a rota mapeada para a função registerSupermarket no teu backend
       fetch("/api/supermarkets/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "X-Requested-With": "XMLHttpRequest", // Importante para o middleware de autenticação devolver JSON
+          "X-Requested-With": "XMLHttpRequest", 
         },
         body: JSON.stringify(result.value),
       })
@@ -74,7 +73,7 @@ function openAddMarketModal() {
               "Sucesso!",
               "Supermercado e conta criados com sucesso.",
               "success",
-            ).then(() => loadMarketTable()); // Faz refresh à página para atualizar a tabela
+            ).then(() => loadMarketTable()); 
           } else {
             Swal.fire(
               "Erro!",

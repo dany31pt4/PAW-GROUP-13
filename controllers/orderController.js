@@ -49,7 +49,7 @@ const createSaleOrder = async (req, res) => {
       status: "confirmed",
     });
 
-    for (item of orderProducts) {
+    for (const item of orderProducts) {
       await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity } });
     }
 
@@ -158,7 +158,7 @@ const cancelOrder = async (req, res) => {
       }
     }
 
-    for ( item of order.products) {
+    for (const item of order.products) {
       await Product.findByIdAndUpdate(item.product._id, { $inc: { stock: item.quantity } });
     }
 

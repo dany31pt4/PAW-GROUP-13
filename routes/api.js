@@ -67,7 +67,7 @@ CATEGORY ROUTES
 */
 
 router.post("/categories/create", verifyToken, verifyRole(["admin"]), categoryController.createCategory);
-router.get("/categories/list", verifyToken, verifyRole(["admin"]), categoryController.listCategories);
+router.get("/categories/list", verifyToken, verifyRole(["admin", "supermarket"]), categoryController.listCategories);
 router.put("/categories/update/:id", verifyToken, verifyRole(["admin"]), categoryController.updateCategory);
 router.delete("/categories/delete/:id", verifyToken, verifyRole(["admin"]), categoryController.deleteCategory);
 router.get("/categories/:id", verifyToken, verifyRole(["admin"]), categoryController.getCategoryById);
@@ -79,7 +79,9 @@ PRODUCT ROUTES
 */
 
 router.post("/product/create", verifyToken, verifyRole(["admin","supermarket"]), verifySupermarketStatus, upload.single("image"), productController.createProduct);
+router.get("/product/list/me", verifyToken, verifyRole(["supermarket"]), productController.listMyProducts);
 router.get("/product/list/:id", verifyToken, verifyRole(["admin","supermarket"]), productController.listProduct);
+router.get("/product/:id", verifyToken, verifyRole(["admin","supermarket"]), productController.getProductById);
 router.put("/product/update/:id", verifyToken, verifyRole(["admin","supermarket"]), verifySupermarketStatus, upload.single("image"), productController.updateProduct);
 router.delete("/product/delete/:id", verifyToken, verifyRole(["admin","supermarket"]), verifySupermarketStatus, productController.deleteProduct);
 router.put("/product/toggle/:id", verifyToken, verifyRole(["admin","supermarket"]), verifySupermarketStatus, productController.toggleProduct);

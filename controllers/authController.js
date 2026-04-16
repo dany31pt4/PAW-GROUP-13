@@ -46,16 +46,6 @@ const login = async (req, res) => {
       );
     }
 
-    /*
-     token = jwt.sign(
-        { id: user._id, role: user.role, name: user.name },
-        secretKey,
-        { expiresIn: jwtExpiration },
-      );
-    }
-    
-    */
-
     if (rememberMe) {
       age = 2592000000; // 30 dias
     }
