@@ -16,8 +16,16 @@ const createProduct = async (req, res) => {
     if (!name || !categoryId || price === undefined || stock === undefined) {
       return res.status(400).json({
         success: false,
-        message: "Nome, categoria, preço e estoque são obrigatórios.",
+        message: "Nome, categoria, preço e stock são obrigatórios.",
       });
+    }
+
+    if (Number(price) < 0) {
+      return res.status(400).json({ success: false, message: "O preço não pode ser negativo." });
+    }
+
+    if (Number(stock) < 0) {
+      return res.status(400).json({ success: false, message: "O stock não pode ser negativo." });
     }
 
     const category = await Category.findById(categoryId);
@@ -123,9 +131,15 @@ const updateProduct = async (req, res) => {
 
     const product = await Product.findById(id);
     if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Produto não encontrado." });
+      return res.status(404).json({ success: false, message: "Produto não encontrado." });
+    }
+
+    if (price !== undefined && Number(price) < 0) {
+      return res.status(400).json({ success: false, message: "O preço não pode ser negativo." });
+    }
+
+    if (stock !== undefined && Number(stock) < 0) {
+      return res.status(400).json({ success: false, message: "O stock não pode ser negativo." });
     }
 
     let image = product.image;

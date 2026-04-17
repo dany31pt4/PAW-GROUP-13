@@ -132,7 +132,7 @@ const getAllOrders = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const validStatuses = ["pending", "confirmed", "preparing", "delivering", "delivered", "cancelled"];
+    const validStatuses = ["pending", "confirmed", "preparing", "awaiting_courier", "delivering", "delivered", "cancelled"];
 
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ success: false, message: "Estado inválido." });

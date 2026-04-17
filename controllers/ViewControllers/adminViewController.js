@@ -2,6 +2,7 @@ const User = require("../../models/user");
 const Supermarket = require("../../models/supermarket");
 const Order = require("../../models/order");
 const Category = require("../../models/category");
+const Product = require("../../models/product");
 const supermarketService = require("../../utils/supermarketService");
 
 const getDashboard = async (req, res) => {
@@ -152,10 +153,108 @@ const getCategories = async (req, res) => {
   }
 };
 
+const getAdminOrderDetail = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.orderId)
+      .populate("customer", "name email")
+      .populate("supermarket", "name")
+      .populate("courier", "name")
+      .populate("products.product", "name image");
+
+    if (!order) {
+      return res.status(404).render("error", { message: "Encomenda não encontrada.", error: { status: 404 } });
+    }
+
+    res.render("admin/order-detail", { activePage: "orders", order });
+  } catch (error) {
+    console.error("Erro ao carregar encomenda:", error);
+    res.status(500).render("error", { message: "Erro ao carregar a encomenda.", error: { status: 500 } });
+  }
+};
+
+const getAdminCategoryDetail = async (req, res) => {
+  try {
+    const category = await Category.findById(req.params.categoryId);
+
+    if (!category) {
+      return res.status(404).render("error", { message: "Categoria não encontrada.", error: { status: 404 } });
+    }
+
+    res.render("admin/category-detail", { activePage: "categories", category });
+  } catch (error) {
+    console.error("Erro ao carregar categoria:", error);
+    res.status(500).render("error", { message: "Erro ao carregar a categoria.", error: { status: 500 } });
+  }
+};
+
+const getAdminUserDetail = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId).select("-password");
+
+    if (!user) {
+      return res.status(404).render("error", { message: "Utilizador não encontrado.", error: { status: 404 } });
+    }
+
+    let courierStats = null;
+    if (user.role === "courier") {
+      const [total, recentOrders, lastOrder] = await Promise.all([
+        Order.countDocuments({ courier: user._id }),
+        Order.find({ courier: user._id })
+          .populate("supermarket", "name")
+          .sort({ createdAt: -1 })
+          .limit(5),
+        Order.findOne({ courier: user._id }).sort({ createdAt: -1 }),
+      ]);
+      courierStats = {
+        total,
+        recentOrders,
+        lastOrderDate: lastOrder ? lastOrder.createdAt.toLocaleDateString("pt-PT") : null,
+      };
+    }
+
+    res.render("admin/user-detail", { activePage: "users", user, courierStats });
+  } catch (error) {
+    console.error("Erro ao carregar utilizador:", error);
+    res.status(500).render("error", { message: "Erro ao carregar o utilizador.", error: { status: 500 } });
+  }
+};
+
+const getAdminSupermarketDetail = async (req, res) => {
+  try {
+    const market = await Supermarket.findById(req.params.supermarketId).populate("user", "name email phone");
+
+    if (!market) {
+      return res.status(404).render("error", { message: "Supermercado não encontrado.", error: { status: 404 } });
+    }
+
+    const [totalOrders, totalProducts, recentOrders] = await Promise.all([
+      Order.countDocuments({ supermarket: market._id }),
+      Product.countDocuments({ supermarket: market._id }),
+      Order.find({ supermarket: market._id })
+        .populate("customer", "name")
+        .sort({ createdAt: -1 })
+        .limit(5),
+    ]);
+
+    res.render("admin/supermarket-detail", {
+      activePage: market.status === "pending" ? "approvals" : "users",
+      market,
+      stats: { totalOrders, totalProducts, recentOrders },
+    });
+  } catch (error) {
+    console.error("Erro ao carregar supermercado:", error);
+    res.status(500).render("error", { message: "Erro ao carregar o supermercado.", error: { status: 500 } });
+  }
+};
+
 module.exports = {
   getDashboard,
   getApprovals,
   getOrders,
   getUsers,
   getCategories,
+  getAdminOrderDetail,
+  getAdminCategoryDetail,
+  getAdminUserDetail,
+  getAdminSupermarketDetail,
 };

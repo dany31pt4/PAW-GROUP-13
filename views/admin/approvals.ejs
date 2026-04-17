@@ -41,9 +41,9 @@
                                 <td><%= item.user.email %></td>
                                 <td><%= item.location %></td>
                                 <td class="text-end">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="openViewModal('<%= item._id %>')">Ver</button>
-                                    <button class="btn btn-sm btn-success" onclick="openApproveModal('<%= item._id %>')">Validar</button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="openRejectModal('<%= item._id %>')">Rejeitar</button>
+                                    <a href="/admin/supermarket/<%= item._id %>" class="btn btn-sm btn-light border shadow-sm me-1" title="Ver"><i class="bi bi-eye-fill text-primary"></i></a>
+                                    <button class="btn btn-sm btn-light border shadow-sm me-1" onclick="openApproveModal('<%= item._id %>')" title="Validar"><i class="bi bi-check-lg text-success"></i></button>
+                                    <button class="btn btn-sm btn-light border shadow-sm" onclick="openRejectModal('<%= item._id %>')" title="Rejeitar"><i class="bi bi-x-lg text-danger"></i></button>
                                 </td>
                             </tr>
                             <% }); %>

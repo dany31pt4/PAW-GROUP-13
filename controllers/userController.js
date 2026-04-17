@@ -231,7 +231,7 @@ const listCustomers = async (req, res) => {
 
 const getCustomerByEmail = async (req, res) => {
   try {
-    const customer = await User.findOne({ email: req.params.email, role: "customer" });
+    const customer = await User.findOne({ email: req.params.email.toLowerCase(), role: "customer" });
     if (!customer) {
       return res
         .status(404)

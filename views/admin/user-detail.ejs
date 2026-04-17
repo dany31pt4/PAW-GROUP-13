@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= user.name %> — Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/style/admin.css">
+</head>
+<body>
+
+    <%- include('../partials/sidebar-admin') %>
+
+    <main class="main-wrapper">
+
+        <div class="d-flex align-items-center mb-4 gap-3">
+            <a href="/admin/users" class="btn btn-light border shadow-sm" style="border-radius: 10px;">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+            <div>
+                <h4 id="user-name-title" class="fw-bold mb-0"><%= user.name %></h4>
+                <p class="text-muted small mb-0">Detalhes do utilizador</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-<%= user.role === 'courier' ? '6' : '5' %>">
+                <div class="table-card mt-0">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-person-fill text-primary me-2"></i>Perfil</h6>
+                        <%
+                            const roleMap = {
+                                customer: { cls: 'bg-primary', label: 'Cliente' },
+                                courier:  { cls: 'bg-info text-dark', label: 'Estafeta' },
+                                admin:    { cls: 'bg-danger', label: 'Admin' },
+                            };
+                            const role = roleMap[user.role] || { cls: 'bg-secondary', label: user.role };
+                        %>
+                        <span class="badge <%= role.cls %> px-3 py-2"><%= role.label %></span>
+                    </div>
+
+                    <div class="mb-3 p-3 rounded-3 bg-light border">
+                        <div class="text-muted small mb-1"><i class="bi bi-person me-1"></i>Nome</div>
+                        <div id="user-name" class="fw-semibold"><%= user.name %></div>
+                    </div>
+
+                    <div class="mb-3 p-3 rounded-3 bg-light border">
+                        <div class="text-muted small mb-1"><i class="bi bi-envelope me-1"></i>Email</div>
+                        <div id="user-email" class="fw-semibold"><%= user.email %></div>
+                    </div>
+
+                    <div id="user-phone-row" class="mb-3 p-3 rounded-3 bg-light border <%= user.phone ? '' : 'd-none' %>">
+                        <div class="text-muted small mb-1"><i class="bi bi-telephone me-1"></i>Telefone</div>
+                        <div id="user-phone" class="fw-semibold"><%= user.phone || '' %></div>
+                    </div>
+
+                    <div id="user-address-row" class="mb-3 p-3 rounded-3 bg-light border <%= user.address ? '' : 'd-none' %>">
+                        <div class="text-muted small mb-1"><i class="bi bi-geo-alt me-1"></i>Morada</div>
+                        <div id="user-address" class="fw-semibold"><%= user.address || '' %></div>
+                    </div>
+
+                    <div class="mb-4 p-3 rounded-3 bg-light border">
+                        <div class="text-muted small mb-1"><i class="bi bi-calendar3 me-1"></i>Registo</div>
+                        <div class="fw-semibold">
+                            <%= new Date(user.createdAt).toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' }) %>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap pt-3 border-top">
+                        <% if (user.role === 'customer') { %>
+                            <button class="btn btn-primary px-4" onclick="openEditCustomerModal('<%= user._id %>')" style="border-radius: 10px;">
+                                <i class="bi bi-pencil me-2"></i>Editar
+                            </button>
+                            <button class="btn btn-outline-danger px-4" onclick="openRemoveCustomerModal('<%= user._id %>')" style="border-radius: 10px;">
+                                <i class="bi bi-trash me-2"></i>Eliminar
+                            </button>
+                        <% } else if (user.role === 'courier') { %>
+                            <button class="btn btn-primary px-4" onclick="openEditCourierModal('<%= user._id %>')" style="border-radius: 10px;">
+                                <i class="bi bi-pencil me-2"></i>Editar
+                            </button>
+                            <button class="btn btn-outline-danger px-4" onclick="openRemoveCourierModal('<%= user._id %>')" style="border-radius: 10px;">
+                                <i class="bi bi-trash me-2"></i>Eliminar
+                            </button>
+                        <% } else if (user.role === 'admin') { %>
+                            <button class="btn btn-primary px-4" onclick="openEditAdminModal('<%= user._id %>')" style="border-radius: 10px;">
+                                <i class="bi bi-pencil me-2"></i>Editar
+                            </button>
+                            <button class="btn btn-outline-danger px-4" onclick="openRemoveAdminModal('<%= user._id %>')" style="border-radius: 10px;">
+                                <i class="bi bi-trash me-2"></i>Eliminar
+                            </button>
+                        <% } %>
+                    </div>
+
+                </div>
+            </div>
+
+            <% if (user.role === 'courier') { %>
+            <div class="col-lg-6">
+                <div class="table-card mt-0">
+                    <h6 class="fw-bold mb-4"><i class="bi bi-bicycle text-info me-2"></i>Estatísticas de Entregas</h6>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <div class="p-3 rounded-3 bg-light border text-center">
+                                <div class="text-muted small mb-1">Total Entregas</div>
+                                <div class="fs-3 fw-bold text-dark"><%= courierStats.total %></div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded-3 bg-light border text-center">
+                                <div class="text-muted small mb-1">Última Entrega</div>
+                                <div class="fw-semibold text-dark" style="font-size: 0.9rem;">
+                                    <%= courierStats.lastOrderDate || '------' %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% if (courierStats.recentOrders && courierStats.recentOrders.length > 0) { %>
+                    <h6 class="fw-semibold text-muted mb-3" style="font-size: 0.82rem; letter-spacing: 0.5px;">ENTREGAS RECENTES</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 13px;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="fw-semibold">Loja</th>
+                                    <th class="fw-semibold">Data</th>
+                                    <th class="fw-semibold">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% courierStats.recentOrders.forEach(o => { %>
+                                <tr>
+                                    <td><%= o.supermarket ? o.supermarket.name : 'N/A' %></td>
+                                    <td class="text-muted"><%= new Date(o.createdAt).toLocaleDateString('pt-PT') %></td>
+                                    <td>
+                                        <%
+                                            const sm = { delivered: 'bg-success-subtle text-success', delivering: 'bg-secondary-subtle text-secondary', cancelled: 'bg-danger-subtle text-danger' };
+                                            const sl = { delivered: 'Entregue', delivering: 'A Caminho', cancelled: 'Cancelada' };
+                                        %>
+                                        <span class="badge border <%= sm[o.status] || 'bg-light text-dark' %>">
+                                            <%= sl[o.status] || o.status %>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } else { %>
+                        <p class="text-muted text-center py-3">Sem entregas registadas.</p>
+                    <% } %>
+                </div>
+            </div>
+            <% } %>
+
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/users-scripts/admin.js"></script>
+    <script src="/scripts/users-scripts/courier.js"></script>
+    <script src="/scripts/users-scripts/customer.js"></script>
+
+    <script>
+        const USER_ID   = '<%= user._id %>';
+        const USER_ROLE = '<%= user.role %>';
+
+        const apiUrl = {
+            customer: `/api/customers/${USER_ID}`,
+            courier:  `/api/users/courier/${USER_ID}`,
+            admin:    `/api/users/admin/${USER_ID}`,
+        }[USER_ROLE];
+
+        // Todos os scripts chamam load*Table() após editar ou eliminar — substituímos por refresh
+        function loadcustomerTable() { refreshUserDetail(); }
+        function loadCourierTable()  { refreshUserDetail(); }
+        function loadAdminTable()    { refreshUserDetail(); }
+
+        async function refreshUserDetail() {
+            const res = await fetch(apiUrl);
+            if (res.status === 404 || !res.ok) {
+                // Utilizador eliminado — redireciona para a lista
+                window.location.href = '/admin/users';
+                return;
+            }
+            const u = await res.json();
+            updateUserUI(u);
+        }
+
+        function updateUserUI(u) {
+            document.title = `${u.name} — Admin`;
+            document.getElementById('user-name-title').textContent = u.name;
+            document.getElementById('user-name').textContent = u.name;
+            document.getElementById('user-email').textContent = u.email;
+
+            const phoneRow = document.getElementById('user-phone-row');
+            if (u.phone) {
+                document.getElementById('user-phone').textContent = u.phone;
+                phoneRow.classList.remove('d-none');
+            } else {
+                phoneRow.classList.add('d-none');
+            }
+
+            const addressRow = document.getElementById('user-address-row');
+            if (u.address) {
+                document.getElementById('user-address').textContent = u.address;
+                addressRow.classList.remove('d-none');
+            } else {
+                addressRow.classList.add('d-none');
+            }
+        }
+    </script>
+
+</body>
+</html>

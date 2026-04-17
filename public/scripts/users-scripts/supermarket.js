@@ -288,9 +288,9 @@ async function loadMarketTable() {
                     <td>${m.location}</td>
                     <td>${statusBadge}</td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-outline-primary" onclick="openViewMarketModal('${m._id}')">Ver</button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="openEditMarketModal('${m._id}')">Editar</button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="openRemoveMarketModal('${m._id}')">Eliminar</button>
+                        <a href="/admin/supermarket/${m._id}" class="btn btn-sm btn-light border shadow-sm me-1" title="Ver"><i class="bi bi-eye-fill text-primary"></i></a>
+                        <button class="btn btn-sm btn-light border shadow-sm me-1" onclick="openEditMarketModal('${m._id}')" title="Editar"><i class="bi bi-pencil text-primary"></i></button>
+                        <button class="btn btn-sm btn-light border shadow-sm" onclick="openRemoveMarketModal('${m._id}')" title="Eliminar"><i class="bi bi-trash text-danger"></i></button>
                     </td>
                 </tr>
             `;

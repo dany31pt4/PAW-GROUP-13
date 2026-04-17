@@ -145,9 +145,9 @@ async function loadcustomerTable() {
                     <td>${c.email}</td>
                     <td>${dataRegisto}</td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-outline-primary" onclick="openViewCustomerModal('${c._id}')">Ver</button>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="openEditCustomerModal('${c._id}')">Editar</button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="openRemoveCustomerModal('${c._id}')">Eliminar</button>
+                        <a href="/admin/user/${c._id}" class="btn btn-sm btn-light border shadow-sm me-1" title="Ver"><i class="bi bi-eye-fill text-primary"></i></a>
+                        <button class="btn btn-sm btn-light border shadow-sm me-1" onclick="openEditCustomerModal('${c._id}')" title="Editar"><i class="bi bi-pencil text-primary"></i></button>
+                        <button class="btn btn-sm btn-light border shadow-sm" onclick="openRemoveCustomerModal('${c._id}')" title="Eliminar"><i class="bi bi-trash text-danger"></i></button>
                     </td>
                 </tr>
             `;

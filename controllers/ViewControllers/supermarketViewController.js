@@ -125,10 +125,72 @@ const getNewSale = async (req, res) => {
   }
 };
 
+const getOrderDetail = async (req, res) => {
+  try {
+    const supermarket = await Supermarket.findOne({ user: req.user.id });
+    const order = await Order.findOne({
+      _id: req.params.orderId,
+      supermarket: supermarket._id,
+    })
+      .populate("customer", "name email")
+      .populate("products.product", "name image");
+
+    if (!order) {
+      return res.status(404).render("error", {
+        message: "Encomenda não encontrada.",
+        error: { status: 404 },
+      });
+    }
+
+    res.render("supermarket/order-detail", {
+      activePage: "orders",
+      supermarket,
+      order,
+    });
+  } catch (error) {
+    console.error("Erro ao carregar detalhe da encomenda:", error);
+    res.status(500).render("error", {
+      message: "Erro ao carregar a encomenda.",
+      error: { status: 500 },
+    });
+  }
+};
+
+const getProductDetail = async (req, res) => {
+  try {
+    const supermarket = await Supermarket.findOne({ user: req.user.id });
+    const product = await Product.findOne({
+      _id: req.params.productId,
+      supermarket: supermarket._id,
+    }).populate("category");
+
+    if (!product) {
+      return res.status(404).render("error", {
+        message: "Produto não encontrado.",
+        error: { status: 404 },
+      });
+    }
+
+    res.render("supermarket/product-detail", {
+      activePage: "products",
+      supermarket,
+      product,
+    });
+  } catch (error) {
+    console.error("Erro ao carregar detalhe do produto:", error);
+    res.status(500).render("error", {
+      message: "Erro ao carregar o produto.",
+      error: { status: 500 },
+    });
+  }
+};
+
 module.exports = {
   getDashboard,
   getSettings,
   getProducts,
   getOrders,
   getNewSale,
+  getProductDetail,
+  getOrderDetail,
 };

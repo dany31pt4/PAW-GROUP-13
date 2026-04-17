@@ -170,8 +170,8 @@ async function loadAdminTable() {
             <td>${admin.email}</td>
             <td>${dataFormatada}</td>
             <td class="text-end">
-                <button class="btn btn-sm btn-outline-secondary" onclick="openEditAdminModal('${admin._id}')">Editar</button>
-                <button class="btn btn-sm btn-outline-danger" onclick="openRemoveAdminModal('${admin._id}')">Eliminar</button>
+                <button class="btn btn-sm btn-light border shadow-sm me-1" onclick="openEditAdminModal('${admin._id}')" title="Editar"><i class="bi bi-pencil text-primary"></i></button>
+                <button class="btn btn-sm btn-light border shadow-sm" onclick="openRemoveAdminModal('${admin._id}')" title="Eliminar"><i class="bi bi-trash text-danger"></i></button>
             </td>
         </tr>
       `;

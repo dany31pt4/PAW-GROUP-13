@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= category.name %> — Admin</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/style/admin.css">
+</head>
+<body>
+
+    <%- include('../partials/sidebar-admin') %>
+
+    <main class="main-wrapper">
+
+        <div class="d-flex align-items-center mb-4 gap-3">
+            <a href="/admin/categories" class="btn btn-light border shadow-sm" style="border-radius: 10px;">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+            <div>
+                <h4 id="cat-name-title" class="fw-bold mb-0"><%= category.name %></h4>
+                <p class="text-muted small mb-0">Detalhes da categoria</p>
+            </div>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-lg-6">
+                <div class="table-card mt-0">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold mb-0"><i class="bi bi-tag-fill text-primary me-2"></i>Informações</h6>
+                        <% if (category.status) { %>
+                            <span id="cat-status-badge" class="badge bg-success px-3 py-2">Ativa</span>
+                        <% } else { %>
+                            <span id="cat-status-badge" class="badge bg-secondary px-3 py-2">Inativa</span>
+                        <% } %>
+                    </div>
+
+                    <div class="mb-3 p-3 rounded-3 bg-light border">
+                        <div class="text-muted small mb-1">Nome</div>
+                        <div id="cat-name" class="fw-semibold"><%= category.name %></div>
+                    </div>
+
+                    <div class="mb-3 p-3 rounded-3 bg-light border">
+                        <div class="text-muted small mb-1">Descrição</div>
+                        <div id="cat-description" class="<%= category.description ? '' : 'text-muted fst-italic' %>">
+                            <%= category.description || 'Sem descrição' %>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 p-3 rounded-3 bg-light border">
+                        <div class="text-muted small mb-1">Criada em</div>
+                        <div class="fw-semibold">
+                            <%= new Date(category.createdAt).toLocaleDateString('pt-PT', { day: '2-digit', month: 'long', year: 'numeric' }) %>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 flex-wrap pt-3 border-top">
+                        <button class="btn btn-primary px-4" onclick="openEditCategoryModal('<%= category._id %>')" style="border-radius: 10px;">
+                            <i class="bi bi-pencil me-2"></i>Editar
+                        </button>
+                        <button class="btn btn-outline-danger px-4" onclick="deleteCategory('<%= category._id %>')" style="border-radius: 10px;">
+                            <i class="bi bi-trash me-2"></i>Eliminar
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/categories.js"></script>
+
+    <script>
+        const CAT_ID = '<%= category._id %>';
+
+        // categories.js chama loadCategoryTable() após editar — substituímos por refresh desta página
+        function loadCategoryTable() {
+            refreshCategoryDetail(CAT_ID);
+        }
+
+        async function refreshCategoryDetail(id) {
+            const res = await fetch(`/api/categories/${id}`);
+            const data = await res.json();
+            if (res.ok) updateCategoryUI(data);
+        }
+
+        function updateCategoryUI(c) {
+            document.title = `${c.name} — Admin`;
+            document.getElementById('cat-name-title').textContent = c.name;
+            document.getElementById('cat-name').textContent = c.name;
+            document.getElementById('cat-description').textContent = c.description || 'Sem descrição';
+
+            const badge = document.getElementById('cat-status-badge');
+            if (c.status) {
+                badge.className = 'badge bg-success px-3 py-2';
+                badge.textContent = 'Ativa';
+            } else {
+                badge.className = 'badge bg-secondary px-3 py-2';
+                badge.textContent = 'Inativa';
+            }
+        }
+
+        async function deleteCategory(id) {
+            const confirmed = await Swal.fire({
+                title: 'Tens a certeza?',
+                text: 'Não vais poder reverter isto!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sim, eliminar!',
+                cancelButtonText: 'Cancelar',
+            });
+            if (!confirmed.isConfirmed) return;
+
+            const res = await fetch(`/api/categories/delete/${id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                await Swal.fire('Eliminado!', 'Categoria eliminada com sucesso.', 'success');
+                window.location.href = '/admin/categories';
+            } else {
+                Swal.fire('Erro!', data.message || 'Não foi possível eliminar.', 'error');
+            }
+        }
+    </script>
+
+</body>
+</html>

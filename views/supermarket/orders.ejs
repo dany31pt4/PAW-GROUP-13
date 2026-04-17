@@ -123,6 +123,9 @@
                                     </td>
 
                                     <td class="text-end pe-4">
+                                        <a href="/supermarket/order/<%= order._id %>" class="btn btn-sm btn-light border shadow-sm me-1" title="Ver detalhes">
+                                            <i class="bi bi-eye-fill text-primary"></i>
+                                        </a>
                                         <% if (order.status === 'pending') { %>
                                             <button class="btn btn-sm btn-success" onclick="updateOrderStatus('<%= order._id %>', 'confirmed')">
                                                 <i class="bi bi-check-lg me-1"></i> Confirmar
@@ -155,7 +158,7 @@
                                 <% }) %>
                             <% } else { %>
                                 <tr>
-                                    <td colspan="8" class="text-center py-5 text-muted">
+                                    <td colspan="9" class="text-center py-5 text-muted">
                                         <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
                                         Não existem encomendas registadas na sua loja.
                                     </td>
