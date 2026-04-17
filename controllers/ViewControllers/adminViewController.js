@@ -47,7 +47,6 @@ const getOrders = async (req, res) => {
       .populate("products.product", "name")
       .sort({ createdAt: -1 });
 
-    // Dados para gráfico: vendas por supermercado
     const salesByMarket = {};
     orders.forEach(o => {
       const name = o.supermarket ? o.supermarket.name : "Desconhecido";

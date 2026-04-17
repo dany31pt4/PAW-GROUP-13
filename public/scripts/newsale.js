@@ -17,7 +17,7 @@ async function searchClient() {
     const data = await res.json();
     if (res.ok) {
       Swal.close();
-      setClient(data._id, data.name, data.email);
+      setClient(data._id, data.name, data.email, data.address);
     } else {
       Swal.fire("Não encontrado", data.message || "Nenhum cliente com este email.", "info");
     }
@@ -26,13 +26,19 @@ async function searchClient() {
   }
 }
 
-function setClient(id, name, email) {
+function setClient(id, name, email, address) {
   selectedClient = { id, name, email };
   document.getElementById("clientNameDisplay").textContent  = name;
   document.getElementById("clientEmailDisplay").textContent = email;
   document.getElementById("clientSearchBlock").classList.add("d-none");
   document.getElementById("newClientForm").classList.add("d-none");
   document.getElementById("selectedClientBlock").classList.remove("d-none");
+
+  const addressInput = document.getElementById("deliveryAddress");
+  if (address && addressInput.value === "") {
+    addressInput.value = address;
+  }
+
   checkSaleValidity();
 }
 
@@ -53,7 +59,6 @@ async function createClient() {
   const email    = document.getElementById("nc-email").value.trim();
   const phone    = document.getElementById("nc-phone").value.trim();
   const password = document.getElementById("nc-password").value;
-
   if (!name || !email || !password)
     return Swal.fire("Atenção", "Nome, email e password são obrigatórios.", "warning");
 
@@ -68,7 +73,7 @@ async function createClient() {
     const data = await res.json();
     if (res.ok) {
       Swal.fire("Sucesso!", "Cliente criado.", "success");
-      setClient(data.data._id, data.data.name, data.data.email);
+      setClient(data.data._id, data.data.name, data.data.email, data.data.address);
     } else {
       Swal.fire("Erro!", data.message || "Não foi possível criar o cliente.", "error");
     }
@@ -166,6 +171,13 @@ function renderCart() {
   checkSaleValidity();
 }
 
+function onDeliveryChange() {
+  const isCourier = document.getElementById("deliveryMethod").value === "courier";
+  document.getElementById("addressBlock").classList.toggle("d-none", !isCourier);
+  updateTotals();
+  checkSaleValidity();
+}
+
 function updateTotals() {
   let subtotal = 0;
   for (let i = 0; i < cart.length; i++) {
@@ -177,7 +189,10 @@ function updateTotals() {
 }
 
 function checkSaleValidity() {
-  document.getElementById("btnConfirmSale").disabled = !selectedClient || cart.length === 0;
+  const isCourier = document.getElementById("deliveryMethod").value === "courier";
+  const address = document.getElementById("deliveryAddress").value.trim();
+  const addressOk = !isCourier || address.length > 0;
+  document.getElementById("btnConfirmSale").disabled = !selectedClient || cart.length === 0 || !addressOk;
 }
 
 // ─── Filtro ───────────────────────────────────────────────────────────────────
@@ -200,6 +215,7 @@ async function processSale() {
 
   const deliveryMethod = document.getElementById("deliveryMethod").value;
   const fee = deliveryMethod === "courier" ? deliveryFee : 0;
+  const deliveryAddress = deliveryMethod === "courier" ? document.getElementById("deliveryAddress").value.trim() : null;
 
   const confirmed = await Swal.fire({
     title: "Confirmar Venda?",
@@ -230,6 +246,7 @@ async function processSale() {
         products,
         deliveryMethod,
         deliveryCost: fee,
+        deliveryAddress,
       }),
     });
     const data = await res.json();

@@ -7,19 +7,22 @@ const Category = require("../../models/category");
 const getDashboard = async (req, res) => {
   try {
     const supermarket = await Supermarket.findOne({ user: req.user.id });
-    const [totalOrders, totalProducts] = await Promise.all([
+    const [totalOrders, totalProducts, recentOrders] = await Promise.all([
       Order.countDocuments({ supermarket: supermarket._id }),
       Product.countDocuments({ supermarket: supermarket._id }),
+      Order.find({ supermarket: supermarket._id, status: "confirmed" })
+        .populate("customer", "name")
+        .sort({ createdAt: -1 })
+        .limit(10),
     ]);
-
 
     res.render("supermarket/dashboard", {
       activePage: "dashboard",
       supermarketStatus: supermarket.status,
-
       supermarketName: supermarket.name,
       totalOrders,
       totalProducts,
+      recentOrders,
     });
   } catch (error) {
     console.error("Erro ao carregar dashboard do supermercado:", error);
@@ -38,6 +41,7 @@ const getSettings = async (req, res) => {
       activePage: "settings",
       user: user,
       supermarket: supermarket,
+      pendingMode: supermarket.status === "pending",
     });
   } catch (error) {
     console.error("Erro ao carregar settings:", error);

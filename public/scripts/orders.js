@@ -8,14 +8,17 @@ async function updateOrderStatus(orderId, newStatus) {
     } else if (newStatus === 'preparing') {
         actionText = "iniciar a preparação desta encomenda";
         actionColor = "#0d6efd";
+    } else if (newStatus === 'awaiting_courier') {
+        actionText = "marcar esta encomenda a aguardar estafeta";
+        actionColor = "#ffc107";
     } else if (newStatus === 'delivering') {
-        actionText = "marcar esta encomenda como pronta (aguarda cliente/estafeta)";
+        actionText = "marcar esta encomenda como a caminho";
         actionColor = "#0dcaf0";
     }
 
     const result = await Swal.fire({
         title: 'Confirmar ação',
-        text: `Pretende ${actionText}? O cliente será notificado da alteração.`,
+        text: `Pretende ${actionText}?`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: actionColor,

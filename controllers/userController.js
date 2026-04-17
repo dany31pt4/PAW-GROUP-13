@@ -204,11 +204,11 @@ const registerCourier = async (req, res) => {
 
 const createCustomer = async (req, res) => {
   try {
-    const { name, email, phone, password } = req.body;
+    const { name, email, phone, password, address } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ success: false, message: "Nome, email e password são obrigatórios." });
     }
-    const newCustomer = await userService.createUser({ name, email, phone, password, role: "customer" });
+    const newCustomer = await userService.createUser({ name, email, phone, password, address, role: "customer" });
     res.status(201).json({ success: true, data: newCustomer });
   } catch (err) {
     if (err.message && err.message.includes("E11000")) {

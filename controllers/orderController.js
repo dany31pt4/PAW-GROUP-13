@@ -8,7 +8,7 @@ const User = require("../models/user");
 // Venda em caixa (M1) — backoffice do supermercado
 const createSaleOrder = async (req, res) => {
   try {
-    const { customerId, products, deliveryMethod = "pickup", deliveryCost = 0 } = req.body;
+    const { customerId, products, deliveryMethod = "pickup", deliveryCost = 0, deliveryAddress } = req.body;
 
     if (!products || products.length === 0) {
       return res.status(400).json({ success: false, message: "Produtos são obrigatórios." });
@@ -54,11 +54,15 @@ const createSaleOrder = async (req, res) => {
       deliveryMethod,
       deliveryCost: deliveryMethod === "courier" ? deliveryCost : 0,
       total,
-      status: "confirmed",
+      status: deliveryMethod === "pickup" ? "delivered" : "confirmed",
     });
 
     for (const item of orderProducts) {
       await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity } });
+    }
+
+    if (deliveryMethod === "courier" && deliveryAddress) {
+      await User.findByIdAndUpdate(customerId, { address: deliveryAddress });
     }
 
     res.status(201).json({ success: true, data: newOrder });

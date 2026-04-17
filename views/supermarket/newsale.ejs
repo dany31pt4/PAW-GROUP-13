@@ -145,10 +145,15 @@
 
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted">Método de Entrega</label>
-                        <select id="deliveryMethod" class="form-select form-select-sm" onchange="updateTotals()">
+                        <select id="deliveryMethod" class="form-select form-select-sm" onchange="onDeliveryChange()">
                             <option value="pickup">Levantamento em Loja (0.00€)</option>
                             <option value="courier">Estafeta (+<%= (supermarket.deliveryCost || 0).toFixed(2) %>€)</option>
                         </select>
+                    </div>
+
+                    <div id="addressBlock" class="mb-3 d-none">
+                        <label class="form-label small fw-bold text-muted">Morada de Entrega <span class="text-danger">*</span></label>
+                        <input type="text" id="deliveryAddress" class="form-control form-control-sm" placeholder="Rua, número, cidade..." oninput="checkSaleValidity()">
                     </div>
 
                     <div class="d-flex justify-content-between mb-1">

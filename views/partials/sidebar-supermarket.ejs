@@ -1,8 +1,18 @@
- <aside class="sidebar">
-        <div class="sidebar-brand">
-            <i class="bi bi-box-seam" style="font-size:20px"></i> Marketplace
-        </div>
-        <nav style="padding: 12px 0;">
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <i class="bi bi-box-seam" style="font-size:20px"></i> Marketplace
+    </div>
+    <nav style="padding: 12px 0;">
+        <% if (typeof rejectedMode !== 'undefined' && rejectedMode) { %>
+            <%# sem links — só logout %>
+        <% } else  if (typeof pendingMode !=='undefined' && pendingMode) { %>
+            <a href="/supermarket/dashboard" class="nav-link-item <%= activePage === 'dashboard' ? 'active' : '' %>">
+                <i class="bi bi-grid-1x2"></i> Painel geral
+            </a>
+            <a href="/supermarket/settings" class="nav-link-item <%= activePage === 'settings' ? 'active' : '' %>">
+                <i class="bi bi-person-gear"></i> Editar Perfil
+            </a>
+            <% } else { %>
             <a href="/supermarket/dashboard" class="nav-link-item <%= activePage === 'dashboard' ? 'active' : '' %>">
                 <i class="bi bi-grid-1x2"></i> Painel geral
             </a>
@@ -15,10 +25,13 @@
             <a href="/supermarket/orders" class="nav-link-item <%= activePage === 'orders' ? 'active' : '' %>">
                 <i class="bi bi-truck"></i> Encomendas
             </a>
-             <a href="/supermarket/newsale" class="nav-link-item <%= activePage === 'newsale' ? 'active' : '' %>">
-                <i class="bi bi-truck"></i> Nova Venda 
+            <a href="/supermarket/newsale" class="nav-link-item <%= activePage === 'newsale' ? 'active' : '' %>">
+                <i class="bi bi-cart-plus"></i> Nova Venda
             </a>
-            <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 16px 0;"></div>
-            <a href="/auth/logout" class="nav-link-item" style="color:#e74c3c;"><i class="bi bi-box-arrow-left"></i> Sair</a>
-        </nav>
+        <% } %>
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 16px 0;"></div>
+        <a href="/auth/logout" class="nav-link-item" style="color:#e74c3c;">
+            <i class="bi bi-box-arrow-left"></i> Sair
+        </a>
+    </nav>
 </aside>

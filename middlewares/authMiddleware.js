@@ -88,31 +88,15 @@ const verifySupermarketStatus = async (req, res, next) => {
     }
 
     if (supermarket.status === "pending") {
-      if (isAjaxRequest(req)) {
-        return res
-          .status(403)
-          .json({
-            success: false,
-            message: "Supermercado ainda não foi aprovado.",
-          });
-      }
       return res.render("supermarket/pending", {
-        supermarket,
-        activePage: "dashboard",
-        supermarketName: supermarket.name,
+        activePage: "dashboard",        
+        pendingMode: true,
       });
     }
 
     if (supermarket.status === "rejected") {
-      if (isAjaxRequest(req)) {
-        return res
-          .status(403)
-          .json({ success: false, message: "Supermercado foi rejeitado." });
-      }
       return res.render("supermarket/rejected", {
-        supermarket,
-        activePage: "dashboard",
-        supermarketName: supermarket.name,
+        rejectedMode: true,
       });
     }
 
@@ -135,6 +119,7 @@ const verifySupermarketStatus = async (req, res, next) => {
       });
   }
 };
+
 
 module.exports = {
   verifyToken,
