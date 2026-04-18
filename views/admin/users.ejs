@@ -1,249 +1,207 @@
 <!DOCTYPE html>
 <html lang="pt">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Utilizadores - Admin</title>
+    <title>Gestão de Utilizadores | Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/style/admin.css">
+    <style>
+        /* Ajustes específicos para as Tabs em Dark Mode */
+        .nav-tabs { border-bottom: 1px solid #232326; }
+        .nav-tabs .nav-link {
+            color: #80808a;
+            border: none;
+            padding: 12px 20px;
+            font-weight: 500;
+        }
+        .nav-tabs .nav-link:hover { color: #fff; border: none; }
+        .nav-tabs .nav-link.active {
+            color: #2ecc71 !important;
+            background: transparent;
+            border-bottom: 2px solid #2ecc71;
+        }
+    </style>
 </head>
 
 <body>
 
     <%- include('../partials/sidebar-admin') %>
 
-        <main class="main-wrapper">
-            <div class="mb-4">
-                <h4 class="fw-bold">Gestão de Utilizadores</h4>
-                <p class="text-muted">Consulta e controlo de todas as contas registadas.</p>
+    <main class="main-content">
+        <header class="content-header mb-5">
+            <div>
+                <h2 class="page-title" style="color: white; font-weight: 700;">Gestão de Utilizadores</h2>
+                <p style="color: #bbb;">Consulta e controlo de todas as contas registadas no sistema.</p>
             </div>
+        </header>
 
-            <ul class="nav nav-tabs mb-4" id="userTabs" role="tablist">
-                <li class="nav-item">
-                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#clientes">Clientes</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#lojas">Supermercados</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#estafetas">Estafetas</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#admins">Admins</button>
-                </li>
-            </ul>
+        <ul class="nav nav-tabs mb-4" id="userTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#clientes">Clientes</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#lojas">Supermercados</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#estafetas">Estafetas</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#admins">Admins</button>
+            </li>
+        </ul>
 
-            <div class="tab-content">
-                <div class="tab-pane fade show active" id="clientes">
-                    <div class="table-card mt-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="clientes">
+                <div class="custom-card mt-0">
+                    <div class="table-responsive">
+                        <table class="table custom-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Data Registo</th>
+                                    <th class="text-end">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% customers.forEach(function(c) { %>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Nome</th>
-                                        <th>Email</th>
-                                        <th>Data Registo</th>
-                                        <th class="text-end">Ações</th>
+                                        <td class="text-muted" style="font-size: 0.8rem;">#<%= c.id.substring(18) %></td>
+                                        <td class="text-white fw-bold"><%= c.name %></td>
+                                        <td><%= c.email %></td>
+                                        <td><span class="loc-tag"><%= c.date %></span></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-light border-secondary" onclick="openViewCustomerModal('<%= c.id %>')"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger ms-1" onclick="openRemoveCustomerModal('<%= c.id %>')"><i class="bi bi-trash"></i></button>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody id="customerTableBody">
-                                    <% customers.forEach(function(c) { %>
-                                        <tr>
-                                            <td><strong>
-                                                    <%= c.id %>
-                                                </strong></td>
-                                            <td><strong>
-                                                    <%= c.name %>
-                                                </strong></td>
-                                            <td>
-                                                <%= c.email %>
-                                            </td>
-                                            <td>
-                                                <%= c.date %>
-                                            </td>
-                                            <td class="text-end">
-                                                <button class="btn btn-sm btn-outline-primary"
-                                                    onclick="openViewCustomerModal('<%= c.id %>')">Ver</button>
-                                                <button class="btn btn-sm btn-outline-secondary"
-                                                    onclick="openEditCustomerModal('<%= c.id %>')">Editar</button>
-                                                <button class="btn btn-sm btn-outline-danger"
-                                                    onclick="openRemoveCustomerModal('<%= c.id %>')">Eliminar</button>
-                                            </td>
-                                        </tr>
-                                        <% }); %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-pane fade" id="lojas">
-                    <div class="d-flex justify-content-end mb-3 mt-2">
-                        <button class="btn btn-primary" onclick="openAddMarketModal()">
-                            <i class="bi bi-shop"></i> Adicionar Supermercado
-                        </button>
-                    </div>
-
-                    <div class="table-card mt-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Supermercado</th>
-                                        <th>Localidade</th>
-                                        <th>Estado</th>
-                                        <th class="text-end">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="marketTableBody">
-                                    <% markets.forEach(function(l) { %>
-                                        <tr>
-                                            <td><strong>
-                                                    <%= l.id %>
-                                                </strong></td>
-                                            <td><strong>
-                                                    <%= l.name %>
-                                                </strong></td>
-                                            <td>
-                                                <%= l.location %>
-                                            </td>
-                                            <td>
-                                                <% if (l.status==="approved" ) { %>
-                                                    <span class="badge bg-success">Ativo</span>
-                                                    <% } else if (l.status==="pending" ) { %>
-                                                        <span class="badge bg-warning text-dark">Pendente</span>
-                                                        <% } else { %>
-                                                            <span class="badge bg-danger">Rejeitado</span>
-                                                            <% } %>
-                                            </td>
-                                            <td class="text-end">
-                                                <button class="btn btn-sm btn-outline-primary"
-                                                    onclick="openViewMarketModal('<%= l._id %>')">Ver</button>
-                                                <button class="btn btn-sm btn-outline-secondary"
-                                                    onclick="openEditMarketModal('<%= l._id %>')">Editar</button>
-                                                <button class="btn btn-sm btn-outline-danger"
-                                                    onclick="openRemoveMarketModal('<%= l._id %>')">Eliminar</button>
-                                            </td>
-                                        </tr>
-                                        <% }); %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-pane fade" id="estafetas">
-                    <div class="d-flex justify-content-end mb-3 mt-2">
-                        <button class="btn btn-primary" onclick="openAddCourierModal()">
-                            <i class="bi bi-bicycle"></i> Adicionar Estafeta
-                        </button>
-                    </div>
-
-                    <div class="table-card mt-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Estafeta</th>
-                                        <th>Última Encomenda</th>
-                                        <th>Total Entregas</th>
-                                        <th class="text-end">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="courierTableBody">
-                                    <% couriers.forEach(function(e) { %>
-                                        <tr>
-                                            <td><strong>
-                                                    <%= e.id %>
-                                                </strong></td>
-                                            <td><strong>
-                                                    <%= e.name %>
-                                                </strong></td>
-                                            <td>
-                                                <%= e.lastOrderDate %>
-                                            </td>
-                                            <td>
-                                                <%= e.totalDeliveries %>
-                                            </td>
-                                            <td class="text-end">
-                                                <button class="btn btn-sm btn-outline-primary"
-                                                    onclick="openViewCourierModal('<%= e.id %>')">Ver</button>
-                                                <button class="btn btn-sm btn-outline-secondary"
-                                                    onclick="openEditCourierModal('<%= e.id %>')">Editar</button>
-                                                <button class="btn btn-sm btn-outline-danger"
-                                                    onclick="openRemoveCourierModal('<%= e.id %>')">Eliminar</button>
-                                            </td>
-                                        </tr>
-                                        <% }); %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="admins">
-                    <div class="d-flex justify-content-end mb-3 mt-2">
-                        <button class="btn btn-primary" onclick="openAddAdminModal()">
-                            <i class="bi bi-person-plus"></i> Adicionar Admin
-                        </button>
-                    </div>
-
-                    <div class="table-card mt-0">
-                        <div class="table-responsive">
-                            <table id="adminTable" class="table table-hover align-middle">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nome</th>
-                                        <th>Email</th>
-                                        <th>Data Registo</th>
-                                        <th class="text-end">Ações</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="adminTableBody">
-                                    <% admins.forEach(function(a) { %>
-                                        <tr>
-                                                   <td><strong>
-                                                    <%= a.id %>
-                                                </strong></td>
-                                            <td><strong>
-                                                    <%= a.name %>
-                                                </strong></td>
-                                            <td>
-                                                <%= a.email %>
-                                            </td>
-                                            <td>
-                                                <%= a.createdAt %>
-                                            </td>
-                                            <td class="text-end">
-                                                <button class="btn btn-sm btn-outline-secondary"
-                                                    onclick="openEditAdminModal('<%= a.id %>')">Editar</button>
-                                                <button class="btn btn-sm btn-outline-danger"
-                                                    onclick="openRemoveAdminModal('<%= a.id %>')">Eliminar</button>
-                                            </td>
-                                        </tr>
-                                        <% }); %>
-                                </tbody>
-                            </table>
-                        </div>
+                                <% }); %>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-        </main>
 
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="/scripts/users-scripts/admin.js"></script>
-        <script src="/scripts/users-scripts/courier.js"></script>
-        <script src="/scripts/users-scripts/supermarket.js"></script>
-        <script src="/scripts/users-scripts/customer.js"></script>
+            <div class="tab-pane fade" id="lojas">
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-success btn-sm px-3" onclick="openAddMarketModal()">
+                        <i class="bi bi-shop"></i> Novo Supermercado
+                    </button>
+                </div>
+                <div class="custom-card">
+                    <div class="table-responsive">
+                        <table class="table custom-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Supermercado</th>
+                                    <th>Localidade</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% markets.forEach(function(l) { %>
+                                    <tr>
+                                        <td class="text-muted" style="font-size: 0.8rem;">#<%= l._id.toString().substring(18) %></td>
+                                        <td class="text-white fw-bold"><%= l.name %></td>
+                                        <td><%= l.location %></td>
+                                        <td>
+                                            <% if (l.status === "approved") { %>
+                                                <span class="badge bg-success-subtle text-success">Ativo</span>
+                                            <% } else { %>
+                                                <span class="badge bg-warning-subtle text-warning">Pendente</span>
+                                            <% } %>
+                                        </td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-light border-secondary" onclick="openEditMarketModal('<%= l._id %>')"><i class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger ms-1" onclick="openRemoveMarketModal('<%= l._id %>')"><i class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
+            <div class="tab-pane fade" id="estafetas">
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-success btn-sm px-3" onclick="openAddCourierModal()">
+                        <i class="bi bi-bicycle"></i> Novo Estafeta
+                    </button>
+                </div>
+                <div class="custom-card">
+                    <div class="table-responsive">
+                        <table class="table custom-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Última Encomenda</th>
+                                    <th>Total Entregas</th>
+                                    <th class="text-end">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% couriers.forEach(function(e) { %>
+                                    <tr>
+                                        <td class="text-white fw-bold"><%= e.name %></td>
+                                        <td class="text-muted"><%= e.lastOrderDate %></td>
+                                        <td><span class="badge bg-dark border border-secondary"><%= e.totalDeliveries %> entregas</span></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-light border-secondary" onclick="openViewCourierModal('<%= e.id %>')"><i class="bi bi-eye"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger ms-1" onclick="openRemoveCourierModal('<%= e.id %>')"><i class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
+            <div class="tab-pane fade" id="admins">
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-success btn-sm px-3" onclick="openAddAdminModal()">
+                        <i class="bi bi-person-plus"></i> Novo Admin
+                    </button>
+                </div>
+                <div class="custom-card">
+                    <div class="table-responsive">
+                        <table class="table custom-table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th class="text-end">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% admins.forEach(function(a) { %>
+                                    <tr>
+                                        <td class="text-white fw-bold"><%= a.name %></td>
+                                        <td class="text-muted"><%= a.email %></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-danger" onclick="openRemoveAdminModal('<%= a.id %>')"><i class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/users-scripts/admin.js"></script>
+    <script src="/scripts/users-scripts/courier.js"></script>
+    <script src="/scripts/users-scripts/supermarket.js"></script>
+    <script src="/scripts/users-scripts/customer.js"></script>
 </body>
-
 </html>

@@ -1,27 +1,43 @@
- <aside class="sidebar">
-        <div class="sidebar-brand">
-            <i class="bi bi-box-seam" style="font-size:20px"></i> Marketplace
-        </div>
-        <nav style="padding: 12px 0;">
-            <a href="/admin/dashboard" class="nav-link-item <%= activePage === 'dashboard' ? 'active' : '' %>">
-                <i class="bi bi-grid-1x2"></i> Painel geral
-            </a>
-            <a href="/admin/approvals" class="nav-link-item <%= activePage === 'approvals' ? 'active' : '' %>">
-                <i class="bi bi-shop-window"></i> Aprovar lojas
-                <% if (allPending > 0) { %>
-                    <span style="margin-left:auto; background:#e74c3c; color:#fff; border-radius:10px; font-size:11px; padding:1px 7px;"><%= allPending %></span>
-                <% } %>
-            </a>
-            <a href="/admin/users" class="nav-link-item <%= activePage === 'users' ? 'active' : '' %>">
-                <i class="bi bi-people"></i> Utilizadores
-            </a>
-            <a href="/admin/orders" class="nav-link-item <%= activePage === 'orders' ? 'active' : '' %>">
-                <i class="bi bi-truck"></i> Encomendas
-            </a>
-             <a href="/admin/categories" class="nav-link-item <%= activePage === 'categories' ? 'active' : '' %>">
-                <i class="bi bi-list"></i> Categorias
-            </a>
-            <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 16px 0;"></div>
-            <a href="/auth/logout" class="nav-link-item" style="color:#e74c3c;"><i class="bi bi-box-arrow-left"></i> Sair</a>
-        </nav>
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <i class="bi bi-box-seam"></i>
+        <span>Marketplace</span>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <a href="/admin/dashboard" class="nav-link-item <%= activePage === 'dashboard' ? 'active' : '' %>">
+            <i class="bi bi-grid-1x2"></i> 
+            <span>Painel Geral</span>
+        </a>
+        
+        <a href="/admin/approvals" class="nav-link-item <%= activePage === 'approvals' ? 'active' : '' %>">
+            <i class="bi bi-shop-window"></i> 
+            <span>Aprovar Lojas</span>
+            <% if (allPending > 0) { %>
+                <span class="badge-pending"><%= allPending %></span>
+            <% } %>
+        </a>
+        
+        <a href="/admin/users" class="nav-link-item <%= activePage === 'users' ? 'active' : '' %>">
+            <i class="bi bi-people"></i> 
+            <span>Utilizadores</span>
+        </a>
+        
+        <a href="/admin/orders" class="nav-link-item <%= activePage === 'orders' ? 'active' : '' %>">
+            <i class="bi bi-truck"></i> 
+            <span>Encomendas</span>
+        </a>
+        
+        <a href="/admin/categories" class="nav-link-item <%= activePage === 'categories' ? 'active' : '' %>">
+            <i class="bi bi-list-ul"></i> 
+            <span>Categorias</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+        
+        <a href="/auth/logout" class="nav-link-item logout">
+            <i class="bi bi-box-arrow-left"></i> 
+            <span>Sair</span>
+        </a>
+    </nav>
 </aside>
