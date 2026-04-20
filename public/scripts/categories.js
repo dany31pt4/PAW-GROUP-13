@@ -90,10 +90,10 @@ async function openViewCategoryModal(categoryId) {
       throw new Error(category.message || "Erro ao carregar detalhes.");
     }
 
-    const estadoTexto =
-      category.status === true || category.status === "active"
-        ? '<span class="badge bg-success">Ativa</span>'
-        : '<span class="badge bg-secondary">Inativa</span>';
+    let estadoTexto = '<span class="badge bg-secondary">Inativa</span>';
+    if (category.status === true || category.status === "active") {
+      estadoTexto = '<span class="badge bg-success">Ativa</span>';
+    }
 
     Swal.fire({
       title: `<i class="bi bi-tag-fill text-primary me-2"></i> Detalhes da Categoria`,
@@ -142,6 +142,15 @@ async function openEditCategoryModal(id) {
       throw new Error(category.message || "Erro ao carregar dados.");
     }
 
+    let activeSelected = "";
+    if (category.status === true) {
+      activeSelected = "selected";
+    }
+    let inactiveSelected = "";
+    if (category.status === false) {
+      inactiveSelected = "selected";
+    }
+
     Swal.fire({
       title: "Editar Categoria",
       html: `
@@ -154,8 +163,8 @@ async function openEditCategoryModal(id) {
             
             <label class="form-label mt-2">Estado</label>
             <select class="form-select" id="edit-status" name="status">
-                <option value="active" ${category.status === true ? "selected" : ""}>Ativa</option>
-                <option value="inactive" ${category.status === false ? "selected" : ""}>Inativa</option>
+                <option value="active" ${activeSelected}>Ativa</option>
+                <option value="inactive" ${inactiveSelected}>Inativa</option>
             </select>
         </div>
       `,
@@ -174,10 +183,14 @@ async function openEditCategoryModal(id) {
           return false;
         }
 
+        let statusValue = false;
+        if (status === "active") {
+          statusValue = true;
+        }
         return {
           name: name,
           description: description,
-          status: status === "active" ? true : false,
+          status: statusValue,
         };
       },
     }).then(async (result) => {

@@ -8,7 +8,10 @@ async function openViewCustomerModal(customerId) {
         const customer = await res.json();
         
         // Formatar data de registo
-        const dataRegisto = customer.createdAt ? new Date(customer.createdAt).toLocaleDateString('pt-PT') : 'Desconhecida';
+        let dataRegisto = 'Desconhecida';
+        if (customer.createdAt) {
+            dataRegisto = new Date(customer.createdAt).toLocaleDateString('pt-PT');
+        }
 
         Swal.fire({
             title: `<i class="bi bi-person"></i> Detalhes do Cliente`,
@@ -138,7 +141,10 @@ async function loadcustomerTable() {
 
         let html = "";
         customers.forEach((c) => {
-            const dataRegisto = c.createdAt ? new Date(c.createdAt).toLocaleDateString('pt-PT') : '---';
+            let dataRegisto = '---';
+            if (c.createdAt) {
+                dataRegisto = new Date(c.createdAt).toLocaleDateString('pt-PT');
+            }
             html += `
                 <tr>
                     <td><strong>${c.name}</strong></td>

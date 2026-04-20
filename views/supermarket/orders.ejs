@@ -145,8 +145,8 @@
                                                 </button>
                                             <% } %>
                                         <% } else if (order.status === 'awaiting_courier') { %>
-                                            <button class="btn btn-sm btn-info text-white" onclick="updateOrderStatus('<%= order._id %>', 'delivering')">
-                                                <i class="bi bi-bicycle me-1"></i> A Caminho
+                                            <button class="btn btn-sm btn-light border disabled text-muted" aria-disabled="true">
+                                                <i class="bi bi-hourglass-split me-1"></i> A aguardar estafeta
                                             </button>
                                         <% } else { %>
                                             <button class="btn btn-sm btn-light border disabled text-muted" aria-disabled="true">

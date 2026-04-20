@@ -107,8 +107,9 @@
                                         switch(order.status) {
                                             case 'pending':    badgeClass = 'bg-warning-subtle text-warning border-warning-subtle';     statusText = 'Pendente';       break;
                                             case 'confirmed':  badgeClass = 'bg-info-subtle text-info border-info-subtle';               statusText = 'Confirmada';     break;
-                                            case 'preparing':  badgeClass = 'bg-primary-subtle text-primary border-primary-subtle';      statusText = 'Em Preparação';  break;
-                                            case 'delivering': badgeClass = 'bg-secondary-subtle text-secondary border-secondary-subtle'; statusText = 'Com Estafeta';   break;
+                                            case 'preparing':         badgeClass = 'bg-primary-subtle text-primary border-primary-subtle';       statusText = 'Em Preparação';    break;
+                                            case 'awaiting_courier':  badgeClass = 'bg-warning-subtle text-warning border-warning-subtle';       statusText = 'Aguarda Estafeta'; break;
+                                            case 'delivering':        badgeClass = 'bg-secondary-subtle text-secondary border-secondary-subtle'; statusText = 'Com Estafeta';     break;
                                             case 'delivered':  badgeClass = 'bg-success-subtle text-success border-success-subtle';      statusText = 'Entregue';       break;
                                             case 'cancelled':  badgeClass = 'bg-danger-subtle text-danger border-danger-subtle';         statusText = 'Cancelada';      break;
                                             default:           badgeClass = 'bg-light text-dark'; statusText = order.status;

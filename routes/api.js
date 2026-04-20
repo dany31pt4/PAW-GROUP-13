@@ -94,6 +94,8 @@ ORDER ROUTES
 =====
 */
 
+router.put("/orders/courier/accept/:id", verifyToken, verifyRole(["courier"]), orderController.acceptDelivery);
+router.put("/orders/courier/complete/:id", verifyToken, verifyRole(["courier"]), orderController.completeDelivery);
 router.post("/orders/sale", verifyToken, verifyRole(["supermarket"]), verifySupermarketStatus, orderController.createSaleOrder);
 router.get("/orders/list", verifyToken, verifyRole(["admin"]), orderController.getAllOrders);
 router.get("/orders/supermarket/:id", verifyToken, verifyRole(["admin", "supermarket"]), orderController.getOrdersBySupermarket);

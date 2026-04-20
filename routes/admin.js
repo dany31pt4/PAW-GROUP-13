@@ -22,6 +22,8 @@ router.get("/approvals", adminViewController.getApprovals);
 router.get("/orders", adminViewController.getOrders);
 router.get("/users", adminViewController.getUsers);
 router.get("/categories", adminViewController.getCategories);
+router.get("/products", adminViewController.getProducts);
+router.get("/product/:productId", adminViewController.getAdminProductDetail);
 router.get("/order/:orderId", adminViewController.getAdminOrderDetail);
 router.get("/category/:categoryId", adminViewController.getAdminCategoryDetail);
 router.get("/user/:userId", adminViewController.getAdminUserDetail);

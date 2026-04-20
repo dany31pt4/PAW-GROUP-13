@@ -17,9 +17,6 @@ const login = async (req, res) => {
     const secretKey = process.env.secret;
     const rememberMe = req.body.remember === "on";
 
-    let jwtExpiration = "1h"; // token age
-    let age = 3600000; // cookie age
-
     if (!user) {
       return res.render("auth/login", { erro: "Email ou password inválidos." });
     }
@@ -30,9 +27,16 @@ const login = async (req, res) => {
       return res.render("auth/login", { erro: "Email ou password inválidos." });
     }
 
+    let jwtExpiration = "2h";
+    let cookieOptions = {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+    };
+
     if (rememberMe) {
-      age = 2592000000; // 30 dias
       jwtExpiration = "30d";
+      cookieOptions.maxAge = 2592000000; // 30 dias em ms
     }
 
     let token;
@@ -61,12 +65,7 @@ const login = async (req, res) => {
       );
     }
 
-    res.cookie("token", token, {
-      httpOnly: true, // JavaScript não consegue ler (Proteção XSS)
-      secure: false, // Se True so  funciona em HTTPS , mas como tamos em desenvolvimento local, deixamos false.
-      sameSite: "strict", // Protege contra ataques CSRF
-      maxAge: age, // Tempo de vida do cookie em milissegundos (1 hora)
-    });
+    res.cookie("token", token, cookieOptions);
 
     return res.redirect("/");
   } catch (erro) {

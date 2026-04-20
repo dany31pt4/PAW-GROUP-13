@@ -50,7 +50,10 @@ const getOrders = async (req, res) => {
 
     const salesByMarket = {};
     orders.forEach(o => {
-      const name = o.supermarket ? o.supermarket.name : "Desconhecido";
+      let name = "Desconhecido";
+      if (o.supermarket) {
+        name = o.supermarket.name;
+      }
       salesByMarket[name] = (salesByMarket[name] || 0) + 1;
     });
 
@@ -205,10 +208,14 @@ const getAdminUserDetail = async (req, res) => {
           .limit(5),
         Order.findOne({ courier: user._id }).sort({ createdAt: -1 }),
       ]);
+      let lastOrderDate = null;
+      if (lastOrder) {
+        lastOrderDate = lastOrder.createdAt.toLocaleDateString("pt-PT");
+      }
       courierStats = {
         total,
         recentOrders,
-        lastOrderDate: lastOrder ? lastOrder.createdAt.toLocaleDateString("pt-PT") : null,
+        lastOrderDate,
       };
     }
 
@@ -227,6 +234,11 @@ const getAdminSupermarketDetail = async (req, res) => {
       return res.status(404).render("error", { message: "Supermercado não encontrado.", error: { status: 404 } });
     }
 
+    let activePage = "users";
+    if (market.status === "pending") {
+      activePage = "approvals";
+    }
+
     const [totalOrders, totalProducts, recentOrders] = await Promise.all([
       Order.countDocuments({ supermarket: market._id }),
       Product.countDocuments({ supermarket: market._id }),
@@ -237,7 +249,7 @@ const getAdminSupermarketDetail = async (req, res) => {
     ]);
 
     res.render("admin/supermarket-detail", {
-      activePage: market.status === "pending" ? "approvals" : "users",
+      activePage,
       market,
       stats: { totalOrders, totalProducts, recentOrders },
     });
@@ -247,14 +259,54 @@ const getAdminSupermarketDetail = async (req, res) => {
   }
 };
 
+const getAdminProductDetail = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.productId)
+      .populate("supermarket", "name _id")
+      .populate("category", "name");
+
+    if (!product) {
+      return res.status(404).render("error", { message: "Produto não encontrado.", error: { status: 404 } });
+    }
+
+    res.render("admin/product-detail", {
+      activePage: "products",
+      product,
+    });
+  } catch (error) {
+    console.error("Erro ao carregar produto:", error);
+    res.status(500).render("error", { message: "Erro ao carregar o produto.", error: { status: 500 } });
+  }
+};
+
+const getProducts = async (req, res) => {
+  try {
+    const products = await Product.find()
+      .populate("supermarket", "name")
+      .populate("category", "name")
+      .sort({ createdAt: -1 });
+
+    res.render("admin/products", {
+      activePage: "products",
+      products,
+    });
+  } catch (error) {
+    console.error("Erro ao carregar produtos:", error);
+    res.status(500).render("error", { message: "Erro ao carregar os produtos.", error: { status: 500 } });
+  }
+};
+
 module.exports = {
   getDashboard,
   getApprovals,
   getOrders,
   getUsers,
   getCategories,
+  getProducts,
   getAdminOrderDetail,
   getAdminCategoryDetail,
   getAdminUserDetail,
   getAdminSupermarketDetail,
+  getProducts,
+  getAdminProductDetail,
 };

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Entregas - Marketplace</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/style/admin.css">
+</head>
+<body>
+
+    <%- include('../partials/sidebar-courier', { activePage: 'history', availableCount: 0 }) %>
+
+    <main class="main-wrapper">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Histórico de Entregas</h3>
+                <p class="text-secondary small mb-0">Todas as entregas que realizaste.</p>
+            </div>
+            <span class="badge bg-success-subtle text-success border border-success-subtle fs-6">
+                <strong><%= deliveries.length %></strong> entregas realizadas
+            </span>
+        </div>
+
+        <div class="table-card">
+            <% if (deliveries.length === 0) { %>
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-clock-history fs-1 d-block mb-3 opacity-50"></i>
+                    Ainda não realizaste nenhuma entrega.
+                </div>
+            <% } else { %>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" style="font-size:14px">
+                    <thead>
+                        <tr class="text-muted" style="font-size:12px">
+                            <th>ID</th>
+                            <th>Supermercado</th>
+                            <th>Cliente</th>
+                            <th>Morada</th>
+                            <th>Produtos</th>
+                            <th>Ganho</th>
+                            <th>Data Entrega</th>
+                            <th>Estado</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% deliveries.forEach(order => { %>
+                        <tr>
+                            <td class="text-muted fw-bold" style="font-size:11px;"><%= order._id %></td>
+                            <td><strong><%= order.supermarket ? order.supermarket.name : 'N/A' %></strong></td>
+                            <td><%= order.customer ? order.customer.name : 'N/A' %></td>
+                            <td class="text-muted" style="font-size:12px;">
+                                <%= order.customer && order.customer.address ? order.customer.address : 'N/A' %>
+                            </td>
+                            <td>
+                                <ul class="list-unstyled mb-0 text-muted" style="font-size:12px;">
+                                    <% order.products.forEach(item => { %>
+                                        <li><span class="fw-bold text-dark"><%= item.quantity %>x</span> <%= item.product ? item.product.name : 'N/A' %></li>
+                                    <% }) %>
+                                </ul>
+                            </td>
+                            <td><strong class="text-success"><%= order.deliveryCost.toFixed(2) %> €</strong></td>
+                            <td class="text-muted"><%= new Date(order.updatedAt).toLocaleDateString('pt-PT') %></td>
+                            <td>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                                    <i class="bi bi-check-circle me-1"></i> Entregue
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <a href="/courier/order/<%= order._id %>" class="btn btn-sm btn-light border shadow-sm" title="Ver encomenda">
+                                    <i class="bi bi-eye-fill text-primary"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+            <% } %>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

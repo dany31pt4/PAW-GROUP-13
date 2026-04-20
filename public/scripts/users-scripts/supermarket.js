@@ -150,6 +150,19 @@ async function openEditMarketModal(marketId) {
       userPhone = market.user.phone;
     }
 
+    let approvedSelected = "";
+    if (market.status === "approved") {
+      approvedSelected = "selected";
+    }
+    let pendingSelected = "";
+    if (market.status === "pending") {
+      pendingSelected = "selected";
+    }
+    let rejectedSelected = "";
+    if (market.status === "rejected") {
+      rejectedSelected = "selected";
+    }
+
     Swal.fire({
       title: "Editar Supermercado",
       html: `
@@ -163,9 +176,9 @@ async function openEditMarketModal(marketId) {
                     
                     <label class="form-label mt-2">Estado</label>
                     <select id="edit-status" class="form-select">
-                        <option value="approved" ${market.status === "approved" ? "selected" : ""}>Ativo</option>
-                        <option value="pending" ${market.status === "pending" ? "selected" : ""}>Pendente</option>
-                        <option value="rejected" ${market.status === "rejected" ? "selected" : ""}>Rejeitado</option>
+                        <option value="approved" ${approvedSelected}>Ativo</option>
+                        <option value="pending" ${pendingSelected}>Pendente</option>
+                        <option value="rejected" ${rejectedSelected}>Rejeitado</option>
                     </select>
 
                     <h6 class="text-primary border-bottom pb-1 mt-4">Dados de Contacto e Acesso</h6>

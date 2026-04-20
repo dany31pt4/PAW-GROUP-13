@@ -1,6 +1,10 @@
 const Product = require("../models/product");
 
 const createProduct = async (productData) => {
+    let isActiveVal = false;
+    if (productData.isActive !== undefined) {
+      isActiveVal = productData.isActive;
+    }
     return await Product.create({
         supermarket: productData.supermarket,
         name: productData.name,
@@ -9,7 +13,7 @@ const createProduct = async (productData) => {
         description: productData.description,
         price: productData.price,
         stock: productData.stock,
-        isActive: productData.isActive !== undefined ? productData.isActive : false,
+        isActive: isActiveVal,
       });
 };
 

@@ -4,8 +4,8 @@ const Order = require("../models/order");
 const Product = require("../models/product");
 const Supermarket = require("../models/supermarket");
 const User = require("../models/user");
+const { sendOrderStatusEmail } = require("../utils/emailService");
 
-// Venda em caixa (M1) — backoffice do supermercado
 const createSaleOrder = async (req, res) => {
   try {
     const { customerId, products, deliveryMethod = "pickup", deliveryCost = 0, deliveryAddress } = req.body;
@@ -16,7 +16,10 @@ const createSaleOrder = async (req, res) => {
 
     const supermarket = await Supermarket.findById(req.user.supermarket_id);
     if (!supermarket.deliveryMethods || !supermarket.deliveryMethods.includes(deliveryMethod)) {
-      const label = deliveryMethod === "courier" ? "entrega por estafeta" : "levantamento em loja";
+      let label = "levantamento em loja";
+      if (deliveryMethod === "courier") {
+        label = "entrega por estafeta";
+      }
       return res.status(400).json({ success: false, message: `Este supermercado não tem ${label} ativo.` });
     }
 
@@ -47,14 +50,24 @@ const createSaleOrder = async (req, res) => {
       total += doc.price * item.quantity;
     }
 
+    let finalDeliveryCost = 0;
+    if (deliveryMethod === "courier") {
+      finalDeliveryCost = deliveryCost;
+    }
+
+    let orderStatus = "confirmed";
+    if (deliveryMethod === "pickup") {
+      orderStatus = "delivered";
+    }
+
     const newOrder = await orderService.createOrder({
       customer: customerId,
       supermarket: req.user.supermarket_id,
       products: orderProducts,
       deliveryMethod,
-      deliveryCost: deliveryMethod === "courier" ? deliveryCost : 0,
+      deliveryCost: finalDeliveryCost,
       total,
-      status: deliveryMethod === "pickup" ? "delivered" : "confirmed",
+      status: orderStatus,
     });
 
     for (const item of orderProducts) {
@@ -141,6 +154,9 @@ const updateOrderStatus = async (req, res) => {
     const order = await orderService.updateOrderStatus(req.params.id, status);
     if (!order) return res.status(404).json({ success: false, message: "Encomenda não encontrada." });
 
+    const orderPopulated = await orderService.getOrderById(order._id);
+    await sendOrderStatusEmail(orderPopulated);
+
     res.status(200).json({ success: true, data: order });
   } catch (error) {
     console.error("Erro ao atualizar estado:", error.message);
@@ -175,10 +191,62 @@ const cancelOrder = async (req, res) => {
     }
 
     const cancelled = await orderService.updateOrderStatus(req.params.id, "cancelled");
+    const cancelledPopulated = await orderService.getOrderById(cancelled._id);
+    await sendOrderStatusEmail(cancelledPopulated);
     res.status(200).json({ success: true, data: cancelled });
   } catch (error) {
     console.error("Erro ao cancelar encomenda:", error.message);
     res.status(500).json({ success: false, message: "Erro ao cancelar encomenda." });
+  }
+};
+
+const acceptDelivery = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ success: false, message: "Encomenda não encontrada." });
+
+    if (order.status !== "awaiting_courier" || order.courier) {
+      return res.status(400).json({ success: false, message: "Entrega não disponível." });
+    }
+
+    const alreadyActive = await Order.findOne({ courier: req.user.id, status: "delivering" });
+    if (alreadyActive) {
+      return res.status(400).json({ success: false, message: "Já tens uma entrega em curso." });
+    }
+
+    order.courier = req.user.id;
+    order.status = "delivering";
+    await order.save();
+
+    const orderPopulated = await orderService.getOrderById(order._id);
+    await sendOrderStatusEmail(orderPopulated);
+
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    console.error("Erro ao aceitar entrega:", error.message);
+    res.status(500).json({ success: false, message: "Erro ao aceitar entrega." });
+  }
+};
+
+const completeDelivery = async (req, res) => {
+  try {
+    const order = await Order.findOne({ _id: req.params.id, courier: req.user.id });
+    if (!order) return res.status(404).json({ success: false, message: "Entrega não encontrada." });
+
+    if (order.status !== "delivering") {
+      return res.status(400).json({ success: false, message: "Esta entrega não está em curso." });
+    }
+
+    order.status = "delivered";
+    await order.save();
+
+    const orderPopulated = await orderService.getOrderById(order._id);
+    await sendOrderStatusEmail(orderPopulated);
+
+    res.status(200).json({ success: true, data: order });
+  } catch (error) {
+    console.error("Erro ao completar entrega:", error.message);
+    res.status(500).json({ success: false, message: "Erro ao completar entrega." });
   }
 };
 
@@ -191,4 +259,6 @@ module.exports = {
   getAllOrders,
   updateOrderStatus,
   cancelOrder,
+  acceptDelivery,
+  completeDelivery,
 };

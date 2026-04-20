@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Estafeta - Marketplace</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/style/admin.css">
+</head>
+<body>
+
+    <%- include('../partials/sidebar-courier', { activePage: 'dashboard', availableCount }) %>
+
+    <main class="main-wrapper">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 style="font-weight:700; color:#2c3e50; margin:0">Painel do Estafeta</h4>
+                <small class="text-muted">Olá, <strong><%= courierName %></strong></small>
+            </div>
+            <% if (activeDelivery) { %>
+                <span class="badge bg-info-subtle text-info border border-info-subtle fs-6">
+                    <i class="bi bi-bicycle me-1"></i> Em entrega
+                </span>
+            <% } else { %>
+                <span class="badge bg-success-subtle text-success border border-success-subtle fs-6">
+                    <i class="bi bi-circle-fill me-1" style="font-size:8px;"></i> Disponível
+                </span>
+            <% } %>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-4">
+                <div class="stat-card blue">
+                    <div class="stat-label">Entregas Realizadas</div>
+                    <div class="stat-val" style="color:#3498db"><%= totalDeliveries %></div>
+                    <i class="bi bi-check-circle text-primary opacity-25" style="font-size:2rem; position:absolute; right:16px; bottom:12px;"></i>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="stat-card orange">
+                    <div class="stat-label">Disponíveis Agora</div>
+                    <div class="stat-val" style="color:#f39c12"><%= availableCount %></div>
+                    <i class="bi bi-hourglass-split text-warning opacity-25" style="font-size:2rem; position:absolute; right:16px; bottom:12px;"></i>
+                </div>
+            </div>
+            <div class="col-6 col-md-4">
+                <div class="stat-card green">
+                    <div class="stat-label">Entrega Ativa</div>
+                    <div class="stat-val" style="color:#2ecc71"><%= activeDelivery ? 1 : 0 %></div>
+                    <i class="bi bi-bicycle text-success opacity-25" style="font-size:2rem; position:absolute; right:16px; bottom:12px;"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entrega ativa -->
+        <% if (activeDelivery) { %>
+        <div class="table-card mb-4" style="border-left: 4px solid #0dcaf0;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 style="font-weight:700; margin:0"><i class="bi bi-bicycle me-2 text-info"></i>Entrega em Curso</h6>
+                <span class="badge bg-info-subtle text-info border border-info-subtle">A caminho</span>
+            </div>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <small class="text-muted d-block">Encomenda</small>
+                    <span class="fw-bold text-muted" style="font-size:11px;"><%= activeDelivery._id %></span>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-muted d-block">Supermercado</small>
+                    <strong><%= activeDelivery.supermarket ? activeDelivery.supermarket.name : 'N/A' %></strong>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-muted d-block">Cliente</small>
+                    <strong><%= activeDelivery.customer ? activeDelivery.customer.name : 'N/A' %></strong>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-success w-100 btn-sm" onclick="completeDelivery('<%= activeDelivery._id %>')">
+                        <i class="bi bi-check-lg me-1"></i> Entregue
+                    </button>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Entregas disponíveis -->
+        <div class="table-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 style="font-weight:700; margin:0">Entregas Disponíveis</h6>
+                <a href="/courier/deliveries" class="btn btn-sm btn-outline-primary">Ver todas</a>
+            </div>
+            <% if (availableDeliveries.length === 0) { %>
+                <p class="text-muted" style="font-size:14px; padding: 12px 0;">Nenhuma entrega disponível de momento.</p>
+            <% } else { %>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" style="font-size:14px">
+                    <thead>
+                        <tr class="text-muted" style="font-size:12px">
+                            <th>ID</th>
+                            <th>Supermercado</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                            <th>Data</th>
+                            <th class="text-end">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% availableDeliveries.forEach(order => { %>
+                        <tr>
+                            <td class="text-muted fw-bold" style="font-size:11px;"><%= order._id %></td>
+                            <td><strong><%= order.supermarket ? order.supermarket.name : 'N/A' %></strong></td>
+                            <td><%= order.customer ? order.customer.name : 'N/A' %></td>
+                            <td><strong><%= (order.total + order.deliveryCost).toFixed(2) %> €</strong></td>
+                            <td class="text-muted"><%= new Date(order.createdAt).toLocaleDateString('pt-PT') %></td>
+                            <td class="text-end">
+                                <% if (activeDelivery) { %>
+                                    <button class="btn btn-sm btn-light border disabled text-muted" disabled title="Tens uma entrega em curso">
+                                        <i class="bi bi-lock-fill me-1"></i> Bloqueado
+                                    </button>
+                                <% } else { %>
+                                    <button class="btn btn-sm btn-primary" onclick="acceptDelivery('<%= order._id %>')">
+                                        <i class="bi bi-check-lg me-1"></i> Aceitar
+                                    </button>
+                                <% } %>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+            <% } %>
+        </div>
+
+        <div class="row g-4">
+            <!-- Top supermercados -->
+            <div class="col-lg-6">
+                <div class="table-card h-100">
+                    <h6 style="font-weight:700; margin-bottom:16px">Supermercados com Mais Entregas</h6>
+                    <% if (topSupermarkets.length === 0) { %>
+                        <p class="text-muted" style="font-size:14px;">Sem dados disponíveis.</p>
+                    <% } else { %>
+                    <% topSupermarkets.forEach((item, i) => { %>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle">#<%= i+1 %></span>
+                                <span style="font-size:14px;"><%= item.name %></span>
+                            </div>
+                            <span class="fw-bold"><%= item.count %> entregas</span>
+                        </div>
+                        <% if (i < topSupermarkets.length - 1) { %><hr class="my-2"><% } %>
+                    <% }) %>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Histórico recente -->
+            <div class="col-lg-6">
+                <div class="table-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 style="font-weight:700; margin:0">Histórico Recente</h6>
+                        <a href="/courier/history" class="btn btn-sm btn-outline-secondary">Ver tudo</a>
+                    </div>
+                    <% if (recentDeliveries.length === 0) { %>
+                        <p class="text-muted" style="font-size:14px; padding: 12px 0;">Nenhuma entrega realizada ainda.</p>
+                    <% } else { %>
+                    <table class="table table-hover align-middle mb-0" style="font-size:14px">
+                        <thead>
+                            <tr class="text-muted" style="font-size:12px">
+                                <th>Supermercado</th>
+                                <th>Data</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% recentDeliveries.forEach(order => { %>
+                            <tr>
+                                <td><%= order.supermarket ? order.supermarket.name : 'N/A' %></td>
+                                <td class="text-muted"><%= new Date(order.updatedAt).toLocaleDateString('pt-PT') %></td>
+                                <td><strong><%= (order.total + order.deliveryCost).toFixed(2) %> €</strong></td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/courier.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entregas - Marketplace</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/style/admin.css">
+</head>
+<body>
+
+    <%- include('../partials/sidebar-courier', { activePage: 'deliveries', availableCount: availableDeliveries.length }) %>
+
+    <main class="main-wrapper">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1">Entregas</h3>
+                <p class="text-secondary small mb-0">Aceita e gere as tuas entregas.</p>
+            </div>
+        </div>
+
+        <!-- Entrega ativa -->
+        <% if (activeDelivery) { %>
+        <div class="table-card mb-4" style="border-left: 4px solid #0dcaf0;">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 style="font-weight:700; margin:0"><i class="bi bi-bicycle me-2 text-info"></i>Entrega em Curso</h6>
+                <span class="badge bg-info-subtle text-info border border-info-subtle">A caminho</span>
+            </div>
+            <div class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <small class="text-muted d-block">Encomenda</small>
+                    <span class="fw-bold text-muted" style="font-size:11px;"><%= activeDelivery._id %></span>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-muted d-block">Supermercado</small>
+                    <strong><%= activeDelivery.supermarket ? activeDelivery.supermarket.name : 'N/A' %></strong>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-muted d-block">Cliente</small>
+                    <strong><%= activeDelivery.customer ? activeDelivery.customer.name : 'N/A' %></strong>
+                </div>
+                <div class="col-md-3 text-end">
+                    <button class="btn btn-success" onclick="completeDelivery('<%= activeDelivery._id %>')">
+                        <i class="bi bi-check-lg me-1"></i> Marcar como Entregue
+                    </button>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Entregas disponíveis -->
+        <div class="table-card">
+            <h6 style="font-weight:700; margin-bottom:16px">Entregas Disponíveis</h6>
+            <% if (availableDeliveries.length === 0) { %>
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
+                    Nenhuma entrega disponível de momento.
+                </div>
+            <% } else { %>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" style="font-size:14px">
+                    <thead>
+                        <tr class="text-muted" style="font-size:12px">
+                            <th>ID</th>
+                            <th>Supermercado</th>
+                            <th>Cliente</th>
+                            <th>Morada</th>
+                            <th>Produtos</th>
+                            <th>Ganho</th>
+                            <th>Data</th>
+                            <th class="text-end">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% availableDeliveries.forEach(order => { %>
+                        <tr>
+                            <td class="text-muted fw-bold" style="font-size:11px;"><%= order._id %></td>
+                            <td><strong><%= order.supermarket ? order.supermarket.name : 'N/A' %></strong></td>
+                            <td><%= order.customer ? order.customer.name : 'N/A' %></td>
+                            <td class="text-muted" style="font-size:12px;">
+                                <%= order.customer && order.customer.address ? order.customer.address : 'N/A' %>
+                            </td>
+                            <td>
+                                <ul class="list-unstyled mb-0 text-muted" style="font-size:12px;">
+                                    <% order.products.forEach(item => { %>
+                                        <li><span class="fw-bold text-dark"><%= item.quantity %>x</span> <%= item.product ? item.product.name : 'N/A' %></li>
+                                    <% }) %>
+                                </ul>
+                            </td>
+                            <td><strong class="text-success"><%= order.deliveryCost.toFixed(2) %> €</strong></td>
+                            <td class="text-muted"><%= new Date(order.createdAt).toLocaleDateString('pt-PT') %></td>
+                            <td class="text-end">
+                                <a href="/courier/order/<%= order._id %>" class="btn btn-sm btn-light border shadow-sm me-1" title="Ver encomenda">
+                                    <i class="bi bi-eye-fill text-primary"></i>
+                                </a>
+                                <% if (activeDelivery) { %>
+                                    <button class="btn btn-sm btn-light border disabled text-muted" disabled title="Tens uma entrega em curso">
+                                        <i class="bi bi-lock-fill me-1"></i> Bloqueado
+                                    </button>
+                                <% } else { %>
+                                    <button class="btn btn-sm btn-primary" onclick="acceptDelivery('<%= order._id %>')">
+                                        <i class="bi bi-check-lg me-1"></i> Aceitar
+                                    </button>
+                                <% } %>
+                            </td>
+                        </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+            <% } %>
+        </div>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/courier.js"></script>
+</body>
+</html>

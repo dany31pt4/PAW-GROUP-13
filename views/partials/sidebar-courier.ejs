@@ -1,0 +1,23 @@
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <i class="bi bi-bicycle" style="font-size:20px"></i> Marketplace
+    </div>
+    <nav style="padding: 12px 0;">
+        <a href="/courier/dashboard" class="nav-link-item <%= activePage === 'dashboard' ? 'active' : '' %>">
+            <i class="bi bi-grid-1x2"></i> Painel geral
+        </a>
+        <a href="/courier/deliveries" class="nav-link-item <%= activePage === 'deliveries' ? 'active' : '' %>">
+            <i class="bi bi-truck"></i> Entregas
+            <% if (typeof availableCount !== 'undefined' && availableCount > 0) { %>
+                <span style="margin-left:auto; background:#e74c3c; color:#fff; border-radius:10px; font-size:11px; padding:1px 7px;"><%= availableCount %></span>
+            <% } %>
+        </a>
+        <a href="/courier/history" class="nav-link-item <%= activePage === 'history' ? 'active' : '' %>">
+            <i class="bi bi-clock-history"></i> Histórico
+        </a>
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 16px 0;"></div>
+        <a href="/auth/logout" class="nav-link-item" style="color:#e74c3c;">
+            <i class="bi bi-box-arrow-left"></i> Sair
+        </a>
+    </nav>
+</aside>

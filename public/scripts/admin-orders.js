@@ -8,12 +8,21 @@ const courierData   = JSON.parse(main.dataset.courierData   || '[]');
 const palette = ['#3498db','#2ecc71','#f1c40f','#e74c3c','#9b59b6','#1abc9c','#e67e22','#34495e'];
 
 // Gráfico: Vendas por Loja (Doughnut)
+let chartLojaLabels = marketLabels;
+if (marketLabels.length === 0) {
+    chartLojaLabels = ['Sem dados'];
+}
+let chartLojaData = marketData;
+if (marketData.length === 0) {
+    chartLojaData = [1];
+}
+
 new Chart(document.getElementById('chartLojas'), {
     type: 'doughnut',
     data: {
-        labels: marketLabels.length ? marketLabels : ['Sem dados'],
+        labels: chartLojaLabels,
         datasets: [{
-            data: marketData.length ? marketData : [1],
+            data: chartLojaData,
             backgroundColor: palette,
             hoverOffset: 4
         }]
@@ -23,14 +32,23 @@ new Chart(document.getElementById('chartLojas'), {
     }
 });
 
+let chartCourierLabels = courierLabels;
+if (courierLabels.length === 0) {
+    chartCourierLabels = ['Sem dados'];
+}
+let chartCourierData = courierData;
+if (courierData.length === 0) {
+    chartCourierData = [0];
+}
+
 // Gráfico: Entregas por Estafeta (Barra Horizontal)
 new Chart(document.getElementById('chartEstafetas'), {
     type: 'bar',
     data: {
-        labels: courierLabels.length ? courierLabels : ['Sem dados'],
+        labels: chartCourierLabels,
         datasets: [{
             label: 'Entregas',
-            data: courierData.length ? courierData : [0],
+            data: chartCourierData,
             backgroundColor: '#3498db',
             borderRadius: 5
         }]

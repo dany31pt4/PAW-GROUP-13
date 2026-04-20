@@ -56,6 +56,11 @@ const createProduct = async (req, res) => {
       supermarketId = req.body.supermarketId;
     }
 
+    let isActiveValue = false;
+    if (isActive !== undefined) {
+      isActiveValue = isActive;
+    }
+
     const productData = {
       supermarket: supermarketId,
       name,
@@ -64,7 +69,7 @@ const createProduct = async (req, res) => {
       description,
       price,
       stock,
-      isActive: isActive !== undefined ? isActive : false,
+      isActive: isActiveValue,
     };
 
     const newProduct = await productService.createProduct(productData);

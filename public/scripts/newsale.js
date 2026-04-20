@@ -132,7 +132,11 @@ function syncRow(id) {
   if (!row) return;
   const originalStock = parseInt(row.querySelector("button").dataset.stock, 10);
   const inCart = findInCart(id);
-  const remaining = originalStock - (inCart ? inCart.quantity : 0);
+  let cartQty = 0;
+  if (inCart) {
+    cartQty = inCart.quantity;
+  }
+  const remaining = originalStock - cartQty;
   row.querySelector(".stock-display").textContent = remaining;
   const btn = row.querySelector("button");
   btn.disabled = remaining <= 0;
@@ -183,7 +187,10 @@ function updateTotals() {
   for (let i = 0; i < cart.length; i++) {
     subtotal += cart[i].price * cart[i].quantity;
   }
-  const fee = document.getElementById("deliveryMethod").value === "courier" ? deliveryFee : 0;
+  let fee = 0;
+  if (document.getElementById("deliveryMethod").value === "courier") {
+    fee = deliveryFee;
+  }
   document.getElementById("subtotalDisplay").textContent = subtotal.toFixed(2) + "€";
   document.getElementById("totalDisplay").textContent    = (subtotal + fee).toFixed(2) + "€";
 }
@@ -204,7 +211,11 @@ function filterProducts() {
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const show = row.dataset.name.includes(search) && (cat === "all" || row.dataset.cat === cat);
-    row.style.display = show ? "" : "none";
+    if (show) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
   }
 }
 
@@ -214,8 +225,14 @@ async function processSale() {
   if (!selectedClient || cart.length === 0) return;
 
   const deliveryMethod = document.getElementById("deliveryMethod").value;
-  const fee = deliveryMethod === "courier" ? deliveryFee : 0;
-  const deliveryAddress = deliveryMethod === "courier" ? document.getElementById("deliveryAddress").value.trim() : null;
+  let fee = 0;
+  if (deliveryMethod === "courier") {
+    fee = deliveryFee;
+  }
+  let deliveryAddress = null;
+  if (deliveryMethod === "courier") {
+    deliveryAddress = document.getElementById("deliveryAddress").value.trim();
+  }
 
   const confirmed = await Swal.fire({
     title: "Confirmar Venda?",

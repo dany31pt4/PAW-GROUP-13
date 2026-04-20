@@ -47,23 +47,30 @@ async function loadProductTable() {
 
     let html = "";
     products.forEach((p) => {
-      const imgSrc = p.image
-        ? p.image
-        : "https://t4.ftcdn.net/jpg/05/97/47/95/360_F_597479556_7bbQ7t4Z8k3xbAloHFHVdZIizWK1PdOo.jpg";
+      let imgSrc = "https://t4.ftcdn.net/jpg/05/97/47/95/360_F_597479556_7bbQ7t4Z8k3xbAloHFHVdZIizWK1PdOo.jpg";
+      if (p.image) {
+        imgSrc = p.image;
+      }
       const img = `<img src="${imgSrc}" onerror="this.src='https://t4.ftcdn.net/jpg/05/97/47/95/360_F_597479556_7bbQ7t4Z8k3xbAloHFHVdZIizWK1PdOo.jpg'" class="rounded-2 shadow-sm me-3" style="width: 45px; height: 45px; object-fit: cover; border: 1px solid #eee;">`;
 
-      const stock =
-        p.stock <= 5
-          ? `<span class="text-danger fw-bold"><i class="bi bi-exclamation-circle me-1"></i>${p.stock}</span>`
-          : `<span class="text-secondary">${p.stock} unid.</span>`;
+      let stock = `<span class="text-secondary">${p.stock} unid.</span>`;
+      if (p.stock <= 5) {
+        stock = `<span class="text-danger fw-bold"><i class="bi bi-exclamation-circle me-1"></i>${p.stock}</span>`;
+      }
 
-      const activeBadge = p.isActive
-        ? `<span class="badge bg-success bg-opacity-10 text-success border border-success-subtle px-2 py-1 rounded-pill">Ativo</span>`
-        : `<span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary-subtle px-2 py-1 rounded-pill">Inativo</span>`;
+      let activeBadge = `<span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary-subtle px-2 py-1 rounded-pill">Inativo</span>`;
+      if (p.isActive) {
+        activeBadge = `<span class="badge bg-success bg-opacity-10 text-success border border-success-subtle px-2 py-1 rounded-pill">Ativo</span>`;
+      }
 
-      const toggleIcon = p.isActive
-        ? "bi-toggle-on text-success"
-        : "bi-toggle-off text-secondary";
+      let toggleIcon = "bi-toggle-off text-secondary";
+      if (p.isActive) {
+        toggleIcon = "bi-toggle-on text-success";
+      }
+      let toggleTitle = "Ativar";
+      if (p.isActive) {
+        toggleTitle = "Desativar";
+      }
       const categoryName = p.category?.name || "Sem categoria";
       const categoryBadge = `<span class="badge bg-light text-dark border px-2 py-1">${categoryName}</span>`;
 
@@ -86,7 +93,7 @@ async function loadProductTable() {
             <button class="btn btn-sm btn-light border shadow-sm me-1" onclick="openEditModal('${p._id}')" title="Editar">
               <i class="bi bi-pencil text-primary"></i>
             </button>
-            <button class="btn btn-sm btn-light border shadow-sm me-1" onclick="toggleProduct('${p._id}')" title="${p.isActive ? "Desativar" : "Ativar"}">
+            <button class="btn btn-sm btn-light border shadow-sm me-1" onclick="toggleProduct('${p._id}')" title="${toggleTitle}">
               <i class="bi ${toggleIcon} fs-6"></i>
             </button>
             <button class="btn btn-sm btn-light border shadow-sm" onclick="confirmDelete('${p._id}')" title="Eliminar">
