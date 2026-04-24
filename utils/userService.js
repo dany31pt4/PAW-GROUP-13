@@ -7,28 +7,36 @@ const hashPassword = async (plainPassword) => {
   return await bcrypt.hash(plainPassword, SALT_ROUNDS);
 };
 
-const createUser = async (userData) => {
-  const hashed = await hashPassword(userData.password);
+const createUser = async (payload) => {
+  const hashed = await hashPassword(payload.password);
   return await User.create({
-    name: userData.name,
-    email: userData.email.toLowerCase(),
+    name: payload.name,
+    email: payload.email.toLowerCase(),
     password: hashed,
-    address: userData.address,
-    phone: userData.phone,
-    role: userData.role,
+    address: payload.address,
+    phone: payload.phone,
+    role: payload.role,
   });
 };
 
 const getUsersByRole = async (role) => {
-  return await User.find({ role }).select("-password");
+  const filter = { role };
+  if (role === "admin") filter.isSuperAdmin = { $ne: true };
+  return await User.find(filter).select("-password");
 };
 
 const getUserById = async (id) => {
   return await User.findById(id).select("-password");
 };
 
+const getUserByEmail = async (email, role) => {
+  const filter = { email: email.toLowerCase() };
+  if (role) filter.role = role;
+  return await User.findOne(filter).select("-password");
+};
+
 const updateUser = async (id, data) => {
-  const updateData = {
+  const payload = {
     name: data.name,
     email: data.email,
     address: data.address,
@@ -36,10 +44,10 @@ const updateUser = async (id, data) => {
   };
 
   if (data.password && data.password.trim() !== "") {
-    updateData.password = await hashPassword(data.password);
+    payload.password = await hashPassword(data.password);
   }
 
-  return await User.findByIdAndUpdate(id, updateData, { new: true }).select("-password");
+  return await User.findByIdAndUpdate(id, payload, { new: true }).select("-password");
 };
 
 const deleteUser = async (id) => {
@@ -54,6 +62,7 @@ module.exports = {
   createUser,
   getUsersByRole,
   getUserById,
+  getUserByEmail,
   updateUser,
   deleteUser,
   hashPassword,

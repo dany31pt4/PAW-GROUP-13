@@ -3,6 +3,7 @@ const Order = require("../../models/order");
 const Product = require("../../models/product");
 const User = require("../../models/user");
 const Category = require("../../models/category");
+const Coupon = require("../../models/coupon");
 
 const getDashboard = async (req, res) => {
   try {
@@ -185,6 +186,16 @@ const getProductDetail = async (req, res) => {
   }
 };
 
+const getCoupons = async (req, res) => {
+  try {
+    const supermarket = await Supermarket.findOne({ user: req.user.id });
+    res.render("supermarket/coupons", { activePage: "coupons", supermarket });
+  } catch (error) {
+    console.error("Erro ao carregar cupões:", error);
+    res.status(500).render("error", { message: "Erro ao carregar cupões.", error: { status: 500 } });
+  }
+};
+
 module.exports = {
   getDashboard,
   getSettings,
@@ -193,4 +204,5 @@ module.exports = {
   getNewSale,
   getProductDetail,
   getOrderDetail,
+  getCoupons,
 };

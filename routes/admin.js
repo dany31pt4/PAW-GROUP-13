@@ -28,5 +28,8 @@ router.get("/order/:orderId", adminViewController.getAdminOrderDetail);
 router.get("/category/:categoryId", adminViewController.getAdminCategoryDetail);
 router.get("/user/:userId", adminViewController.getAdminUserDetail);
 router.get("/supermarket/:supermarketId", adminViewController.getAdminSupermarketDetail);
+router.get("/map", adminViewController.getMap);
+router.get("/coupons", adminViewController.getCoupons);
+router.get("/coupon/:couponId", adminViewController.getCouponDetail);
 
 module.exports = router;

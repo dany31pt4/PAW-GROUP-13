@@ -2,6 +2,7 @@ const deliveryFee = parseFloat(document.querySelector("main").dataset.deliveryFe
 
 let selectedClient = null;
 const cart = [];
+let appliedCoupon = null;
 
 // ─── Cliente ──────────────────────────────────────────────────────────────────
 
@@ -191,8 +192,52 @@ function updateTotals() {
   if (document.getElementById("deliveryMethod").value === "courier") {
     fee = deliveryFee;
   }
+
+  let discount = 0;
+  if (appliedCoupon) {
+    discount =  parseFloat((subtotal * appliedCoupon.discountValue / 100).toFixed(2));
+  }
+
+  const discountRow = document.getElementById("discountRow");
+  if (discount > 0) {
+    discountRow.classList.remove("d-none");
+    document.getElementById("discountDisplay").textContent = "-" + discount.toFixed(2) + "€";
+  } else {
+    discountRow.classList.add("d-none");
+  }
+
   document.getElementById("subtotalDisplay").textContent = subtotal.toFixed(2) + "€";
-  document.getElementById("totalDisplay").textContent    = (subtotal + fee).toFixed(2) + "€";
+  document.getElementById("totalDisplay").textContent    = (Math.max(0, subtotal - discount) + fee).toFixed(2) + "€";
+}
+
+function applyCoupon() {
+  const code = document.getElementById("couponCode").value.trim();
+  const resultEl = document.getElementById("couponResult");
+  if (!code) {
+    resultEl.innerHTML = '<span class="text-danger">Introduz um código.</span>';
+    return;
+  }
+  let subtotal = 0;
+  for (let i = 0; i < cart.length; i++) subtotal += cart[i].price * cart[i].quantity;
+
+  fetch(`/api/coupons/validate?code=${encodeURIComponent(code)}&subtotal=${subtotal}`)
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (data.valid) {
+        appliedCoupon = { code: code.toUpperCase(), discount: data.discount, discountType: data.discountType, discountValue: data.discountValue };
+        const label = data.discountType === "percentage"
+          ? data.discountValue + "% = -" + data.discount.toFixed(2) + "€"
+          : "-" + data.discount.toFixed(2) + "€";
+        resultEl.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>Cupão aplicado: ' + label + '</span>';
+      } else {
+        appliedCoupon = null;
+        resultEl.innerHTML = '<span class="text-danger">' + data.message + '</span>';
+      }
+      updateTotals();
+    })
+    .catch(function () {
+      resultEl.innerHTML = '<span class="text-danger">Erro ao validar cupão.</span>';
+    });
 }
 
 function checkSaleValidity() {
@@ -255,16 +300,24 @@ async function processSale() {
   }
 
   try {
-    const res  = await fetch("/api/orders/sale", {
+    let couponCode;
+    if (appliedCoupon) {
+      couponCode = appliedCoupon.code;
+    } else {
+      couponCode = null;
+    }
+    const payload = {
+      customerId: selectedClient.id,
+      products,
+      deliveryMethod,
+      deliveryCost: fee,
+      deliveryAddress,
+      couponCode,
+    };
+    const res = await fetch("/api/orders/sale", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        customerId: selectedClient.id,
-        products,
-        deliveryMethod,
-        deliveryCost: fee,
-        deliveryAddress,
-      }),
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
     if (res.ok) {

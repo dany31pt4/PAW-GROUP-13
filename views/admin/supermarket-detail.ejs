@@ -53,7 +53,7 @@
 
                     <div class="mb-3 p-3 rounded-3 bg-light border">
                         <div class="text-muted small mb-1"><i class="bi bi-geo-alt me-1"></i>Localidade</div>
-                        <div class="fw-semibold"><%= market.location || '—' %></div>
+                        <div class="fw-semibold"><%= market.location ? market.location.address : '—' %></div>
                     </div>
 
                     <% if (market.user) { %>
@@ -101,6 +101,9 @@
 
                     <!-- Ações -->
                     <div id="market-action-wrapper" class="d-flex gap-2 flex-wrap pt-3 border-top">
+                        <button class="btn btn-primary px-4" onclick="openEditMarketModal('<%= market._id %>')" style="border-radius: 10px;">
+                            <i class="bi bi-pencil me-2"></i>Editar
+                        </button>
                         <% if (market.status === 'pending') { %>
                             <button class="btn btn-success px-4" onclick="approveMarket('<%= market._id %>')" style="border-radius: 10px;">
                                 <i class="bi bi-check-lg me-2"></i>Validar
@@ -181,8 +184,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/users-scripts/supermarket.js"></script>
 
     <script>
+        function loadMarketTable() { window.location.reload(); }
         async function approveMarket(id) {
             const confirmed = await Swal.fire({
                 title: 'Aprovar Registo?',

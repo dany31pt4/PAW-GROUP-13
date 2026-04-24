@@ -1,0 +1,17 @@
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <i class="bi bi-bag-heart" style="font-size:20px"></i> Marketplace
+    </div>
+    <nav style="padding: 12px 0;">
+        <a href="/customer/dashboard" class="nav-link-item <%= activePage === 'dashboard' ? 'active' : '' %>">
+            <i class="bi bi-shop"></i> Lojas
+        </a>
+        <a href="/customer/orders" class="nav-link-item <%= activePage === 'orders' ? 'active' : '' %>">
+            <i class="bi bi-bag"></i> As Minhas Encomendas
+        </a>
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); margin: 16px 0;"></div>
+        <a href="/auth/logout" class="nav-link-item" style="color:#e74c3c;">
+            <i class="bi bi-box-arrow-left"></i> Sair
+        </a>
+    </nav>
+</aside>

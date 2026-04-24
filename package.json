@@ -18,10 +18,12 @@
     "helmet": "^8.1.0",
     "http-errors": "~1.6.3",
     "jsonwebtoken": "^9.0.3",
-    "mailgun.js": "^13.0.0",
     "mongoose": "^9.3.3",
     "morgan": "~1.9.1",
     "multer": "^2.1.1",
+    "nodemailer": "^8.0.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "sweetalert2": "^11.26.24"
   }
 }

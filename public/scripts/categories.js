@@ -46,7 +46,7 @@ function openAddCategoryModal() {
 
       fetch("/api/categories/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" }, // ver o data size
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(result.value),
       })
         .then(async (response) => {
@@ -132,7 +132,7 @@ async function openEditCategoryModal(id) {
     const contentType = response.headers.get("content-type");
     if (!contentType || !contentType.includes("application/json")) {
       throw new Error(
-        "A rota da API falhou ou não devolveu JSON. Verifica o backend!",
+        "A rota da API falhou ou não devolveu JSON.",
       );
     }
 
@@ -310,12 +310,12 @@ async function loadCategoryTable() {
     let html = "";
 
     categories.forEach((c) => {
-      let statusBadge = "";
-      if (c.status === true) {
-        statusBadge = '<span class="badge bg-success">Ativa</span>';
-      } else {
-        statusBadge = '<span class="badge bg-danger">Rejeitado</span>';
-      }
+      const statusBadge = c.status
+        ? '<span class="badge bg-success">Ativa</span>'
+        : '<span class="badge bg-secondary">Inativa</span>';
+
+      const toggleIcon = c.status ? 'bi-toggle-on text-success' : 'bi-toggle-off text-secondary';
+      const toggleTitle = c.status ? 'Desativar' : 'Ativar';
 
       html += `
                 <tr>
@@ -324,6 +324,7 @@ async function loadCategoryTable() {
                     <td class="text-end">
                         <a href="/admin/category/${c._id}" class="btn btn-sm btn-light border shadow-sm me-1" title="Ver"><i class="bi bi-eye-fill text-primary"></i></a>
                         <button class="btn btn-sm btn-light border shadow-sm me-1" onclick="openEditCategoryModal('${c._id}')" title="Editar"><i class="bi bi-pencil text-primary"></i></button>
+                        <button class="btn btn-sm btn-light border shadow-sm me-1" onclick="toggleCategory('${c._id}')" title="${toggleTitle}"><i class="bi ${toggleIcon} fs-6"></i></button>
                         <button class="btn btn-sm btn-light border shadow-sm" onclick="openRemoveCategoryModal('${c._id}')" title="Eliminar"><i class="bi bi-trash text-danger"></i></button>
                     </td>
                 </tr>
@@ -333,6 +334,38 @@ async function loadCategoryTable() {
     tbody.innerHTML = html;
   } catch (err) {
     console.error("Erro ao carregar tabela de supermercados:", err);
+  }
+}
+
+async function toggleCategory(id) {
+  const result = await Swal.fire({
+    title: "Alterar estado?",
+    text: "A categoria vai ser ativada ou desativada.",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#0d6efd",
+    cancelButtonColor: "#6c757d",
+    confirmButtonText: "Confirmar",
+    cancelButtonText: "Cancelar",
+  });
+
+  if (!result.isConfirmed) return;
+
+  Swal.fire({ title: "A processar...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+  try {
+    const res = await fetch(`/api/categories/toggle/${id}`, { method: "PUT" });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      const label = data.data.status ? "ativada" : "desativada";
+      Swal.fire("Sucesso!", `Categoria ${label} com sucesso.`, "success");
+      loadCategoryTable();
+    } else {
+      Swal.fire("Erro!", data.message || "Não foi possível alterar o estado.", "error");
+    }
+  } catch {
+    Swal.fire("Erro!", "Erro de conexão.", "error");
   }
 }
 

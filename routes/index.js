@@ -9,6 +9,7 @@ router.get("/", verifyToken, function (req, res) {
   if (role === "admin") return res.redirect("/admin/dashboard");
   if (role === "supermarket") return res.redirect("/supermarket/dashboard");
   if (role === "courier") return res.redirect("/courier/dashboard");
+  if (role === "customer") return res.redirect("/customer/dashboard");
 
   return res.redirect("/auth/login");
 });

@@ -44,7 +44,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold text-muted uppercase">Localização</label>
-                            <input type="text" id="s-location" class="form-control" value="<%= supermarket.location || '' %>">
+                            <input type="text" id="s-location" class="form-control" value="<%= supermarket.location ? supermarket.location.address : '' %>">
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold text-muted uppercase">Horário de Funcionamento</label>

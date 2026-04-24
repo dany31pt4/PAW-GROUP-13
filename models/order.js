@@ -26,6 +26,8 @@ const orderSchema = new mongoose.Schema(
       },
     ],
 
+    coupon: { type: mongoose.Schema.Types.ObjectId, ref: "Coupon", default: null },
+    discount: { type: Number, default: 0 },
     total: { type: Number, required: true },
     deliveryMethod: {
       type: String,
@@ -38,6 +40,7 @@ const orderSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
+    deliveryAddress: { type: String, default: null },
 
     status: {
       type: String,

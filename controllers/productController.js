@@ -1,8 +1,6 @@
 const productService = require("../utils/productService");
 const Category = require("../models/category");
 const Supermarket = require("../models/supermarket");
-const Product = require("../models/product");
-
 
 const createProduct = async (req, res) => {
   try {
@@ -14,10 +12,7 @@ const createProduct = async (req, res) => {
     }
 
     if (!name || !categoryId || price === undefined || stock === undefined) {
-      return res.status(400).json({
-        success: false,
-        message: "Nome, categoria, preço e stock são obrigatórios.",
-      });
+      return res.status(400).json({ success: false, message: "Nome, categoria, preço e stock são obrigatórios." });
     }
 
     if (Number(price) < 0) {
@@ -30,38 +25,24 @@ const createProduct = async (req, res) => {
 
     const category = await Category.findById(categoryId);
     if (!category) {
-      return res.status(400).json({
-        success: false,
-        message: "Categoria não existe.",
-      });
+      return res.status(400).json({ success: false, message: "Categoria não existe." });
     }
 
     let supermarketId;
     if (req.user.role === "supermarket") {
       const supermarket = await Supermarket.findOne({ user: req.user.id });
       if (!supermarket) {
-        return res.status(404).json({
-          success: false,
-          message: "Supermercado não encontrado.",
-        });
+        return res.status(404).json({ success: false, message: "Supermercado não encontrado." });
       }
       supermarketId = supermarket._id;
     } else {
       if (!req.body.supermarketId) {
-        return res.status(400).json({
-          success: false,
-          message: "supermarketId é obrigatório para admins.",
-        });
+        return res.status(400).json({ success: false, message: "supermarketId é obrigatório para admins." });
       }
       supermarketId = req.body.supermarketId;
     }
 
-    let isActiveValue = false;
-    if (isActive !== undefined) {
-      isActiveValue = isActive;
-    }
-
-    const productData = {
+    const newProduct = await productService.createProduct({
       supermarket: supermarketId,
       name,
       image,
@@ -69,10 +50,9 @@ const createProduct = async (req, res) => {
       description,
       price,
       stock,
-      isActive: isActiveValue,
-    };
+      isActive,
+    });
 
-    const newProduct = await productService.createProduct(productData);
     res.status(201).json({ success: true, data: newProduct });
   } catch (error) {
     console.error("Erro ao criar produto:", error.message);
@@ -82,46 +62,30 @@ const createProduct = async (req, res) => {
 
 const listProduct = async (req, res) => {
   try {
-    const id = req.params.id;
-    const products = await Product.find({
-      supermarket: id,
-      isActive: true,
-    }).populate("category", "name");
+    const products = await productService.listBySupermarket(req.params.id, true);
     res.json({ success: true, data: products });
   } catch (error) {
     console.error("Erro ao listar produtos:", error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Erro ao listar produto." });
+    res.status(500).json({ success: false, message: "Erro ao listar produto." });
   }
 };
 
-// Listar produtos do supermercado logado
 const listMyProducts = async (req, res) => {
   try {
-    const products = await Product.find({
-      supermarket: req.user.supermarket_id,
-    }).populate("category", "name");
+    const products = await productService.listBySupermarket(req.user.supermarket_id);
     res.json({ success: true, data: products });
   } catch (error) {
     console.error("Erro ao listar produtos:", error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Erro ao listar produtos." });
+    res.status(500).json({ success: false, message: "Erro ao listar produtos." });
   }
 };
 
-// Obter produto por id
 const getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate(
-      "category",
-      "name",
-    );
-    if (!product)
-      return res
-        .status(404)
-        .json({ success: false, message: "Produto não encontrado." });
+    const product = await productService.getById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Produto não encontrado." });
+    }
     res.json({ success: true, data: product });
   } catch (error) {
     console.error("Erro ao obter produto:", error.message);
@@ -131,10 +95,9 @@ const getProductById = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   try {
-    const id = req.params.id;
     const { name, categoryId, description, price, stock, isActive } = req.body;
 
-    const product = await Product.findById(id);
+    const product = await productService.getById(req.params.id);
     if (!product) {
       return res.status(404).json({ success: false, message: "Produto não encontrado." });
     }
@@ -152,67 +115,42 @@ const updateProduct = async (req, res) => {
       image = `/uploads/products/${req.file.filename}`;
     }
 
-    const updatedProduct = await productService.updateProduct(id, {
-      name,
-      image,
-      category: categoryId,
-      description,
-      price,
-      stock,
-      isActive,
+    const updatedProduct = await productService.updateProduct(req.params.id, {
+      name, image, category: categoryId, description, price, stock, isActive,
     });
 
     res.status(200).json({ success: true, data: updatedProduct });
   } catch (error) {
     console.error("Erro ao atualizar produto:", error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Erro ao atualizar produto." });
+    res.status(500).json({ success: false, message: "Erro ao atualizar produto." });
   }
 };
+
 const toggleProduct = async (req, res) => {
   try {
-    const id = req.params.id;
-
-    const product = await Product.findById(id);
+    const product = await productService.getById(req.params.id);
     if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Produto não encontrado." });
+      return res.status(404).json({ success: false, message: "Produto não encontrado." });
     }
 
-    const updatedProduct = await productService.updateProduct(id, {
-      isActive: !product.isActive,
-    });
+    const updatedProduct = await productService.updateProduct(req.params.id, { isActive: !product.isActive });
     res.status(200).json({ success: true, data: updatedProduct });
   } catch (error) {
     console.error("Erro ao alterar estado do produto:", error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Erro ao alterar estado do produto." });
+    res.status(500).json({ success: false, message: "Erro ao alterar estado do produto." });
   }
 };
 
 const deleteProduct = async (req, res) => {
   try {
-    const id = req.params.id;
-
-    const product = await Product.findById(id);
-    if (!product) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Produto não encontrado." });
+    const deleted = await productService.deleteProduct(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ success: false, message: "Produto não encontrado." });
     }
-
-    await Product.findByIdAndDelete(id);
-    res
-      .status(200)
-      .json({ success: true, message: "Produto eliminado com sucesso." });
+    res.status(200).json({ success: true, message: "Produto eliminado com sucesso." });
   } catch (error) {
     console.error("Erro ao eliminar produto:", error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Erro ao eliminar produto." });
+    res.status(500).json({ success: false, message: "Erro ao eliminar produto." });
   }
 };
 

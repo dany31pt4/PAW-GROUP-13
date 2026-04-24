@@ -39,7 +39,7 @@
                                 <td><strong><%= item._id %></strong></td>
                                 <td><strong><%= item.name %></strong></td>
                                 <td><%= item.user.email %></td>
-                                <td><%= item.location %></td>
+                                <td><%= item.location ? item.location.address : '—' %></td>
                                 <td class="text-end">
                                     <a href="/admin/supermarket/<%= item._id %>" class="btn btn-sm btn-light border shadow-sm me-1" title="Ver"><i class="bi bi-eye-fill text-primary"></i></a>
                                     <button class="btn btn-sm btn-light border shadow-sm me-1" onclick="openApproveModal('<%= item._id %>')" title="Validar"><i class="bi bi-check-lg text-success"></i></button>

@@ -166,6 +166,7 @@ async function loadAdminTable() {
 
       html += `
         <tr>
+            <td><strong>${admin._id}</strong></td>
             <td><strong>${admin.name}</strong></td>
             <td>${admin.email}</td>
             <td>${dataFormatada}</td>

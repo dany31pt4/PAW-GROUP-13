@@ -106,7 +106,7 @@
                                                     <%= l.name %>
                                                 </strong></td>
                                             <td>
-                                                <%= l.location %>
+                                                <%= l.location ? l.location.address : '—' %>
                                             </td>
                                             <td>
                                                 <% if (l.status==="approved" ) { %>

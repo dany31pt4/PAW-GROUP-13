@@ -3,12 +3,13 @@ const userService = require("../utils/userService");
 const Order = require("../models/order");
 const Product = require("../models/product");
 const Supermarket = require("../models/supermarket");
+const Coupon = require("../models/coupon");
 const User = require("../models/user");
-const { sendOrderStatusEmail } = require("../utils/emailService");
+const { sendOrderStatusEmail, sendCourierAvailableEmail } = require("../utils/emailService");
 
 const createSaleOrder = async (req, res) => {
   try {
-    const { customerId, products, deliveryMethod = "pickup", deliveryCost = 0, deliveryAddress } = req.body;
+    const { customerId, products, deliveryMethod = "pickup", deliveryCost = 0, deliveryAddress, couponCode } = req.body;
 
     if (!products || products.length === 0) {
       return res.status(400).json({ success: false, message: "Produtos são obrigatórios." });
@@ -55,6 +56,19 @@ const createSaleOrder = async (req, res) => {
       finalDeliveryCost = deliveryCost;
     }
 
+    let discount = 0;
+    let couponDoc = null;
+    if (couponCode) {
+      couponDoc = await Coupon.findOne({
+        code: couponCode.toUpperCase().trim(),
+        active: true,
+        supermarket: req.user.supermarket_id,
+      });
+      if (couponDoc && !(couponDoc.expiresAt && couponDoc.expiresAt < new Date()) && !(couponDoc.maxUses > 0 && couponDoc.usedCount >= couponDoc.maxUses)) {
+        discount = parseFloat((total * couponDoc.discountValue / 100).toFixed(2));
+      }
+    }
+
     let orderStatus = "confirmed";
     if (deliveryMethod === "pickup") {
       orderStatus = "delivered";
@@ -66,9 +80,15 @@ const createSaleOrder = async (req, res) => {
       products: orderProducts,
       deliveryMethod,
       deliveryCost: finalDeliveryCost,
-      total,
+      discount,
+      coupon: couponDoc?._id || null,
+      total: parseFloat((total - discount).toFixed(2)),
       status: orderStatus,
     });
+
+    if (couponDoc) {
+      await Coupon.findByIdAndUpdate(couponDoc._id, { $inc: { usedCount: 1 } });
+    }
 
     for (const item of orderProducts) {
       await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity } });
@@ -78,6 +98,9 @@ const createSaleOrder = async (req, res) => {
       await User.findByIdAndUpdate(customerId, { address: deliveryAddress });
     }
 
+    const populatedOrder = await orderService.getOrderById(newOrder._id);
+    await sendOrderStatusEmail(populatedOrder);
+
     res.status(201).json({ success: true, data: newOrder });
   } catch (error) {
     console.error("Erro ao registar venda:", error.message);
@@ -85,14 +108,102 @@ const createSaleOrder = async (req, res) => {
   }
 };
 
-// Encomenda online pelo cliente (M2)
+// Encomenda online pelo cliente
 const createOrder = async (req, res) => {
   try {
+    const { supermarketId, products, deliveryMethod = "pickup", deliveryAddress, couponCode } = req.body;
+
+    if (!supermarketId || !products || products.length === 0) {
+      return res.status(400).json({ success: false, message: "Supermercado e produtos são obrigatórios." });
+    }
+
+    const supermarket = await Supermarket.findById(supermarketId);
+    if (!supermarket || supermarket.status !== "approved") {
+      return res.status(404).json({ success: false, message: "Supermercado não encontrado." });
+    }
+
+    if (!supermarket.deliveryMethods || !supermarket.deliveryMethods.includes(deliveryMethod)) {
+      let label = "levantamento em loja";
+      if (deliveryMethod === "courier") label = "entrega por estafeta";
+      return res.status(400).json({ success: false, message: `Este supermercado não tem ${label} ativo.` });
+    }
+
+    const orderProducts = [];
+    let total = 0;
+
+    for (const item of products) {
+      const doc = await Product.findById(item.productId);
+      if (!doc) return res.status(404).json({ success: false, message: "Produto não encontrado." });
+      if (doc.supermarket.toString() !== supermarketId) {
+        return res.status(400).json({ success: false, message: "Produto não pertence a este supermercado." });
+      }
+      if (!doc.isActive) return res.status(400).json({ success: false, message: `Produto "${doc.name}" está desativado.` });
+      if (doc.stock < item.quantity) return res.status(400).json({ success: false, message: `Stock insuficiente para "${doc.name}".` });
+
+      orderProducts.push({ product: doc._id, quantity: item.quantity, unitPrice: doc.price });
+      total += doc.price * item.quantity;
+    }
+
+    let finalDeliveryCost = 0;
+    if (deliveryMethod === "courier") {
+      finalDeliveryCost = supermarket.deliveryCost || 0;
+    }
+
+    let discount = 0;
+    let couponDoc = null;
+    if (couponCode) {
+      couponDoc = await Coupon.findOne({
+        code: couponCode.toUpperCase().trim(),
+        active: true,
+        supermarket: supermarketId,
+      });
+      if (couponDoc) {
+        const expired = couponDoc.expiresAt && couponDoc.expiresAt < new Date();
+        const exhausted = couponDoc.maxUses > 0 && couponDoc.usedCount >= couponDoc.maxUses;
+        if (!expired && !exhausted) {
+          discount = parseFloat((total * couponDoc.discountValue / 100).toFixed(2));
+        }
+      }
+    }
+
+    const newOrder = await orderService.createOrder({
+      customer: req.user.id,
+      supermarket: supermarketId,
+      products: orderProducts,
+      deliveryMethod,
+      deliveryCost: finalDeliveryCost,
+      deliveryAddress: deliveryMethod === "courier" ? (deliveryAddress || null) : null,
+      discount,
+      coupon: couponDoc ? couponDoc._id : null,
+      total: parseFloat((total - discount).toFixed(2)),
+      status: "pending",
+    });
+
+    if (couponDoc) {
+      await Coupon.findByIdAndUpdate(couponDoc._id, { $inc: { usedCount: 1 } });
+    }
+
+    for (const item of orderProducts) {
+      await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity } });
+    }
+
+    const populatedOrder = await orderService.getOrderById(newOrder._id);
+    await sendOrderStatusEmail(populatedOrder);
+
+    res.status(201).json({ success: true, data: newOrder });
   } catch (error) {
     console.error("Erro ao criar encomenda:", error.message);
-    res
-      .status(500)
-      .json({ success: false, message: "Erro ao criar encomenda." });
+    res.status(500).json({ success: false, message: "Erro ao criar encomenda." });
+  }
+};
+
+// Listar as minhas encomendas (cliente autenticado)
+const getMyOrders = async (req, res) => {
+  try {
+    const orders = await orderService.getOrdersByCustomer(req.user.id);
+    res.status(200).json({ success: true, data: orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Erro ao listar encomendas." });
   }
 };
 
@@ -157,6 +268,12 @@ const updateOrderStatus = async (req, res) => {
     const orderPopulated = await orderService.getOrderById(order._id);
     await sendOrderStatusEmail(orderPopulated);
 
+    if (status === "awaiting_courier") {
+      const activeCourierIds = await Order.find({ status: "delivering" }).distinct("courier");
+      const availableCouriers = await User.find({ role: "courier", _id: { $nin: activeCourierIds } }).select("email name");
+      await sendCourierAvailableEmail(availableCouriers, orderPopulated);
+    }
+
     res.status(200).json({ success: true, data: order });
   } catch (error) {
     console.error("Erro ao atualizar estado:", error.message);
@@ -169,6 +286,10 @@ const cancelOrder = async (req, res) => {
   try {
     const order = await orderService.getOrderById(req.params.id);
     if (!order) return res.status(404).json({ success: false, message: "Encomenda não encontrada." });
+
+    if (req.user.role === "customer" && order.customer._id.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, message: "Sem permissão para cancelar esta encomenda." });
+    }
 
     if (order.status === "cancelled") {
       return res.status(400).json({ success: false, message: "Encomenda já foi cancelada." });
@@ -253,6 +374,7 @@ const completeDelivery = async (req, res) => {
 module.exports = {
   createSaleOrder,
   createOrder,
+  getMyOrders,
   getOrderById,
   getOrdersByCustomer,
   getOrdersBySupermarket,

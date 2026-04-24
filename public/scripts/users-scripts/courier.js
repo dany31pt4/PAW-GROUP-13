@@ -205,9 +205,10 @@ async function loadCourierTable() {
     couriers.forEach((c) => {
       html += `
         <tr>
+            <td><strong>${c._id}</strong></td>
             <td><strong>${c.name}</strong></td>
-            <td>${c.email}</td>
-            <td>${c.totalDeliveries || 0}</td>
+            <td>---</td>
+            <td>---</td>
             <td class="text-end">
                 <a href="/admin/user/${c._id}" class="btn btn-sm btn-light border shadow-sm me-1" title="Ver"><i class="bi bi-eye-fill text-primary"></i></a>
                 <button class="btn btn-sm btn-light border shadow-sm me-1" onclick="openEditCourierModal('${c._id}')" title="Editar"><i class="bi bi-pencil text-primary"></i></button>

@@ -1,0 +1,597 @@
+\documentclass[12pt,a4paper]{article}
+
+% ─── Pacotes ──────────────────────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[portuguese]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue, citecolor=blue}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{parskip}
+\usepackage{mdframed}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, shapes.rounded, positioning}
+
+% ─── Cores ────────────────────────────────────────────────────────────────────
+\definecolor{primaryblue}{RGB}{13,110,253}
+\definecolor{lightgray}{RGB}{248,249,250}
+\definecolor{codegray}{RGB}{240,240,240}
+\definecolor{successgreen}{RGB}{25,135,84}
+\definecolor{warningyellow}{RGB}{255,193,7}
+\definecolor{dangerred}{RGB}{220,53,69}
+
+% ─── Estilo de código ─────────────────────────────────────────────────────────
+\lstdefinestyle{bashstyle}{
+  backgroundcolor=\color{codegray},
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{gray!40},
+  xleftmargin=8pt,
+  xrightmargin=8pt,
+  aboveskip=6pt,
+  belowskip=6pt,
+}
+\lstset{style=bashstyle}
+
+% ─── Caixas de destaque ───────────────────────────────────────────────────────
+\newmdenv[
+  backgroundcolor=lightgray,
+  linecolor=primaryblue,
+  linewidth=2pt,
+  topline=false, rightline=false, bottomline=false,
+  leftmargin=0pt, rightmargin=0pt,
+  innerleftmargin=10pt, innerrightmargin=10pt,
+  innertopmargin=6pt, innerbottommargin=6pt,
+]{infobox}
+
+% ─── Cabeçalho ────────────────────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textcolor{gray}{PAW --- Grupo 13}}
+\lhead{\textcolor{gray}{Marketplace de Supermercados}}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ─── Secções coloridas ────────────────────────────────────────────────────────
+\titleformat{\section}{\Large\bfseries\color{primaryblue}}{}{0em}{\thesection\quad}[\titlerule]
+\titleformat{\subsection}{\large\bfseries}{}{0em}{\thesubsection\quad}
+\titleformat{\subsubsection}{\normalsize\bfseries}{}{0em}{\thesubsubsection\quad}
+
+% ─── Título ───────────────────────────────────────────────────────────────────
+\title{
+  \vspace{-1cm}
+  \Large \textbf{Programação Avançada para a Web}\\[0.4cm]
+  \large Trabalho Prático --- Grupo 13 \quad|\quad ESTG --- P.Porto\\[0.2cm]
+  \rule{\linewidth}{1pt}\\[0.4cm]
+  \LARGE \textbf{Marketplace de Supermercados Locais}\\[0.3cm]
+  \large Relatório de Progresso --- Milestone 1\\[0.2cm]
+  \rule{\linewidth}{1pt}
+}
+\author{Grupo 13}
+\date{Abril 2026}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+\newpage
+
+\tableofcontents
+\newpage
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Introdução}
+
+O presente relatório descreve o trabalho desenvolvido pelo Grupo 13 no âmbito da unidade curricular de \textbf{Programação Avançada para a Web (PAW)}. O projeto consiste no desenvolvimento de uma plataforma \textit{marketplace} para supermercados locais, que centraliza a gestão de lojas, produtos, encomendas, estafetas e clientes através de uma aplicação web completa.
+
+\subsection{Objetivos da Plataforma}
+
+A plataforma oferece um conjunto alargado de funcionalidades, organizadas por perfil de utilizador:
+
+\begin{itemize}[leftmargin=*, label=\textcolor{primaryblue}{\textbullet}]
+  \item Registo e aprovação de supermercados com notificação por email;
+  \item Gestão de produtos por categoria, com suporte a imagens e controlo de stock;
+  \item Registo de vendas presenciais com carrinho, cupões de desconto e método de entrega;
+  \item Fluxo completo de encomendas com estados e notificações automáticas por email;
+  \item Rede de estafetas para aceitação e conclusão de entregas ao domicílio;
+  \item Sistema de cupões de desconto por percentagem, com validade e limite de usos;
+  \item Mapa interativo com geolocalização automática dos supermercados;
+  \item API REST completamente documentada com Swagger/OpenAPI 3.0.
+\end{itemize}
+
+\subsection{Perfis de Utilizador}
+
+A plataforma define quatro perfis com permissões diferenciadas e portais independentes:
+
+\begin{center}
+\begin{tabular}{>{\ttfamily}lp{9cm}}
+\toprule
+\textbf{Perfil} & \textbf{Responsabilidades} \\
+\midrule
+admin       & Gestão global: aprovação de lojas, gestão de utilizadores, categorias, produtos, encomendas, cupões e mapa \\
+supermarket & Gestão da sua loja: produtos, vendas presenciais, encomendas recebidas, cupões e definições \\
+courier     & Aceitação de entregas disponíveis e marcação como entregue \\
+customer    & Cliente final — registo e histórico de encomendas (M2) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Arquitetura e Tecnologias}
+
+\subsection{Stack Tecnológica}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Componente}      & \textbf{Tecnologia / Versão} \\
+\midrule
+Runtime                  & Node.js $\geq$ 18 \\
+Framework web            & Express 4 \\
+Base de dados            & MongoDB + Mongoose 9 \\
+Motor de templates       & EJS \\
+Autenticação             & JWT em cookie \texttt{HttpOnly} (jsonwebtoken 9) \\
+Upload de ficheiros      & Multer 2 \\
+Email                    & Nodemailer 8 (Gmail SMTP) \\
+Segurança                & express-mongo-sanitize \\
+Geocodificação           & Nominatim (OpenStreetMap API) \\
+Mapa interativo          & Leaflet.js + OpenStreetMap \\
+Documentação API         & Swagger UI + swagger-jsdoc (OpenAPI 3.0) \\
+UI / CSS                 & Bootstrap 5.3 + Bootstrap Icons 1.11 \\
+Alertas frontend         & SweetAlert2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Arquitetura MVC}
+
+O projeto segue uma arquitetura \textbf{MVC (Model-View-Controller)} com separação clara de responsabilidades:
+
+\begin{itemize}[leftmargin=*, label=\textcolor{primaryblue}{\textbullet}]
+  \item \textbf{Models} (\texttt{/models}): esquemas Mongoose para \texttt{User}, \texttt{Supermarket}, \texttt{Product}, \texttt{Category}, \texttt{Order} e \texttt{Coupon};
+  \item \textbf{Views} (\texttt{/views}): templates EJS organizados por perfil (\texttt{admin/}, \texttt{supermarket/}, \texttt{courier/}, \texttt{auth/});
+  \item \textbf{Controllers} (\texttt{/controllers}): lógica de negócio separada em controllers de API e controllers de vistas;
+  \item \textbf{Routes} (\texttt{/routes}): mapeamento de rotas por domínio --- \texttt{api.js}, \texttt{admin.js}, \texttt{supermarket.js}, \texttt{courier.js};
+  \item \textbf{Middlewares} (\texttt{/middlewares}): \texttt{verifyToken} (validação JWT), \texttt{verifyRole} (controlo de acesso por perfil) e \texttt{verifySupermarketStatus} (bloqueia supermercados não aprovados);
+  \item \textbf{Utils} (\texttt{/utils}): serviços reutilizáveis para email, geocodificação, Swagger e acesso à base de dados.
+\end{itemize}
+
+\subsection{Segurança}
+
+\begin{itemize}[leftmargin=*, label=\textcolor{primaryblue}{\textbullet}]
+  \item Tokens JWT armazenados em cookies \texttt{HttpOnly} — inacessíveis via JavaScript no browser;
+  \item Passwords com hash \texttt{bcrypt} (salt rounds: 10);
+  \item \texttt{express-mongo-sanitize} para prevenção de injeção NoSQL;
+  \item Controlo de acesso por role em todas as rotas protegidas;
+  \item Validação de propriedade em operações sensíveis (ex: cancelamento de encomenda);
+  \item \textbf{Conta superadmin} protegida: criada automaticamente na primeira inicialização via \texttt{utils/seed.js}, com flag \texttt{isSuperAdmin} na base de dados — invisível na tabela de admins, imune a edição e eliminação por qualquer utilizador.
+\end{itemize}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Funcionalidades Implementadas}
+
+\subsection{Rotas de Interface (EJS)}
+
+\subsubsection{Autenticação --- \texttt{/auth}}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Método} & \textbf{Rota} & \textbf{Descrição} \\
+\midrule
+GET  & \texttt{/auth/login}    & Página de login \\
+POST & \texttt{/auth/login}    & Submissão de credenciais \\
+GET  & \texttt{/auth/logout}   & Logout (elimina cookie JWT) \\
+GET  & \texttt{/auth/register} & Página de registo de supermercado \\
+POST & \texttt{/auth/register} & Submissão de registo \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Painel de Administração --- \texttt{/admin}}
+
+Todas as rotas requerem perfil \texttt{admin}.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Rota} & \textbf{Descrição} \\
+\midrule
+\texttt{/admin/dashboard}           & Dashboard com estatísticas globais (lojas, utilizadores, encomendas) \\
+\texttt{/admin/approvals}           & Aprovação e rejeição de supermercados pendentes \\
+\texttt{/admin/users}               & Gestão de todos os utilizadores (tabs por perfil) \\
+\texttt{/admin/categories}          & Criação e gestão de categorias de produtos \\
+\texttt{/admin/products}            & Visão global de todos os produtos \\
+\texttt{/admin/product/:id}         & Detalhe e edição de produto \\
+\texttt{/admin/orders}              & Listagem de todas as encomendas \\
+\texttt{/admin/order/:id}           & Detalhe de encomenda com histórico \\
+\texttt{/admin/supermarket/:id}     & Detalhe de supermercado com estatísticas \\
+\texttt{/admin/user/:id}            & Detalhe de utilizador \\
+\texttt{/admin/map}                 & Mapa interativo com supermercados georreferenciados \\
+\texttt{/admin/coupons}             & Listagem de todos os cupões da plataforma \\
+\texttt{/admin/coupon/:id}          & Detalhe e edição de cupão \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Portal do Supermercado --- \texttt{/supermarket}}
+
+Todas as rotas requerem perfil \texttt{supermarket} e estado \texttt{approved}.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Rota} & \textbf{Descrição} \\
+\midrule
+\texttt{/supermarket/dashboard}     & Dashboard com métricas e encomendas recentes \\
+\texttt{/supermarket/settings}      & Definições da loja (nome, morada, horário, entregas) e conta \\
+\texttt{/supermarket/products}      & Gestão de produtos (criar, editar, ativar/desativar) \\
+\texttt{/supermarket/product/:id}   & Detalhe e edição de produto \\
+\texttt{/supermarket/orders}        & Listagem e gestão de encomendas recebidas \\
+\texttt{/supermarket/order/:id}     & Detalhe de encomenda e progressão de estado \\
+\texttt{/supermarket/newsale}       & Registar nova venda presencial com carrinho \\
+\texttt{/supermarket/coupons}       & Criação e gestão de cupões da loja \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Portal do Estafeta --- \texttt{/courier}}
+
+Todas as rotas requerem perfil \texttt{courier}.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Rota} & \textbf{Descrição} \\
+\midrule
+\texttt{/courier/dashboard}   & Dashboard com entrega ativa (se existir) \\
+\texttt{/courier/deliveries}  & Lista de entregas disponíveis para aceitar \\
+\texttt{/courier/history}     & Histórico de entregas concluídas \\
+\texttt{/courier/order/:id}   & Detalhe da entrega e ação de conclusão \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{API REST --- \texttt{/api}}
+
+A API devolve sempre JSON. A autenticação é feita via cookie \texttt{token} (JWT HttpOnly). A documentação interativa completa está disponível em \texttt{/api-docs} (Swagger UI).
+
+\subsubsection{Utilizadores}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{M} & \textbf{Rota} & \textbf{Acesso} & \textbf{Descrição} \\
+\midrule
+POST   & \texttt{/api/users/createAdmin}       & admin & Criar admin \\
+GET    & \texttt{/api/users/listAdmins}        & admin & Listar admins \\
+GET    & \texttt{/api/users/admin/:id}         & admin & Detalhe de admin \\
+PUT    & \texttt{/api/users/updateAdmin/:id}   & admin & Editar admin \\
+DELETE & \texttt{/api/users/deleteAdmin/:id}   & admin & Eliminar admin \\
+\midrule
+POST   & \texttt{/api/users/createCourier}     & admin & Criar estafeta \\
+GET    & \texttt{/api/users/listCouriers}      & admin & Listar estafetas \\
+GET    & \texttt{/api/users/courier/:id}       & admin & Detalhe de estafeta \\
+PUT    & \texttt{/api/users/updateCourier/:id} & admin & Editar estafeta \\
+DELETE & \texttt{/api/users/deleteCourier/:id} & admin & Eliminar estafeta \\
+\midrule
+POST   & \texttt{/api/customers/create}        & admin, supermarket & Criar cliente \\
+GET    & \texttt{/api/customers/list}          & admin & Listar clientes \\
+GET    & \texttt{/api/customers/:id}           & admin & Detalhe de cliente \\
+GET    & \texttt{/api/customers/email/:email}  & admin, supermarket & Cliente por email \\
+PUT    & \texttt{/api/customers/update/:id}    & admin & Editar cliente \\
+DELETE & \texttt{/api/customers/delete/:id}    & admin & Eliminar cliente \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Supermercados}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{M} & \textbf{Rota} & \textbf{Acesso} & \textbf{Descrição} \\
+\midrule
+POST   & \texttt{/api/supermarkets/create}         & admin & Criar supermercado \\
+GET    & \texttt{/api/supermarkets/list}           & admin & Listar todos \\
+GET    & \texttt{/api/supermarkets/listPending}    & admin & Listar pendentes \\
+GET    & \texttt{/api/supermarkets/map}            & público & Dados para o mapa \\
+GET    & \texttt{/api/supermarkets/:id}            & admin & Detalhe \\
+PUT    & \texttt{/api/supermarkets/approve/:id}    & admin & Aprovar \\
+PUT    & \texttt{/api/supermarkets/reject/:id}     & admin & Rejeitar \\
+PUT    & \texttt{/api/supermarkets/update/:id}     & admin & Editar (admin) \\
+PUT    & \texttt{/api/supermarkets/me}             & supermarket & Editar a própria loja \\
+DELETE & \texttt{/api/supermarkets/delete/:id}     & admin & Eliminar \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Categorias e Produtos}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{M} & \textbf{Rota} & \textbf{Acesso} & \textbf{Descrição} \\
+\midrule
+POST   & \texttt{/api/categories/create}       & admin & Criar categoria \\
+GET    & \texttt{/api/categories/list}         & admin, supermarket & Listar \\
+GET    & \texttt{/api/categories/:id}          & admin & Detalhe \\
+PUT    & \texttt{/api/categories/update/:id}   & admin & Editar \\
+DELETE & \texttt{/api/categories/delete/:id}   & admin & Eliminar \\
+\midrule
+POST   & \texttt{/api/product/create}          & admin, supermarket & Criar produto \\
+GET    & \texttt{/api/product/list/me}         & supermarket & Produtos da minha loja \\
+GET    & \texttt{/api/product/list/:id}        & admin, supermarket & Produtos por loja \\
+GET    & \texttt{/api/product/:id}             & admin, supermarket & Detalhe \\
+PUT    & \texttt{/api/product/update/:id}      & admin, supermarket & Editar \\
+PUT    & \texttt{/api/product/toggle/:id}      & admin, supermarket & Ativar/desativar \\
+DELETE & \texttt{/api/product/delete/:id}      & admin, supermarket & Eliminar \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Encomendas}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{M} & \textbf{Rota} & \textbf{Acesso} & \textbf{Descrição} \\
+\midrule
+POST   & \texttt{/api/orders/sale}                  & supermarket & Venda presencial \\
+GET    & \texttt{/api/orders/list}                  & admin & Todas as encomendas \\
+GET    & \texttt{/api/orders/supermarket/:id}       & admin, supermarket & Por supermercado \\
+GET    & \texttt{/api/orders/customer/:id}          & admin, supermarket & Por cliente \\
+GET    & \texttt{/api/orders/:id}                   & admin, supermarket & Detalhe \\
+PUT    & \texttt{/api/orders/status/:id}            & admin, supermarket & Atualizar estado \\
+PUT    & \texttt{/api/orders/cancel/:id}            & admin, supermarket & Cancelar \\
+PUT    & \texttt{/api/orders/courier/accept/:id}    & courier & Aceitar entrega \\
+PUT    & \texttt{/api/orders/courier/complete/:id}  & courier & Concluir entrega \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Cupões}
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{M} & \textbf{Rota} & \textbf{Acesso} & \textbf{Descrição} \\
+\midrule
+POST   & \texttt{/api/coupons/create}          & supermarket & Criar cupão \\
+GET    & \texttt{/api/coupons/list}            & admin, supermarket & Listar \\
+GET    & \texttt{/api/coupons/:id}             & admin, supermarket & Detalhe \\
+GET    & \texttt{/api/coupons/validate}        & supermarket & Validar cupão \\
+PUT    & \texttt{/api/coupons/update/:id}      & admin, supermarket & Editar \\
+PUT    & \texttt{/api/coupons/toggle/:id}      & admin, supermarket & Ativar/desativar \\
+DELETE & \texttt{/api/coupons/delete/:id}      & admin, supermarket & Eliminar \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Fluxo de Estados de Encomenda}
+
+O ciclo de vida de uma encomenda passa pelos seguintes estados:
+
+\vspace{0.5cm}
+\begin{center}
+\begin{tikzpicture}[
+  node distance=1.2cm and 2cm,
+  every node/.style={font=\small},
+  state/.style={rounded rectangle, draw=primaryblue, fill=lightgray, minimum width=2.8cm, minimum height=0.7cm, align=center},
+  arr/.style={-{Stealth}, thick, color=primaryblue},
+  cancel/.style={-{Stealth}, thick, color=dangerred, dashed},
+]
+  \node[state] (pending)   {\texttt{pending}};
+  \node[state, right=of pending] (confirmed) {\texttt{confirmed}};
+  \node[state, right=of confirmed] (preparing) {\texttt{preparing}};
+  \node[state, below right=0.8cm and 0.4cm of preparing] (awc) {\texttt{awaiting\_courier}};
+  \node[state, right=1.2cm of awc] (delivering2) {\texttt{delivering}};
+  \node[state, above right=0.8cm and 0.4cm of preparing] (delivering1) {\texttt{delivering}};
+  \node[state, right=1.2cm of delivering1] (delivered1) {\texttt{delivered}};
+  \node[state, right=1.2cm of delivering2] (delivered2) {\texttt{delivered}};
+
+  \draw[arr] (pending) -- (confirmed);
+  \draw[arr] (confirmed) -- (preparing);
+  \draw[arr] (preparing) -- node[above, sloped, font=\tiny]{estafeta} (awc);
+  \draw[arr] (preparing) -- node[above, sloped, font=\tiny]{levantamento} (delivering1);
+  \draw[arr] (awc) -- (delivering2);
+  \draw[arr] (delivering1) -- (delivered1);
+  \draw[arr] (delivering2) -- (delivered2);
+
+  \node[state, fill=dangerred!15, draw=dangerred, below=1.5cm of confirmed] (cancelled) {\texttt{cancelled}};
+  \draw[cancel] (pending.south) .. controls +(0,-0.7) and +(0,0.3) .. (cancelled.west);
+  \draw[cancel] (confirmed.south) -- node[right, font=\tiny, color=dangerred]{5 min} (cancelled.north);
+\end{tikzpicture}
+\end{center}
+\vspace{0.3cm}
+
+O cancelamento repõe automaticamente o \textbf{stock} de todos os produtos. Para encomendas no estado \texttt{confirmed}, o cancelamento só é permitido nos primeiros \textbf{5 minutos}.
+
+\subsection{Notificações por Email}
+
+São enviadas notificações automáticas via Nodemailer (Gmail SMTP) nos seguintes eventos:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Evento} & \textbf{Destinatário} & \textbf{Trigger} \\
+\midrule
+Mudança de estado de encomenda & Cliente & Qualquer transição de estado \\
+Aprovação / rejeição de registo & Supermercado & Ação do admin \\
+Nova entrega disponível & Todos os estafetas livres & Estado \texttt{awaiting\_courier} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Funcionalidades Extra (Bonificação)}
+
+\begin{infobox}
+As funcionalidades abaixo constituem extras implementados para além do enunciado base, elegíveis para bonificação.
+\end{infobox}
+
+\vspace{0.3cm}
+\textbf{Mapa Interativo}
+
+A página \texttt{/admin/map} apresenta todos os supermercados aprovados georreferenciados, utilizando \textbf{Leaflet.js} com tiles OpenStreetMap. As coordenadas são obtidas automaticamente via \textbf{Nominatim} (geocodificação reversa) no momento do registo ou edição da morada, sem intervenção manual.
+
+\vspace{0.3cm}
+\textbf{Cupões de Desconto}
+
+Sistema completo de cupões com as seguintes características:
+\begin{itemize}[leftmargin=*, label=\textcolor{primaryblue}{\textbullet}]
+  \item Criados pelo \textbf{supermercado} e válidos apenas na sua loja;
+  \item Apenas desconto por percentagem (1\%--100\%);
+  \item Controlo de data de expiração e número máximo de usos;
+  \item Ativação/desativação pelo supermercado e pelo admin;
+  \item O admin pode visualizar e editar todos os cupões da plataforma, com informação do supermercado criador;
+  \item Aplicados em vendas presenciais (\texttt{/supermarket/newsale}) com desconto calculado em tempo real.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Notificações por Email}
+
+Descrito na secção anterior --- envio automático em todos os eventos relevantes do ciclo de vida de encomendas e supermercados.
+
+\vspace{0.3cm}
+\textbf{API Documentada com Swagger}
+
+Documentação interativa completa em \texttt{/api-docs} com OpenAPI 3.0: todos os endpoints com esquemas de request/response, exemplos e autenticação via cookie JWT.
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Como Colocar a Solução a Executar}
+
+\subsection{Pré-requisitos}
+
+\begin{itemize}[leftmargin=*, label=\textcolor{primaryblue}{\textbullet}]
+  \item Node.js $\geq$ 18;
+  \item MongoDB local ou MongoDB Atlas;
+  \item Conta Gmail com \textit{App Password} para envio de emails (opcional).
+\end{itemize}
+
+\subsection{Instalação e Execução}
+
+\begin{enumerate}
+  \item Clonar o repositório:
+\begin{lstlisting}
+git clone <url-do-repositorio>
+cd paw-group-13
+\end{lstlisting}
+
+  \item Instalar as dependências:
+\begin{lstlisting}
+npm install
+\end{lstlisting}
+
+  \item Criar o ficheiro \texttt{.env} na raiz do projeto:
+\begin{lstlisting}
+MONGO_URI=mongodb+srv://<user>:<pass>@<cluster>.mongodb.net/<db>
+secret=<chave-secreta-jwt>
+EMAIL_USER=<email@gmail.com>
+EMAIL_PASS=<app-password-gmail>
+\end{lstlisting}
+
+  \item Iniciar o servidor em modo de desenvolvimento:
+\begin{lstlisting}
+npm start
+\end{lstlisting}
+
+  \item Aceder à aplicação em \url{http://localhost:3000}. A documentação Swagger está em \url{http://localhost:3000/api-docs}.
+\end{enumerate}
+
+\subsection{Dependências Principais}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Pacote} & \textbf{Versão} & \textbf{Utilização} \\
+\midrule
+express               & \textasciitilde4.16 & Framework web \\
+mongoose              & \textasciicircum9.3 & ODM MongoDB \\
+jsonwebtoken          & \textasciicircum9.0 & Autenticação JWT \\
+bcrypt                & \textasciicircum6.0 & Hash de passwords \\
+ejs                   & \textasciitilde2.6  & Motor de templates \\
+multer                & \textasciicircum2.1 & Upload de imagens \\
+nodemailer            & \textasciicircum8.0 & Envio de emails \\
+express-mongo-sanitize & \textasciicircum2.2 & Segurança NoSQL \\
+swagger-ui-express    & \textasciicircum5.0 & Documentação API \\
+swagger-jsdoc         & \textasciicircum6.2 & Geração OpenAPI \\
+dotenv                & \textasciicircum17  & Variáveis de ambiente \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Logins de Teste}
+
+Os seguintes utilizadores estão disponíveis na base de dados de teste:
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+\textbf{Perfil} & \textbf{Email} & \textbf{Password} & \textbf{Notas} \\
+\midrule
+Superadmin   & \texttt{superadmin@gmail.com}      & \texttt{estg2026}   & Criado automaticamente; não editável nem eliminável \\
+Admin        & \texttt{admin@marketplace.pt}      & \texttt{admin123}   & Acesso total \\
+Supermercado & \texttt{mercado@marketplace.pt}    & \texttt{super123}   & Estado: aprovado \\
+Estafeta     & \texttt{estafeta@marketplace.pt}   & \texttt{courier123} & Disponível \\
+Cliente      & \texttt{cliente@marketplace.pt}    & \texttt{cliente123} & Conta ativa \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{infobox}
+\textbf{Nota:} A conta \texttt{superadmin@gmail.com} é criada automaticamente na primeira inicialização do servidor — não é necessário inserção manual. As restantes credenciais devem ser substituídas pelas contas reais presentes na base de dados de teste antes da entrega.
+\end{infobox}
+
+\subsection{Percursos de Teste Recomendados}
+
+\subsubsection{Admin}
+\begin{enumerate}[leftmargin=*, label=\arabic*.]
+  \item Login em \texttt{/auth/login} com conta admin;
+  \item Verificar o dashboard (\texttt{/admin/dashboard}) com contagens globais;
+  \item Aprovar um supermercado pendente em \texttt{/admin/approvals} --- verificar email de aprovação;
+  \item Criar um estafeta e um cliente em \texttt{/admin/users};
+  \item Criar uma categoria de produto em \texttt{/admin/categories};
+  \item Consultar os cupões da plataforma em \texttt{/admin/coupons} e ver o detalhe de um;
+  \item Visualizar o mapa de supermercados em \texttt{/admin/map};
+  \item Testar a API em \texttt{/api-docs} (fazer login primeiro para o cookie estar ativo).
+\end{enumerate}
+
+\subsubsection{Supermercado}
+\begin{enumerate}[leftmargin=*, label=\arabic*.]
+  \item Login com conta de supermercado aprovado;
+  \item Configurar a loja em \texttt{/supermarket/settings} (morada, horário, métodos de entrega);
+  \item Adicionar um produto em \texttt{/supermarket/products} com imagem e categoria;
+  \item Registar uma venda presencial em \texttt{/supermarket/newsale}: pesquisar cliente por email, adicionar produtos, aplicar cupão (opcional), finalizar;
+  \item Gerir o estado da encomenda criada em \texttt{/supermarket/orders};
+  \item Criar um cupão da loja em \texttt{/supermarket/coupons}.
+\end{enumerate}
+
+\subsubsection{Estafeta}
+\begin{enumerate}[leftmargin=*, label=\arabic*.]
+  \item Login com conta de estafeta;
+  \item Verificar entregas disponíveis em \texttt{/courier/deliveries} (requer encomenda no estado \texttt{awaiting\_courier});
+  \item Aceitar a entrega e confirmá-la em \texttt{/courier/order/:id};
+  \item Consultar o histórico de entregas em \texttt{/courier/history}.
+\end{enumerate}
+
+% ══════════════════════════════════════════════════════════════════════════════
+\section{Considerações Finais}
+
+Na Milestone 1 foram implementadas as funcionalidades base da plataforma, com foco no \textbf{backoffice}: gestão interna pelos perfis \textit{admin}, \textit{supermarket} e \textit{courier}. A API REST está completa e documentada com Swagger, o sistema de autenticação com JWT em cookie garante separação de acessos entre perfis, e os extras de bonificação (mapa georreferenciado, cupões de desconto e notificações por email) estão totalmente implementados.
+
+Para a \textbf{Milestone 2} está previsto o desenvolvimento do frontoffice para o cliente final: navegação no catálogo de supermercados, encomenda online com carrinho e cupões, e histórico de encomendas com cancelamento.
+
+\end{document}

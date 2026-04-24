@@ -13,7 +13,7 @@ const renderRegisterPage = (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email: email.toLowerCase() }); // Procura o utilizador pelo email no mongo
+    const user = await User.findOne({ email: email.toLowerCase() }); 
     const secretKey = process.env.secret;
     const rememberMe = req.body.remember === "on";
 
@@ -47,22 +47,16 @@ const login = async (req, res) => {
           erro: "Conta de supermercado inválida. Contacte o suporte.",
         });
       }
-      token = jwt.sign(
-        {
-          id: user._id,
-          supermarket_id: supermarket._id,
-          role: user.role,
-          name: user.name,
-        },
-        secretKey,
-        { expiresIn: jwtExpiration },
-      );
+      const payload = {
+        id: user._id,
+        supermarket_id: supermarket._id,
+        role: user.role,
+        name: user.name,
+      };
+      token = jwt.sign(payload, secretKey, { expiresIn: jwtExpiration });
     } else {
-      token = jwt.sign(
-        { id: user._id, role: user.role, name: user.name },
-        secretKey,
-        { expiresIn: jwtExpiration },
-      );
+      const payload = { id: user._id, role: user.role, name: user.name };
+      token = jwt.sign(payload, secretKey, { expiresIn: jwtExpiration });
     }
 
     res.cookie("token", token, cookieOptions);
@@ -78,8 +72,7 @@ const login = async (req, res) => {
 
 const logout = (req, res) => {
   res.clearCookie("token");
-  console.log("Logout successful, token cookie cleared.");
-  return res.redirect("/auth/login"); // ou res.json
+  return res.redirect("/auth/login"); 
 };
 
 module.exports = {

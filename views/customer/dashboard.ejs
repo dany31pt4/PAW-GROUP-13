@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lojas — Marketplace</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/style/admin.css">
+</head>
+<body>
+    <%- include('../partials/sidebar-customer', { activePage: 'dashboard' }) %>
+    <main class="main-wrapper">
+        <div class="mb-4">
+            <h4 class="fw-bold">Lojas Disponíveis</h4>
+            <p class="text-muted">Escolhe uma loja para começar a comprar.</p>
+        </div>
+
+        <% if (supermarkets.length === 0) { %>
+            <p class="text-muted">Nenhuma loja disponível de momento.</p>
+        <% } else { %>
+        <div class="row g-4">
+            <% supermarkets.forEach(function(s) { %>
+            <div class="col-md-4">
+                <div class="table-card mt-0 h-100 d-flex flex-column">
+                    <h5 class="fw-bold mb-1"><i class="bi bi-shop me-2 text-primary"></i><%= s.name %></h5>
+                    <p class="text-muted small mb-2"><i class="bi bi-geo-alt me-1"></i><%= s.location ? s.location.address : '—' %></p>
+                    <% if (s.description) { %>
+                        <p class="small mb-2"><%= s.description %></p>
+                    <% } %>
+                    <% if (s.schedule) { %>
+                        <p class="small text-muted mb-2"><i class="bi bi-clock me-1"></i><%= s.schedule %></p>
+                    <% } %>
+                    <div class="d-flex gap-2 mb-3 flex-wrap">
+                        <% if (s.deliveryMethods && s.deliveryMethods.includes('pickup')) { %>
+                            <span class="badge bg-light text-dark border"><i class="bi bi-shop me-1"></i>Levantamento</span>
+                        <% } %>
+                        <% if (s.deliveryMethods && s.deliveryMethods.includes('courier')) { %>
+                            <span class="badge bg-light text-dark border"><i class="bi bi-bicycle me-1"></i>Entrega (<%= (s.deliveryCost || 0).toFixed(2) %>€)</span>
+                        <% } %>
+                    </div>
+                    <a href="/customer/shop/<%= s._id %>" class="btn btn-primary mt-auto">
+                        <i class="bi bi-cart me-1"></i> Entrar na Loja
+                    </a>
+                </div>
+            </div>
+            <% }); %>
+        </div>
+        <% } %>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

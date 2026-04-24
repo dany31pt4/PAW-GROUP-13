@@ -12,6 +12,7 @@ router.get("/settings", supermarketViewController.getSettings);
 router.get("/products",verifySupermarketStatus, supermarketViewController.getProducts);
 router.get("/orders",verifySupermarketStatus, supermarketViewController.getOrders);
 router.get("/newsale",verifySupermarketStatus, supermarketViewController.getNewSale);
+router.get("/coupons", verifySupermarketStatus, supermarketViewController.getCoupons);
 router.get("/product/:productId", verifySupermarketStatus, supermarketViewController.getProductDetail);
 router.get("/order/:orderId", verifySupermarketStatus, supermarketViewController.getOrderDetail);
 

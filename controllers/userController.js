@@ -1,5 +1,4 @@
 const userService = require("../utils/userService");
-const User = require("../models/user");
 
 /*
 =======================================================
@@ -38,7 +37,12 @@ const deleteAdmin = async (req, res) => {
       });
     }
 
-    const deletedAdmin = await User.findByIdAndDelete(adminId);
+    const target = await userService.getUserById(adminId);
+    if (target && target.isSuperAdmin) {
+      return res.status(403).json({ success: false, message: "Esta conta não pode ser eliminada." });
+    }
+
+    const deletedAdmin = await userService.deleteUser(adminId);
 
     if (!deletedAdmin) {
       return res.status(404).json({
@@ -91,6 +95,11 @@ const getAdminById = async (req, res) => {
 
 const updateAdmin = async (req, res) => {
   try {
+    const target = await userService.getUserById(req.params.id);
+    if (target && target.isSuperAdmin) {
+      return res.status(403).json({ success: false, message: "Esta conta não pode ser editada." });
+    }
+
     const updated = await userService.updateUser(req.params.id, req.body);
     if (!updated) {
       return res
@@ -231,7 +240,7 @@ const listCustomers = async (req, res) => {
 
 const getCustomerByEmail = async (req, res) => {
   try {
-    const customer = await User.findOne({ email: req.params.email.toLowerCase(), role: "customer" });
+    const customer = await userService.getUserByEmail(req.params.email, "customer");
     if (!customer) {
       return res
         .status(404)

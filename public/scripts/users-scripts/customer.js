@@ -147,6 +147,7 @@ async function loadcustomerTable() {
             }
             html += `
                 <tr>
+                    <td><strong>${c._id}</strong></td>
                     <td><strong>${c.name}</strong></td>
                     <td>${c.email}</td>
                     <td>${dataRegisto}</td>

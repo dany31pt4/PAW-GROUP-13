@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "supermarket", "courier", "customer"],
       default: "customer",
     },
+    isSuperAdmin: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= supermarket.name %> — Marketplace</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/style/admin.css">
+</head>
+<body>
+    <%- include('../partials/sidebar-customer', { activePage: 'dashboard' }) %>
+    <main class="main-wrapper"
+        data-supermarket-id="<%= supermarket._id %>"
+        data-delivery-fee="<%= supermarket.deliveryCost || 0 %>"
+        data-has-pickup="<%= supermarket.deliveryMethods && supermarket.deliveryMethods.includes('pickup') ? '1' : '0' %>"
+        data-has-courier="<%= supermarket.deliveryMethods && supermarket.deliveryMethods.includes('courier') ? '1' : '0' %>">
+
+        <div class="d-flex align-items-center mb-4 gap-3">
+            <a href="/customer/dashboard" class="btn btn-light border shadow-sm" style="border-radius:10px;">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+            <div>
+                <h4 class="fw-bold mb-0"><%= supermarket.name %></h4>
+                <p class="text-muted small mb-0"><i class="bi bi-geo-alt me-1"></i><%= supermarket.location ? supermarket.location.address : '—' %></p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Produtos -->
+            <div class="col-lg-7">
+                <div class="table-card mt-0">
+                    <div class="d-flex gap-2 mb-3">
+                        <input type="text" id="prodSearch" class="form-control form-control-sm" placeholder="Pesquisar produto..." oninput="filterProducts()">
+                        <select id="catFilter" class="form-select form-select-sm" style="max-width:160px;" onchange="filterProducts()">
+                            <option value="all">Todas</option>
+                            <% categories.forEach(function(c) { %>
+                                <option value="<%= c._id %>"><%= c.name %></option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <% if (products.length === 0) { %>
+                        <p class="text-muted text-center py-4">Esta loja ainda não tem produtos disponíveis.</p>
+                    <% } else { %>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size:13px;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Produto</th>
+                                    <th>Preço</th>
+                                    <th>Stock</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="productTableBody">
+                                <% products.forEach(function(p) { %>
+                                <tr class="product-row" data-id="<%= p._id %>" data-name="<%= p.name.toLowerCase() %>" data-cat="<%= p.category ? p.category._id : '' %>">
+                                    <td>
+                                        <strong><%= p.name %></strong>
+                                        <% if (p.description) { %><br><span class="text-muted" style="font-size:11px;"><%= p.description %></span><% } %>
+                                    </td>
+                                    <td class="fw-semibold"><%= p.price.toFixed(2) %>€</td>
+                                    <td><span class="stock-display"><%= p.stock %></span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary"
+                                            data-id="<%= p._id %>"
+                                            data-label="<%= p.name %>"
+                                            data-price="<%= p.price %>"
+                                            data-stock="<%= p.stock %>"
+                                            onclick="addToCart(this)"
+                                            <% if (p.stock <= 0) { %>disabled<% } %>>
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- Carrinho -->
+            <div class="col-lg-5">
+                <div class="table-card mt-0" style="position:sticky;top:20px;">
+                    <h6 class="fw-bold mb-3"><i class="bi bi-cart me-2 text-primary"></i>Carrinho</h6>
+                    <div id="cartItemsList">
+                        <p class="text-muted text-center small py-3">O carrinho está vazio.</p>
+                    </div>
+
+                    <hr>
+
+                    <!-- Método de entrega -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Método de Entrega</label>
+                        <select id="deliveryMethod" class="form-select form-select-sm" onchange="onDeliveryChange()">
+                            <% if (supermarket.deliveryMethods && supermarket.deliveryMethods.includes('pickup')) { %>
+                                <option value="pickup">Levantamento em Loja</option>
+                            <% } %>
+                            <% if (supermarket.deliveryMethods && supermarket.deliveryMethods.includes('courier')) { %>
+                                <option value="courier">Entrega ao Domicílio (+<%= (supermarket.deliveryCost || 0).toFixed(2) %>€)</option>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div id="addressBlock" class="mb-3 d-none">
+                        <label class="form-label fw-bold small">Morada de Entrega</label>
+                        <input type="text" id="deliveryAddress" class="form-control form-control-sm" placeholder="Rua, Cidade" value="<%= user && user.address ? user.address : '' %>" oninput="checkValidity()">
+                    </div>
+
+                    <!-- Cupão -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Cupão de Desconto</label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" id="couponCode" class="form-control text-uppercase" placeholder="Código do cupão">
+                            <button class="btn btn-outline-secondary" onclick="applyCoupon()">Aplicar</button>
+                        </div>
+                        <div id="couponResult" class="mt-1 small"></div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Totais -->
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="text-muted">Subtotal</span>
+                        <span id="subtotalDisplay">0.00€</span>
+                    </div>
+                    <div class="d-flex justify-content-between small mb-1 d-none" id="discountRow">
+                        <span class="text-success"><i class="bi bi-ticket-perforated me-1"></i>Desconto</span>
+                        <span class="text-success fw-semibold" id="discountDisplay"></span>
+                    </div>
+                    <div class="d-flex justify-content-between small mb-3" id="feeRow" style="display:none!important;">
+                        <span class="text-muted">Taxa de entrega</span>
+                        <span id="feeDisplay">0.00€</span>
+                    </div>
+                    <div class="d-flex justify-content-between fw-bold mb-3">
+                        <span>Total</span>
+                        <span id="totalDisplay">0.00€</span>
+                    </div>
+
+                    <button id="btnConfirmSale" class="btn btn-primary w-100" onclick="processOrder()" disabled>
+                        <i class="bi bi-bag-check me-1"></i> Finalizar Encomenda
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/scripts/customer-shop.js"></script>
+</body>
+</html>

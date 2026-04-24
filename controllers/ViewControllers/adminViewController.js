@@ -3,6 +3,7 @@ const Supermarket = require("../../models/supermarket");
 const Order = require("../../models/order");
 const Category = require("../../models/category");
 const Product = require("../../models/product");
+const Coupon = require("../../models/coupon");
 const supermarketService = require("../../utils/supermarketService");
 
 const getDashboard = async (req, res) => {
@@ -57,7 +58,6 @@ const getOrders = async (req, res) => {
       salesByMarket[name] = (salesByMarket[name] || 0) + 1;
     });
 
-    // Dados para gráfico: entregas por estafeta
     const deliveriesByCourier = {};
     orders.filter(o => o.courier).forEach(o => {
       const name = o.courier.name;
@@ -296,6 +296,27 @@ const getProducts = async (req, res) => {
   }
 };
 
+const getMap = (req, res) => {
+  res.render("admin/map", { activePage: "map" });
+};
+
+const getCoupons = (req, res) => {
+  res.render("admin/coupons", { activePage: "coupons" });
+};
+
+const getCouponDetail = async (req, res) => {
+  try {
+    const coupon = await Coupon.findById(req.params.couponId).populate("supermarket", "name");
+    if (!coupon) {
+      return res.status(404).render("error", { status: 404, message: "Cupão não encontrado." });
+    }
+    res.render("admin/coupon-detail", { activePage: "coupons", coupon });
+  } catch (error) {
+    console.error("Erro ao carregar cupão:", error);
+    res.status(500).render("error", { status: 500, message: "Erro ao carregar o cupão." });
+  }
+};
+
 module.exports = {
   getDashboard,
   getApprovals,
@@ -307,6 +328,8 @@ module.exports = {
   getAdminCategoryDetail,
   getAdminUserDetail,
   getAdminSupermarketDetail,
-  getProducts,
   getAdminProductDetail,
+  getMap,
+  getCoupons,
+  getCouponDetail,
 };

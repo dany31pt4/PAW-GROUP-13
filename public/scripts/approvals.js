@@ -27,7 +27,7 @@ async function openViewModal(id) {
             <p class="mb-2"><strong>Nome:</strong> ${market.name || "Não definido"}</p>
             <p class="mb-2"><strong>Email:</strong> ${market.user?.email || "Sem email"}</p>
             <p class="mb-2"><strong>Telefone:</strong> ${market.user?.phone || "Sem telefone"}</p>
-            <p class="mb-2"><strong>Localidade:</strong> ${market.location || "Não definida"}</p>
+            <p class="mb-2"><strong>Localidade:</strong> ${market.location?.address || "Não definida"}</p>
             <p class="mb-2"><strong>Estado:</strong> <span class="badge bg-warning text-dark">Pendente</span></p>
         </div>
       `,

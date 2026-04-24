@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= locals.status || 500 %> — Marketplace</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { background: #f8f9fa; }
+        .error-icon { font-size: 5rem; }
+        .error-code { font-size: 6rem; font-weight: 800; line-height: 1; color: #212529; }
+        .error-card { max-width: 520px; width: 100%; }
+    </style>
+</head>
+<body class="d-flex align-items-center justify-content-center min-vh-100">
+    <div class="error-card text-center p-5 bg-white rounded-4 shadow-sm">
+        <%
+            const status = locals.status || 500;
+            let icon, title, desc;
+
+            if (status === 404) {
+                icon = 'bi-map text-primary';
+                title = 'Página não encontrada';
+                desc = locals.message || 'A página que procura não existe ou foi movida.';
+            } else if (status === 403) {
+                icon = 'bi-lock text-warning';
+                title = 'Acesso negado';
+                desc = locals.message || 'Não tem permissão para aceder a esta página.';
+            } else if (status === 401) {
+                icon = 'bi-person-x text-secondary';
+                title = 'Não autenticado';
+                desc = locals.message || 'Precisa de fazer login para continuar.';
+            } else {
+                icon = 'bi-exclamation-triangle text-danger';
+                title = 'Erro interno';
+                desc = locals.message || 'Ocorreu um erro inesperado. Tenta novamente mais tarde.';
+            }
+        %>
+
+        <i class="bi <%= icon %> error-icon mb-3 d-block"></i>
+        <div class="error-code mb-2"><%= status %></div>
+        <h4 class="fw-bold mb-2"><%= title %></h4>
+        <p class="text-muted mb-4"><%= desc %></p>
+
+        <div class="d-flex gap-2 justify-content-center flex-wrap">
+            <button onclick="history.back()" class="btn btn-outline-secondary px-4">
+                <i class="bi bi-arrow-left me-2"></i>Voltar
+            </button>
+            <a href="/" class="btn btn-primary px-4">
+                <i class="bi bi-house me-2"></i>Início
+            </a>
+            <% if (status === 401) { %>
+            <a href="/auth/login" class="btn btn-success px-4">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Login
+            </a>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

@@ -21,6 +21,7 @@ function openAddMarketModal() {
                 
                 <label class="form-label mt-2">Localidade / Morada</label>
                 <input type="text" id="swal-address" class="form-control" placeholder="Ex: Bragança">
+                <p class="text-muted mt-1" style="font-size:12px;"><i class="bi bi-geo-alt me-1"></i>As coordenadas são obtidas automaticamente a partir da morada.</p>
             </div>
         `,
     confirmButtonText: "Registar Supermercado",
@@ -116,7 +117,7 @@ async function openViewMarketModal(marketId) {
       html: `
                 <div class="text-start border-top pt-3">
                     <p><strong>Nome:</strong> ${market.name}</p>
-                    <p><strong>Localidade:</strong> ${market.location}</p>
+                    <p><strong>Localidade:</strong> ${market.location?.address || '—'}</p>
                     <p><strong>Email:</strong> ${email}</p>
                     <p><strong>Telefone:</strong> ${phone}</p>
                     <p><strong>Estado atual:</strong> ${statusBadge}</p>
@@ -172,7 +173,7 @@ async function openEditMarketModal(marketId) {
                     <input type="text" id="edit-name" class="form-control" value="${market.name}">
                     
                     <label class="form-label mt-2">Localidade</label>
-                    <input type="text" id="edit-location" class="form-control" value="${market.location}">
+                    <input type="text" id="edit-location" class="form-control" value="${market.location?.address || ''}">
                     
                     <label class="form-label mt-2">Estado</label>
                     <select id="edit-status" class="form-select">
@@ -190,6 +191,8 @@ async function openEditMarketModal(marketId) {
                     
                     <label class="form-label mt-2">Nova Password</label>
                     <input type="password" id="edit-password" class="form-control" placeholder="Deixa vazio para manter">
+
+                    <p class="text-muted mt-2" style="font-size:12px;"><i class="bi bi-geo-alt me-1"></i>As coordenadas para o mapa são obtidas automaticamente ao guardar a morada.</p>
                 </div>
             `,
       showCancelButton: true,
@@ -297,8 +300,9 @@ async function loadMarketTable() {
 
       html += `
                 <tr>
+                    <td><strong>${m._id}</strong></td>
                     <td><strong>${m.name}</strong></td>
-                    <td>${m.location}</td>
+                    <td>${m.location?.address || '—'}</td>
                     <td>${statusBadge}</td>
                     <td class="text-end">
                         <a href="/admin/supermarket/${m._id}" class="btn btn-sm btn-light border shadow-sm me-1" title="Ver"><i class="bi bi-eye-fill text-primary"></i></a>
