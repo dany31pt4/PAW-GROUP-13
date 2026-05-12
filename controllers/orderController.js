@@ -159,8 +159,8 @@ const createOrder = async (req, res) => {
       });
       if (couponDoc) {
         const expired = couponDoc.expiresAt && couponDoc.expiresAt < new Date();
-        const exhausted = couponDoc.maxUses > 0 && couponDoc.usedCount >= couponDoc.maxUses;
-        if (!expired && !exhausted) {
+        const maxuses = couponDoc.maxUses > 0 && couponDoc.usedCount >= couponDoc.maxUses;
+        if (!expired && !maxuses) {
           discount = parseFloat((total * couponDoc.discountValue / 100).toFixed(2));
         }
       }
@@ -197,7 +197,6 @@ const createOrder = async (req, res) => {
   }
 };
 
-// Listar as minhas encomendas (cliente autenticado)
 const getMyOrders = async (req, res) => {
   try {
     const orders = await orderService.getOrdersByCustomer(req.user.id);
@@ -207,7 +206,6 @@ const getMyOrders = async (req, res) => {
   }
 };
 
-// Obter detalhes de uma encomenda pelo id
 const getOrderById = async (req, res) => {
   try {
     const order = await orderService.getOrderById(req.params.id);
@@ -219,7 +217,6 @@ const getOrderById = async (req, res) => {
   }
 };
 
-// Listar encomendas de um cliente (histórico de compras)
 const getOrdersByCustomer = async (req, res) => {
   try {
     const orders = await orderService.getOrdersByCustomer(req.params.id);
@@ -230,7 +227,6 @@ const getOrdersByCustomer = async (req, res) => {
   }
 };
 
-// Listar encomendas recebidas por um supermercado
 const getOrdersBySupermarket = async (req, res) => {
   try {
     const orders = await orderService.getOrdersBySupermarket(req.params.id);
@@ -241,7 +237,6 @@ const getOrdersBySupermarket = async (req, res) => {
   }
 };
 
-// Listar todas as encomendas (apenas admin)
 const getAllOrders = async (req, res) => {
   try {
     const orders = await orderService.getAllOrders();
@@ -252,7 +247,6 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-// Atualizar o estado de uma encomenda
 const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -281,12 +275,12 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-// Cancelar encomenda — só até 5 minutos após confirmação, repõe stock
 const cancelOrder = async (req, res) => {
   try {
     const order = await orderService.getOrderById(req.params.id);
     if (!order) return res.status(404).json({ success: false, message: "Encomenda não encontrada." });
 
+    //PARA 2º MILESTONE
     if (req.user.role === "customer" && order.customer._id.toString() !== req.user.id) {
       return res.status(403).json({ success: false, message: "Sem permissão para cancelar esta encomenda." });
     }

@@ -111,7 +111,6 @@ function openRemoveAdminModal(adminId) {
         const data = await response.json();
 
         if (response.ok && data.success) {
-          // Mostrar sucesso
           Swal.fire({
             title: "Eliminado!",
             text: "O administrador foi eliminado com sucesso.",
@@ -138,7 +137,6 @@ function openRemoveAdminModal(adminId) {
   });
 }
 
-// (Re)Loads the admin table
 async function loadAdminTable() {
   try {
     const response = await fetch("/api/users/listAdmins");
